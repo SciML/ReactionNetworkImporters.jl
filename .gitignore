@@ -1,0 +1,7 @@
+*.cdat
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+.DS_Store
