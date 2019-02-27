@@ -9,7 +9,8 @@ using ReactionNetworkImporters
 # parameters
 doplot = false
 networkname = "testbcrbng"
-tf = 4*10^4
+tf = 40000
+steps = 400
 
 # BNG simulation data
 datadir  = joinpath(@__DIR__,"../data/repressilator")
@@ -39,8 +40,5 @@ if doplot
     plot!(bsol.t, bsol[pTetRid,:], label=:DEBPTetR)
 end
 
-# test the error
-@assert all(bsol.t .== gdatdf[:time])
-#norm(gdatdf[:pTetR] - bsol[pTetRid,:], Inf)
-
-@assert maximum(abs.(gdatdf[:pTetR][2:end] - bsol[pTetRid,2:end]) ./ abs.(gdatdf[:pTetR][2:end])) < 1e-6
+@test all(bsol.t .== gdatdf[:time])
+@test all(abs.(gdatdf[:pTetR] - bsol[pTetRid,:]) .< 1e-6*abs.(gdatdf[:pTetR]))
