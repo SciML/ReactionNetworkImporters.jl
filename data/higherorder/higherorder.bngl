@@ -1,0 +1,14 @@
+begin seed species
+  A 100
+  B 100
+end seed species
+begin observables
+  Molecules A A()
+  Molecules B B()
+  Molecules C C()
+end observables
+begin reaction rules
+  A() + A() + A() + B() + B() <-> C() 0.01, 1
+end reaction rules
+
+simulate({method=>"ode",t_end=>1e-2,n_steps=>2000})

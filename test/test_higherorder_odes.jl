@@ -3,14 +3,14 @@ using ReactionNetworkImporters
 
 # parameters
 doplot = false
-networkname = "Repressilator"
-tf = 40000
-nsteps = 400
+networkname = "HigherOrder"
+tf = 1e-2
+nsteps = 2000
 
 # BNG simulation data
-datadir  = joinpath(@__DIR__,"../data/repressilator")
-fname    = joinpath(datadir, "Repressilator.net")
-gdatfile = joinpath(datadir, "Repressilator.gdat")
+datadir  = joinpath(@__DIR__,"../data/higherorder")
+fname    = joinpath(datadir, "higherorder.net")
+gdatfile = joinpath(datadir, "higherorder.gdat")
 print("getting gdat file...")
 gdatdf = DataFrame(load(File(format"CSV", gdatfile), header_exists=true, spacedelim=true))
 println("done")
@@ -22,19 +22,20 @@ addodes!(rnbng; build_jac=false, build_symfuncs=false)
 boprob = ODEProblem(rnbng, u0, (0.,tf), p)
 
 # BNG simulation data testing
-pTetRid = prnbng.groupstoids[:pTetR][1]
-bngsol = gdatdf[:pTetR]
+Aid = prnbng.groupstoids[:A][1]
+Asol = gdatdf[:A]
 
 # note solvers run _much_ faster the second time 
 bsol = solve(boprob, Tsit5(), abstol=1e-12, reltol=1e-12, saveat=tf/nsteps); 
 
 if doplot
     plotlyjs()
-    p1 = plot(gdatdf[:time], gdatdf[:pTetR], label=:BNGPTetR)    
-    plot!(p1, bsol.t, bsol[pTetRid,:], label=:DEBPTetR) 
-    display(p1)    
+    p1 = plot(gdatdf[:time], gdatdf[:A], label=:A_BNG)    
+    plot!(p1, bsol.t, bsol[Aid,:], label=:A_DE)
+    display(p1)
+    println("Err = ", norm(gdatdf[:A] - bsol[Aid,:],Inf))
 end
 
 @test all(bsol.t .== gdatdf[:time])
-@test all(abs.(gdatdf[:pTetR] - bsol[pTetRid,:]) .< 1e-6*abs.(gdatdf[:pTetR]))
+@test all(abs.(gdatdf[:A] - bsol[Aid,:]) .< 1e-6*abs.(gdatdf[:A]))
 
