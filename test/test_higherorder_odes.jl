@@ -37,5 +37,5 @@ if doplot
 end
 
 @test all(bsol.t .== gdatdf[:time])
-@test all(abs.(gdatdf[:A] - bsol[Aid,:]) .< 1e-6*abs.(gdatdf[:A]))
+@test all(abs.(gdatdf[:A] - bsol[Aid,:]) .< 1e-6 .* abs.(gdatdf[:A]))
 
