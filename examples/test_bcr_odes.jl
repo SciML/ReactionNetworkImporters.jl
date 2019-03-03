@@ -32,11 +32,11 @@ show(to)
 # BNG simulation results for Activated Syk
 asykgroups = prnbng.groupstoids[:Activated_Syk]
 asyksyms = findall(x -> x ∈ asykgroups, rnbng.syms_to_ints)
-asynbng = zeros(length(cdatdf[:time]))
-for sym in asyksyms
-    global asynbng
-    asynbng += cdatdf[sym]
-end
+# asynbng = zeros(length(gdatdf[:time]))
+# for sym in asyksyms
+#     global asynbng
+#     asynbng += gdatdf[sym]
+# end
 
 # DiffEq solver 
 reset_timer!(to); @timeit to "BNG_CVODE_BDF" begin bsol = solve(boprob, CVODE_BDF(),dense=false, saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
@@ -47,7 +47,7 @@ basyk = sum(bsol[asykgroups,:], dims=1)
 if doplot
     plotlyjs()
     plot(gdatdf[:time][2:end], gdatdf[:Activated_Syk][2:end], xscale=:log10, label=:AsykGroup)
-    plot!(cdatdf[:time][2:end], asynbng[2:end], xscale=:log10, label=:AsykSum)
+    # plot!(cdatdf[:time][2:end], asynbng[2:end], xscale=:log10, label=:AsykSum)
     plot!(bsol.t[2:end], basyk'[2:end], label=:AsykDEBio, xscale=:log10)
 end
 
