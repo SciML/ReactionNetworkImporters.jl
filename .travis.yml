@@ -17,5 +17,5 @@ branches:
     - master    
     - /release-.*/
     
-notifications:
+notifications: 
   email: false
