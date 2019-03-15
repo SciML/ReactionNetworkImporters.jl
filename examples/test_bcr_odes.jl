@@ -40,6 +40,7 @@ asyksyms = findall(x -> x ∈ asykgroups, rnbng.syms_to_ints)
 
 # DiffEq solver 
 reset_timer!(to); @timeit to "BNG_CVODE_BDF" begin bsol = solve(boprob, CVODE_BDF(),dense=false, saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
+# #reset_timer!(to); @timeit to "BNG_RODAS5_BDF" begin bsol2 = solve(boprob, rodas5(autodiff=false),dense=false, saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
 
 # Activated Syk from DiffEq
 basyk = sum(bsol[asykgroups,:], dims=1)
@@ -47,11 +48,13 @@ basyk = sum(bsol[asykgroups,:], dims=1)
 if doplot
     plotlyjs()
     plot(gdatdf[:time][2:end], gdatdf[:Activated_Syk][2:end], xscale=:log10, label=:AsykGroup)
-    # plot!(cdatdf[:time][2:end], asynbng[2:end], xscale=:log10, label=:AsykSum)
+#     # plot!(cdatdf[:time][2:end], asynbng[2:end], xscale=:log10, label=:AsykSum)
     plot!(bsol.t[2:end], basyk'[2:end], label=:AsykDEBio, xscale=:log10)
 end
 
 # test the error, note may be large in abs value though small relatively
-norm(gdatdf[:Activated_Syk] - asynbng, Inf)
+# #norm(gdatdf[:Activated_Syk] - asynbng, Inf)
+# #norm(asynbng - basyk', Inf)
 norm(gdatdf[:Activated_Syk] - basyk', Inf)
-norm(asynbng - basyk', Inf)
+
+# #@assert all(abs.(gdatdf[:Activated_Syk] - asynbng) .< 1e-6 * abs.(gdatdf[:Activated_Syk]))
