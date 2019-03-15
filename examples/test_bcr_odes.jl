@@ -47,7 +47,7 @@ basyk = sum(bsol[asykgroups,:], dims=1)
 
 if doplot
     plotlyjs()
-    plot(gdatdf[:time][2:end], gdatdf[:Activated_Syk][2:end], xscale=:log10, label=:AsykGroup)
+    plot(gdatdf[:time][2:end], gdatdf[:Activated_Syk][2:end], xscale=:log10, label=:AsykGroup, linestyle=:dot)
 #     # plot!(cdatdf[:time][2:end], asynbng[2:end], xscale=:log10, label=:AsykSum)
     plot!(bsol.t[2:end], basyk'[2:end], label=:AsykDEBio, xscale=:log10)
 end

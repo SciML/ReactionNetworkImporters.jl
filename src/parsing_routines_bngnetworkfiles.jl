@@ -104,8 +104,8 @@ function parse_reactions!(rn, ft, lines, idx, idstosyms)
         # reactants and correct for higher-order rate rescalings by BioNetGen
         empty!(cntdict)
         foreach(rid -> (rid>0) && (haskey(cntdict,rid) ? (cntdict[rid] += 1) : (cntdict[rid]=1)), reactantids)
-        scalefactor = prod(factorial, values(cntdict))
-        rateexpr = :($scalefactor * $rateexpr)
+        scalefactor = isempty(cntdict) ? 0 : prod(factorial, values(cntdict))
+        (!iszero(scalefactor)) && (rateexpr = :($scalefactor * $rateexpr))
         rstoich = Tuple(idstosyms[rid] => cnt for (rid,cnt) in cntdict)
 
         # product stoichiometry
