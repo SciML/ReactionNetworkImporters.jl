@@ -22,7 +22,9 @@ function recursive_replace!(expr::Any, replace_requests::Dict{Symbol,Symbol}=REP
     if expr isa Symbol
         haskey(replace_requests,expr) && return replace_requests[expr]
     elseif expr isa Expr
-        foreach(arg -> recursive_replace!(arg, replace_requests), expr.args)
+        for i = 1:length(expr.args)
+            expr.args[i] = recursive_replace!(expr.args[i], replace_requests)
+        end
     end
     return expr
 end
@@ -44,7 +46,7 @@ function parse_params(ft::BNGNetwork, lines, idx)
 
         # value could be an expression
         pval = Meta.parse(vals[3])
-        (typeof(pval) <: Expr) && recursive_replace!(pval)
+        (pval isa Expr) && recursive_replace!(pval)
 
         push!(pvals,pval)
         idx += 1
@@ -108,7 +110,7 @@ function parse_reactions!(rn, ft, lines, idx, idstosyms)
 
         # product stoichiometry
         empty!(cntdict)
-        foreach(pid -> (pid>0) && (haskey(cntdict,pid) ? (cntdict[pid] += 1) : (cntdict[pid]=1)), reactantids)
+        foreach(pid -> (pid>0) && (haskey(cntdict,pid) ? (cntdict[pid] += 1) : (cntdict[pid]=1)), productids)
         pstoich = Tuple(idstosyms[pid] => cnt for (pid,cnt) in cntdict)
 
         # create the reaction
@@ -159,7 +161,7 @@ end
 
 
 # for parsing a subset of the BioNetGen .net file format
-function loadrxnetwork(ft::BNGNetwork, networkname, rxfilename; kwargs...)
+function loadrxnetwork(ft::BNGNetwork, networkname::String, rxfilename; kwargs...)
 
     file  = open(rxfilename, "r");
     lines = readlines(file)
@@ -169,8 +171,8 @@ function loadrxnetwork(ft::BNGNetwork, networkname, rxfilename; kwargs...)
     ptoids,pvals,idx = parse_params(ft, lines, idx)
     println("done")
 
-    rn = @empty_reaction_network $networkname
-    
+    rn = eval(Meta.parse("@empty_reaction_network $networkname"))
+
     print("Adding parameters...")
     foreach(psym -> addparam!(rn, psym), keys(ptoids))
     println("done")
@@ -200,15 +202,8 @@ function loadrxnetwork(ft::BNGNetwork, networkname, rxfilename; kwargs...)
     close(file)
 
     # get numeric values for parameters and u₀ 
-    p,u0 = exprs_to_nums(ptoids, pvals, u0exprs)
-
-    # reorder species to reaction_network ordering
-    u₀ = similar(u0)
-    smap = speciesmap(rn)
-    for i in eachindex(u0)
-        @assert smap[idstoshortsyms[i]] == i
-        u₀[smap[idstoshortsyms[i]]] = u0[i]
-    end
+    p,u₀ = exprs_to_nums(ptoids, pvals, u0exprs)
+    @assert all( speciesmap(rn)[sym] == i for (i,sym) in enumerate(idstoshortsyms) )
 
     ParsedReactionNetwork(rn, u₀; p = p, paramexprs = pvals, symstonames = shortsymstosyms, groupstoids = groupstoids)
 end
