@@ -1,5 +1,6 @@
 # ReactionNetworkImporters.jl
 
+[![Build Status](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/isaacsas/reactionnetworkimporters-jl/branch/master)
 
 This package provides importers to load reaction networks from several file formats. Currently it supports loading networks in the following formats:
