@@ -1,0 +1,15 @@
+# Created by BioNetGen 2.3.1
+begin parameters
+    1 kp1   10  # Constant
+    2 km1   0.2  # Constant
+end parameters
+begin species
+    1 A() 0
+end species
+begin reactions
+    1 0 1 kp1 #birth
+    2 1 0 km1 #death
+end reactions
+begin groups
+    1 Atot                 1
+end groups

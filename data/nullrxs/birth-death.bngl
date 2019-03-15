@@ -1,0 +1,24 @@
+begin model
+begin parameters
+ kp1 10
+ km1 0.2
+end parameters
+
+begin species
+  A() 0
+end species
+
+begin observables
+  Molecules Atot A() 
+end observables
+
+begin reaction rules
+  birth: 0 -> A() kp1
+  death: A() -> 0 km1
+end reaction rules
+end model
+
+generate_network()
+
+saveConcentrations()
+simulate({suffix=>"ode",method=>"ode",t_end=>50,n_steps=>500})
