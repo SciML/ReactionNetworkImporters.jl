@@ -1,5 +1,7 @@
 # ReactionNetworkImporters.jl
 
+[![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/isaacsas/reactionnetworkimporters-jl/branch/master)
+
 This package provides importers to load reaction networks from several file formats. Currently it supports loading networks in the following formats:
 1. A *subset* of the BioNetGen .net file format.
 2. The basic format used by the [RSSA](https://www.cosbi.eu/research/prototypes/rssa) group at COSBI in their [model collection](https://www.cosbi.eu/prototypes/jLiexDeBIgFV4zxwnKiW97oc4BjTtIoRGajqdUz4.zip).
