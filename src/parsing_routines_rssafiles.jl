@@ -73,5 +73,5 @@ function loadrxnetwork(ft::RSSANetwork, networkname, specs_ic_file, rxs_file; kw
     rn,rnstr = build_rxnetwork(ft, networkname, rxstrs, rxrates; kwargs...)
     initialpop = get_init_condit(ft, rn, specs_ic)
 
-    ParsedReactionNetwork(rn, initialpop; rnstr=rnstr)
+    ParsedReactionNetwork(rn, initialpop)
 end
