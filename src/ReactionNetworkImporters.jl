@@ -7,6 +7,8 @@ abstract type NetworkFileFormat end
 # exported data types
 struct RSSANetwork <: NetworkFileFormat end
 struct BNGNetwork <: NetworkFileFormat end
+struct MatrixNetwork <: NetworkFileFormat end
+
 struct ParsedReactionNetwork    
     "DiffEqBiological Network"
     rn
@@ -30,11 +32,12 @@ end
 ParsedReactionNetwork(rn, u₀; p=nothing, paramexprs=nothing, symstonames=nothing, groupstoids=nothing) = 
                         ParsedReactionNetwork(rn, u₀, p, paramexprs, symstonames, groupstoids)
 
-export RSSANetwork, BNGNetwork, ParsedReactionNetwork
+export RSSANetwork, BNGNetwork, MatrixNetwork, ParsedReactionNetwork
 
 # parsers
 include("parsing_routines_rssafiles.jl")
 include("parsing_routines_bngnetworkfiles.jl")
+include("parsing_routines_matrixnetworks.jl")
 
 export loadrxnetwork
 
