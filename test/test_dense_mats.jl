@@ -10,7 +10,7 @@ rs = @reaction_network begin
 end k1 k2 k3 k4 k5
 
 # model using matrices
-params = [:k1, :k2, :k3, :k4, :k5]
+pars = [:k1, :k2, :k3, :k4, :k5]
 substoich =[2 0 0;
             0 1 0;
             1 1 0;
@@ -22,6 +22,17 @@ prodstoich = [0 1 0;
               1 1 0;
               3 0 0]'
 
-prn = loadrxnetwork(MatrixNetwork(), "testnet", params, params, substoich, prodstoich)
+prn = loadrxnetwork(MatrixNetwork(), "testnet", pars, pars, substoich, prodstoich)
+@test rs == prn.rn
 
+
+# using DiffEqBiological
+rs = @reaction_network begin
+    k1, 2A --> B
+    k2, B --> 2A
+    k3, A + B --> C
+    k4, C --> A + B
+    k5, 3C --> 3A
+end k1 k2 k3 k4 k5
+prn = loadrxnetwork(MatrixNetwork(), "testnet2", [:A,:B,:C], pars, pars, substoich, prodstoich)
 @test rs == prn.rn
