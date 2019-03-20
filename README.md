@@ -38,6 +38,71 @@ sol = solve(oprob, Tsit5(), saveat=tf/1000.)
 ```
 See the [DiffEqBiological documentation](https://github.com/JuliaDiffEq/DiffEqBiological.jl/) for how to generate ODE, SDE, jump and other types of models.
 
+### Loading a dense matrix representation
+DiffEqBiological `reaction_networks` can also be constructed from substrate and product stoichiometric matrices. For example, here we both directly build a DiffEqBiological network using the `@reaction_network` macro, and then show how to build the same network from stoichiometry matrices using `ReactionNetworkImporters`:
+```julia
+# DiffEqBiological network from the macro:
+rs = @reaction_network begin
+    k1, 2A --> B
+    k2, B --> 2A
+    k3, A + B --> C
+    k4, C --> A + B
+    k5, 3C --> 3A
+end k1 k2 k3 k4 k5
+
+# network from stoichiometry using ReactionNetworkImporters
+species = [:A,:B,:C]
+pars = [:k1, :k2, :k3, :k4, :k5]
+substoich =[2 0 0;
+            0 1 0;
+            1 1 0;
+            0 0 1;
+            0 0 3]'
+prodstoich = [0 1 0;
+              2 0 0;
+              0 0 1;
+              1 1 0;
+              3 0 0]'
+prn = loadrxnetwork(MatrixNetwork(), "testnet2", pars, substoich, prodstoich; 
+                    species=species, params=pars)
+
+# test the two networks are the same
+@assert rs == prn.rn
+```
+
+The basic usage is
+```julia
+prn = loadrxnetwork(MatrixNetwork(), "networktypename", 
+                    rateexprs::Vector{Union{Expr,Symbol,Float64,Int}}, 
+                    substoich::AbstractMatrix, 
+                    prodstoich::AbstractMatrix; 
+                    species=Symbol[], 
+                    params=Symbol[])
+```
+Here `MatrixNetwork()` is the dispatch type, which selects that we are
+constructing a matrix-based stoichiometric representation as input. The other
+parameters are:
+- `rateexprs` - Any DiffEqBiological valid expressions for the rates. This can
+  be a hardcoded rate constant like `1.0`, the symbol of a parameter like `:k`,
+  or an expression involving parameters and species like `:(k*A)`. Note, 
+  the reaction `A+B --> C` with rate `:(k*B)` would have rate law `k*A*B^2`.
+- `substoich` - A number of species by number of reactions matrix with entry
+  `(i,j)` giving the stoichiometric coefficient of species `i` as a substrate in
+  reaction `j`.
+- `prodstoich` - A number of species by number of reactions matrix with entry
+  `(i,j)` giving the stoichiometric coefficient of species `i` as a product in
+  reaction `j`.
+- `species` - Optional symbols for each species in the network.
+- `parameters` - Symbols for each parameter in the network.
+
+`prn` is again a `ParsedReactionNetwork`, with only the `reaction_network`
+field, `prn.rn`, defined.
+
+If the keyword argument `species` is not set, the resulting reaction network
+will simply name the species `S1`, `S2`,..., `SN` for a system with `N` total
+species. `params` defaults to an empty vector of `Symbol`s, so that it does not
+need to be set for systems with no parameters.
+
 ### Loading a RSSA format network file
 As the licensing is unclear we can not redistribute any example RSSA formatted networks. They can be downloaded from the model collection link listed above. Assuming you've saved both a reaction network file and corresponding initial condition file, they can be loaded as
 ```julia
