@@ -39,7 +39,7 @@ sol = solve(oprob, Tsit5(), saveat=tf/1000.)
 ```
 See the [DiffEqBiological documentation](https://github.com/JuliaDiffEq/DiffEqBiological.jl/) for how to generate ODE, SDE, jump and other types of models.
 
-### Loading a dense matrix representation
+### Loading a matrix representation
 DiffEqBiological `reaction_networks` can also be constructed from substrate and product stoichiometric matrices. For example, here we both directly build a DiffEqBiological network using the `@reaction_network` macro, and then show how to build the same network from stoichiometry matrices using `ReactionNetworkImporters`:
 ```julia
 # DiffEqBiological network from the macro:
@@ -89,7 +89,7 @@ parameters are:
   the reaction `A+B --> C` with rate `:(k*B)` would have rate law `k*A*B^2`.
 - `substoich` - A number of species by number of reactions matrix with entry
   `(i,j)` giving the stoichiometric coefficient of species `i` as a substrate in
-  reaction `j`.
+  reaction `j`. 
 - `prodstoich` - A number of species by number of reactions matrix with entry
   `(i,j)` giving the stoichiometric coefficient of species `i` as a product in
   reaction `j`.
@@ -98,6 +98,10 @@ parameters are:
 
 `prn` is again a `ParsedReactionNetwork`, with only the `reaction_network`
 field, `prn.rn`, defined.
+
+A dispatch is added if `substoich` and `prodstoich` both have the type
+`SparseMatrixCSC`, in which case they are efficiently iterated through using the
+`SparseArrays` interface.
 
 If the keyword argument `species` is not set, the resulting reaction network
 will simply name the species `S1`, `S2`,..., `SN` for a system with `N` total
