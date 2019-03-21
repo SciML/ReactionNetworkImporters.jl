@@ -1,4 +1,4 @@
-using DiffEqBiological, ReactionNetworkImporters
+using DiffEqBiological, ReactionNetworkImporters, SparseArrays
 
 # version giving parameters and rates
 rs = @reaction_network begin
@@ -23,6 +23,10 @@ prodstoich = [0 1 0;
 prn = loadrxnetwork(MatrixNetwork(), "testnet", pars, substoich, prodstoich; params=pars)
 @test rs == prn.rn
 
+# sparse version
+prn = loadrxnetwork(MatrixNetwork(), "testnet", pars, sparse(substoich), sparse(prodstoich); params=pars)
+@test rs == prn.rn
+
 # version with hard coded rates (no parameter symbols)
 rs = @reaction_network begin
     1., 2S1 --> S2
@@ -33,6 +37,11 @@ rs = @reaction_network begin
 end 
 prn = loadrxnetwork(MatrixNetwork(), "testnet", ones(Float64,5), substoich, prodstoich)
 @test rs == prn.rn
+
+# sparse version
+prn = loadrxnetwork(MatrixNetwork(), "testnet", ones(Float64,5), sparse(substoich), sparse(prodstoich))
+@test rs == prn.rn
+
 
 
 # version with species names and parameters
@@ -45,4 +54,8 @@ rs = @reaction_network begin
 end k1 k2 k3 k4 k5
 species = [:A, :B, :C]
 prn = loadrxnetwork(MatrixNetwork(), "testnet2", pars, substoich, prodstoich; species=species, params=pars)
+@test rs == prn.rn
+
+# sparse version
+prn = loadrxnetwork(MatrixNetwork(), "testnet2", pars, sparse(substoich), sparse(prodstoich); species=species, params=pars)
 @test rs == prn.rn

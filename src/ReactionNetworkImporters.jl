@@ -1,6 +1,6 @@
 module ReactionNetworkImporters
 
-using DataStructures, DiffEqBiological
+using DataStructures, DiffEqBiological, SparseArrays
 
 abstract type NetworkFileFormat end
 
