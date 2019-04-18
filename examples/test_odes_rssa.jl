@@ -19,9 +19,10 @@ reset_timer!(to)
 # get the reaction network
 @timeit to "netgen" prn = loadrxnetwork(RSSAFile(), networkname, speciesf, rxsf; printrxs = false)
 rn = prn.rn; initialpop = prn.u₀
-@timeit to "addodes" addodes!(rn; build_jac=false, build_symfuncs=false)
+@timeit to "addodes" addodes!(rn; build_jac=false, build_symfuncs=false, build_paramjac=false)
 @timeit to "ODEProb" oprob = ODEProblem(rn,convert.(Float64,initialpop),(0.,tf))
 show(to)
+println()
 
 # note solvers run faster the second time 
 
