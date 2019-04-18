@@ -26,7 +26,8 @@ reset_timer!(to)
 @timeit to "bionetgen" prnbng = loadrxnetwork(BNGNetwork(),string(networkname,"bng"), fname); 
 rnbng = prnbng.rn; u0 = prnbng.u₀; p = prnbng.p; 
 #@timeit to "baddodes" addodes!(rnbng; build_jac=false, build_symfuncs=false, build_paramjac=false)
-@timeit to "baddodes" addodes!(rnbng; sparse_jac=true, build_symfuncs=false, build_paramjac=false)
+#@timeit to "baddodes" addodes!(rnbng; sparse_jac=true, build_symfuncs=false, build_paramjac=false)
+@timeit to "baddodes" addodes!(rnbng; build_jac=true, build_symfuncs=false, build_paramjac=false)
 @timeit to "bODEProb" boprob = ODEProblem(rnbng, u0, (0.,tf), p)
 u = copy(u0);
 du = similar(u);
@@ -46,9 +47,9 @@ asyksyms = findall(x -> x ∈ asykgroups, rnbng.syms_to_ints)
 
 # DiffEq solver 
 #reset_timer!(to); 
-#@timeit to "BNG_CVODE_BDF" begin bsol = solve(boprob, CVODE_BDF(),dense=false, saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-@timeit to "BNG_CVODE_BDF" begin bsol = solve(boprob, CVODE_BDF(linear_solver=:GMRES),dense=false, saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-# #reset_timer!(to); @timeit to "BNG_RODAS5_BDF" begin bsol2 = solve(boprob, rodas5(autodiff=false),dense=false, saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
+@timeit to "BNG_CVODE_BDF-DENSE" begin bsol = solve(boprob, CVODE_BDF(), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
+#@timeit to "BNG_CVODE_BDF-GMRES" begin bsol = solve(boprob, CVODE_BDF(linear_solver=:GMRES), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
+# #reset_timer!(to); @timeit to "BNG_RODAS5_BDF" begin bsol2 = solve(boprob, rodas5(autodiff=false), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
 
 # Activated Syk from DiffEq
 basyk = sum(bsol[asykgroups,:], dims=1)
