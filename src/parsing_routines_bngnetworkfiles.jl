@@ -182,7 +182,7 @@ function loadrxnetwork(ft::BNGNetwork, networkname::String, rxfilename; kwargs..
     println("done")
 
     # map from species id to short sym
-    print("Adding species")
+    print("Adding species...")
     idstoshortsyms = Vector{Symbol}(undef,length(shortsymstoids))
     for (k,v) in shortsymstoids
         idstoshortsyms[v] = k
