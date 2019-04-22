@@ -35,8 +35,8 @@ du = similar(u);
 @timeit to "f1" rnbng.f(du,u,p,0.)
 @timeit to "f2" rnbng.f(du,u,p,0.)
 if build_jac
-    #J = zeros(length(u),length(u))
-    J = similar(rnbng.odefun.jac_prototype)
+    J = zeros(length(u),length(u))
+    #J = similar(rnbng.odefun.jac_prototype)
     @timeit to "J1" rnbng.jac(J,u,p,0.)
     @timeit to "J2" rnbng.jac(J,u,p,0.)
 end
