@@ -1,7 +1,7 @@
 name = "ReactionNetworkImporters"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 authors = ["Samuel Isaacson <isaacsas@users.noreply.github.com>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
