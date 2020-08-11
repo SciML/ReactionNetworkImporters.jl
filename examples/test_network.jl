@@ -1,5 +1,5 @@
 using ReactionNetworkImporters
-using DiffEqBase, DiffEqBiological, DiffEqJump, OrdinaryDiffEq, Plots
+using DiffEqBase, Catalyst, DiffEqJump, OrdinaryDiffEq, Plots
 
 using TimerOutputs
 

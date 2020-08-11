@@ -1,5 +1,4 @@
-# NEEDS DiffEqBiological master as of 4/20/19
-using DiffEqBase, DiffEqBiological, OrdinaryDiffEq, Sundials, LinearAlgebra, SparseArrays
+using DiffEqBase, Catalyst, OrdinaryDiffEq, Sundials, LinearAlgebra, SparseArrays
 using ReactionNetworkImporters
 using TimerOutputs
 

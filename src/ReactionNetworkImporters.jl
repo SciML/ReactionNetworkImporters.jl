@@ -1,6 +1,6 @@
 module ReactionNetworkImporters
 
-using DataStructures, DiffEqBiological, SparseArrays
+using DataStructures, Catalyst, SparseArrays
 
 abstract type NetworkFileFormat end
 
@@ -10,8 +10,8 @@ struct BNGNetwork <: NetworkFileFormat end
 struct MatrixNetwork <: NetworkFileFormat end
 
 struct ParsedReactionNetwork    
-    "DiffEqBiological Network"
-    rn
+    "Catalyst Network"
+    rn::ReactionSystem
 
     "Initial Conditions"
     u₀
@@ -19,24 +19,24 @@ struct ParsedReactionNetwork
     "Parameters"
     p
 
-    "Parameter Expressions"
+    "Parameters as ModelingToolkit Operations"
     paramexprs
 
-    "Dict from short sym in rn.syms to full sym for species name"
-    symstonames
+    "Dict from `Variable` in species(rn) to full string for species name"
+    varstonames
 
-    "Dict from lumped species name (symbol) to group of species ids"
+    "Dict from lumped species name (as string) to group of species ids"
     groupstoids
 
 end
-ParsedReactionNetwork(rn, u₀; p=nothing, paramexprs=nothing, symstonames=nothing, groupstoids=nothing) = 
-                        ParsedReactionNetwork(rn, u₀, p, paramexprs, symstonames, groupstoids)
+ParsedReactionNetwork(rn::ReactionSystem, u₀; p=nothing, paramexprs=nothing, varstonames=nothing, groupstoids=nothing) = 
+                        ParsedReactionNetwork(rn, u₀, p, paramexprs, varstonames, groupstoids)
 
 export RSSANetwork, BNGNetwork, MatrixNetwork, ParsedReactionNetwork
 
 # parsers
-include("parsing_routines_rssafiles.jl")
-include("parsing_routines_bngnetworkfiles.jl")
+#include("parsing_routines_rssafiles.jl")
+#include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
 export loadrxnetwork
