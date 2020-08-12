@@ -24,9 +24,10 @@ function loadrxnetwork(ft::MatrixNetwork, networkname::String,
 
     # create the network
     rn = make_empty_network()    
+    t  = rn.iv()
 
-    # create the species if none passed in
-    isempty(species) && (species = [Variable(Symbol("S",i))() for i=1:numspecs])
+    # create the species if none passed in    
+    isempty(species) && (species = [Variable(:S,i)(t) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
@@ -79,9 +80,10 @@ function loadrxnetwork(ft::MatrixNetwork, networkname::String,
 
     # create the network
     rn = make_empty_network()
+    t  = rn.iv()
 
     # create the species if none passed in
-    isempty(species) && (species = [Variable(Symbol("S",i))() for i=1:numspecs])
+    isempty(species) && (species = [Variable(:S,i)(t) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
