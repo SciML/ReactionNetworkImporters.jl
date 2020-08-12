@@ -25,29 +25,29 @@ prn = loadrxnetwork(MatrixNetwork(), "testnet", pars, substoich, prodstoich; par
 @test rs == prn.rn
 
 # sparse version
-# prn = loadrxnetwork(MatrixNetwork(), "testnet", pars, sparse(substoich), sparse(prodstoich); params=pars)
-# @test rs == prn.rn
+prn = loadrxnetwork(MatrixNetwork(), "testnet", pars, sparse(substoich), sparse(prodstoich); params=pars)
+@test rs == prn.rn
 
 # version with hard coded rates (no parameter symbols)
 rs = @reaction_network begin
     1., 2S1 --> S2
-    1., S2 --> 2S1
-    1., S1 + S2 --> S3
-    1., S3 --> S1 + S2
-    1., 3S3 --> 3S1
+    2., S2 --> 2S1
+    3., S1 + S2 --> S3
+    4., S3 --> S1 + S2
+    5., 3S3 --> 3S1
 end 
-prn = loadrxnetwork(MatrixNetwork(), "testnet", ones(Float64,5), substoich, prodstoich)
+prn = loadrxnetwork(MatrixNetwork(), "testnet", convert.(Float64,1:5), substoich, prodstoich)
 @test rs == prn.rn
 
 # sparse version
-# prn = loadrxnetwork(MatrixNetwork(), "testnet", ones(Float64,5), sparse(substoich), sparse(prodstoich))
-# @test rs == prn.rn
+prn = loadrxnetwork(MatrixNetwork(), "testnet", convert.(Float64,1:5), sparse(substoich), sparse(prodstoich))
+@test rs == prn.rn
 
 
 
-# version with species names and parameters
+# version with species names, rate functions and symbolic parameters
 rs = @reaction_network begin
-    k1, 2A --> B
+    k1*A, 2A --> B
     k2, B --> 2A
     k3, A + B --> C
     k4, C --> A + B
@@ -56,9 +56,10 @@ end k1 k2 k3 k4 k5
 @parameters t
 @variables A(t) B(t) C(t)
 species = [A,B,C]
-prn = loadrxnetwork(MatrixNetwork(), "testnet2", pars, substoich, prodstoich; species=species, params=pars)
+rates = [k1*A,k2,k3,k4,k5]
+prn = loadrxnetwork(MatrixNetwork(), "testnet2", rates, substoich, prodstoich; species=species, params=pars)
 @test rs == prn.rn
 
 # sparse version
-# prn = loadrxnetwork(MatrixNetwork(), "testnet2", pars, sparse(substoich), sparse(prodstoich); species=species, params=pars)
-# @test rs == prn.rn
+prn = loadrxnetwork(MatrixNetwork(), "testnet2", rates, sparse(substoich), sparse(prodstoich); species=species, params=pars)
+@test rs == prn.rn
