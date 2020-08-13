@@ -171,10 +171,11 @@ function loadrxnetwork(ft::BNGNetwork, networkname::String, rxfilename; kwargs..
     ptoids,pvals,idx = parse_params(ft, lines, idx)
     println("done")
 
-    rn = eval(Meta.parse("@empty_reaction_network $networkname"))
+    rn = make_empty_network()
+    t  = rn.iv()
 
     print("Adding parameters...")
-    foreach(psym -> addparam!(rn, psym), keys(ptoids))
+    foreach(psym -> addparam!(rn, Variable(psym)), keys(ptoids))
     println("done")
 
     print("Parsing species...")
@@ -186,9 +187,9 @@ function loadrxnetwork(ft::BNGNetwork, networkname::String, rxfilename; kwargs..
     idstoshortsyms = Vector{Symbol}(undef,length(shortsymstoids))
     for (k,v) in shortsymstoids
         idstoshortsyms[v] = k
-        addspecies!(rn, k)
+        addspecies!(rn, Variable(k)(t))
     end
-    @assert species(rn) == idstoshortsyms "species(rn) noteq to idstoshortsyms"
+    @assert all((s,id) -> s.op.name == id, zip(species(rn),idstoshortsyms)) "species(rn) noteq to idstoshortsyms"
     println("done")
 
     print("Parsing and adding reactions...")
