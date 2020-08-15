@@ -61,7 +61,7 @@ end
 
 
 # for parsing the simple format from the book by Thanh et al.
-function loadrxnetwork(ft::RSSANetwork, networkname, specs_ic_file, rxs_file; kwargs...)
+function loadrxnetwork(ft::RSSANetwork, specs_ic_file, rxs_file; kwargs...)
 
     # parse initial conditions
     specs_ic = parse_species(ft, specs_ic_file)

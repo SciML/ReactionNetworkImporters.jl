@@ -9,7 +9,7 @@
 """ 
     For dense matrices
 """
-function loadrxnetwork(ft::MatrixNetwork, networkname::String, 
+function loadrxnetwork(ft::MatrixNetwork, 
                         rateexprs::AbstractVector, 
                         substoich::AbstractMatrix, 
                         prodstoich::AbstractMatrix; 
@@ -66,7 +66,7 @@ end
 """ 
     For sparse matrices
 """
-function loadrxnetwork(ft::MatrixNetwork, networkname::String, 
+function loadrxnetwork(ft::MatrixNetwork,
                         rateexprs::AbstractVector, 
                         substoich::SparseMatrixCSC, 
                         prodstoich::SparseMatrixCSC; 

@@ -5,7 +5,7 @@ using DataStructures, Catalyst, SparseArrays
 abstract type NetworkFileFormat end
 
 # exported data types
-struct RSSANetwork <: NetworkFileFormat end
+#struct RSSANetwork <: NetworkFileFormat end
 struct BNGNetwork <: NetworkFileFormat end
 struct MatrixNetwork <: NetworkFileFormat end
 
@@ -19,7 +19,7 @@ struct ParsedReactionNetwork
     "Parameters"
     p
 
-    "Parameters as ModelingToolkit Operations"
+    "Expressions for the Parameters"
     paramexprs
 
     "Dict from `Variable` in species(rn) to full string for species name"
@@ -36,7 +36,7 @@ export RSSANetwork, BNGNetwork, MatrixNetwork, ParsedReactionNetwork
 
 # parsers
 #include("parsing_routines_rssafiles.jl")
-#include("parsing_routines_bngnetworkfiles.jl")
+include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
 export loadrxnetwork
