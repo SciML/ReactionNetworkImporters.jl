@@ -1,7 +1,7 @@
 # load a BioNetGen defined BCR network, solve the ODEs
 # plot a specific observable and compare to the BioNetGen solution
 
-using DiffEqBase, DiffEqBiological, Plots, OrdinaryDiffEq, Sundials, DataFrames, CSVFiles, LinearAlgebra, SparseArrays
+using DiffEqBase, Catalyst, Plots, OrdinaryDiffEq, Sundials, DataFrames, CSVFiles, LinearAlgebra, SparseArrays
 using ReactionNetworkImporters
 using TimerOutputs
 

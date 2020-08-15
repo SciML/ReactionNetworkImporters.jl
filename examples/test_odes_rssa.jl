@@ -1,7 +1,7 @@
 # example using network from the RSSA Models
 # download input files from: https://gist.github.com/isaacsas/7648fe065f1884307a2906a0a48ea12b
 
-using DiffEqBase, DiffEqBiological, OrdinaryDiffEq, Sundials
+using DiffEqBase, Catalyst, OrdinaryDiffEq, Sundials
 using ReactionNetworkImporters
 using TimerOutputs
 

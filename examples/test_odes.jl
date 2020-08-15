@@ -1,4 +1,4 @@
-using DiffEqBase, DiffEqBiological, OrdinaryDiffEq, Sundials
+using DiffEqBase, Catalyst, OrdinaryDiffEq, Sundials
 using ReactionNetworkImporters
 using TimerOutputs
 

@@ -1,4 +1,4 @@
-using DiffEqBase, DiffEqBiological, Plots, OrdinaryDiffEq, DataFrames, CSVFiles, LinearAlgebra
+using DiffEqBase, Catalyst, Plots, OrdinaryDiffEq, DataFrames, CSVFiles, LinearAlgebra
 using ReactionNetworkImporters
 
 # parameters
@@ -16,26 +16,25 @@ gdatdf = DataFrame(load(File(format"CSV", gdatfile), header_exists=true, spacede
 println("done")
 
 # load the BNG reaction network in DiffEqBio
-prnbng = loadrxnetwork(BNGNetwork(),string(networkname,"bng"), fname)
+prnbng = loadrxnetwork(BNGNetwork(), fname)
 rnbng = prnbng.rn; u0 = prnbng.u₀; p = prnbng.p; 
-addodes!(rnbng; build_jac=false, build_symfuncs=false)
 boprob = ODEProblem(rnbng, u0, (0.,tf), p)
 
 # BNG simulation data testing
 Aid = prnbng.groupstoids[:A][1]
-Asol = gdatdf[:A]
+Asol = gdatdf[!,:A]
 
 # note solvers run _much_ faster the second time 
 bsol = solve(boprob, Tsit5(), abstol=1e-12, reltol=1e-12, saveat=tf/nsteps); 
 
 if doplot
     plotlyjs()
-    p1 = plot(gdatdf[:time], gdatdf[:A], label=:A_BNG)    
+    p1 = plot(gdatdf[!,:time], gdatdf[!,:A], label=:A_BNG)    
     plot!(p1, bsol.t, bsol[Aid,:], label=:A_DE)
     display(p1)
-    println("Err = ", norm(gdatdf[:A] - bsol[Aid,:],Inf))
+    println("Err = ", norm(gdatdf[!,:A] - bsol[Aid,:],Inf))
 end
 
-@test all(bsol.t .== gdatdf[:time])
-@test all(abs.(gdatdf[:A] - bsol[Aid,:]) .< 1e-6 .* abs.(gdatdf[:A]))
+@test all(bsol.t .== gdatdf[!,:time])
+@test all(abs.(gdatdf[!,:A] - bsol[Aid,:]) .< 1e-6 .* abs.(gdatdf[!,:A]))
 
