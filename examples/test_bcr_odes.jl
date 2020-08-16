@@ -6,7 +6,7 @@ using ReactionNetworkImporters
 using TimerOutputs
 
 # parameters
-doplot = true
+doplot = false
 networkname = "testbcrbng"
 tf = 10000.
 build_jac = false
@@ -31,7 +31,7 @@ show(to)
 rnbng = prnbng.rn; u0 = prnbng.u₀; p = prnbng.p; 
 @timeit to "bODESystem" bosys = convert(ODESystem, rnbng)
 show(to)
-@timeit to "bODEProb" boprob = ODEProblem(bosys, Pair.(species(rnbng,u0), (0.,tf), Pair.(params(rnbng),p))
+@timeit to "bODEProb" boprob = ODEProblem(bosys, Pair.(species(rnbng),u0), (0.,tf), Pair.(params(rnbng),p))
 show(to)
 u = copy(u0);
 du = similar(u);
@@ -47,8 +47,8 @@ show(to)
 println()
 
 # BNG simulation results for Activated Syk
-asykgroups = prnbng.groupstoids[!,:Activated_Syk]
-asyksyms = findall(x -> x ∈ asykgroups, rnbng.syms_to_ints)
+asykgroups = prnbng.groupstoids[:Activated_Syk]
+#asyksyms = findall(x -> x ∈ asykgroups, rnbng.syms_to_ints)
 # asynbng = zeros(length(gdatdf[:time]))
 # for sym in asyksyms
 #     global asynbng
@@ -72,9 +72,9 @@ basyk = sum(bsol[asykgroups,:], dims=1)
 
 if doplot
     plotlyjs()
-    plot(gdatdf[!,:time][2:end], gdatdf[!,:Activated_Syk][2:end], xscale=:log10, label=:AsykGroup, linestyle=:dot)
+    plot(gdatdf[!,:time][2:end], gdatdf[!,:Activated_Syk][2:end], xscale=:log10, label="AsykGroup", linestyle=:dot)
 #     # plot!(cdatdf[:time][2:end], asynbng[2:end], xscale=:log10, label=:AsykSum)
-    plot!(bsol.t[2:end], basyk'[2:end], label=:AsykDEBio, xscale=:log10)
+    plot!(bsol.t[2:end], basyk'[2:end], label="AsykDEBio", xscale=:log10)
 end
 
 # test the error, note may be large in abs value though small relatively
@@ -82,4 +82,4 @@ end
 # #norm(asynbng - basyk', Inf)
 norm(gdatdf[!,:Activated_Syk] - basyk', Inf)
 
-@assert all(abs.(gdatdf[:Activated_Syk] - asynbng) .< 1e-6 * abs.(gdatdf[:Activated_Syk]))
+#@assert all(abs.(gdatdf[!,:Activated_Syk] - basyk') .< 1e-6 * abs.(gdatdf[:Activated_Syk]))

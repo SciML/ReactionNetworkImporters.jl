@@ -70,8 +70,8 @@ function loadrxnetwork(ft::MatrixNetwork,
                         rateexprs::AbstractVector, 
                         substoich::SparseMatrixCSC, 
                         prodstoich::SparseMatrixCSC; 
-                        species=Symbol[], 
-                        params=Symbol[])
+                        species::AbstractVector=Operation[], 
+                        params::AbstractVector=Operation[])
 
     sz = size(substoich)
     @assert sz == size(prodstoich)
