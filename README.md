@@ -3,13 +3,18 @@
 [![Build Status](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/isaacsas/reactionnetworkimporters-jl/branch/master)
 
+*Note, v0.2.0 is a breaking release in that ReactionNetworkImporters now
+generates a Catalyst.jl `ReactionSystem`. Do not upgrade if you rely on the
+previous DiffEqBiological.jl reaction network representation.*
+
 This package provides importers to load reaction networks into
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl)
 [`ReactionSystem`s](https://catalyst.sciml.ai/dev/api/catalyst_api/#ModelingToolkit.ReactionSystem)
 from several file formats. Currently it supports loading networks in the
 following formats:
 1. A *subset* of the BioNetGen .net file format.
-2. Networks represented by dense or sparse substrate and product stoichiometric matrices.
+2. Networks represented by dense or sparse substrate and product stoichiometric
+   matrices.
 <!-- 3. The basic format used by the [RSSA](https://www.cosbi.eu/research/prototypes/rssa) group at COSBI in their [model collection](https://www.cosbi.eu/prototypes/jLiexDeBIgFV4zxwnKiW97oc4BjTtIoRGajqdUz4.zip). -->
 
 ----
