@@ -1,7 +1,7 @@
 # ReactionNetworkImporters.jl
 
 [![Build Status](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/isaacsas/reactionnetworkimporters-jl/branch/master)
+<!-- [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/isaacsas/reactionnetworkimporters-jl/branch/master) -->
 
 *Note, v0.2.0 is a breaking release in that ReactionNetworkImporters now
 generates a Catalyst.jl `ReactionSystem`. Do not upgrade if you rely on the
