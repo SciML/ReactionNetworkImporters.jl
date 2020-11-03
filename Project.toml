@@ -10,7 +10,7 @@ ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
-Catalyst = "5.0.5"
+Catalyst = "5.0.5, 6.0"
 DataStructures = "0.17.20, 0.18"
 ModelingToolkit = "3.15.0"
 julia = "1.3"
