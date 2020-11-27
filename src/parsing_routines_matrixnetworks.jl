@@ -13,9 +13,9 @@ function loadrxnetwork(ft::MatrixNetwork,
                         rateexprs::AbstractVector, 
                         substoich::AbstractMatrix, 
                         prodstoich::AbstractMatrix; 
-                        species::AbstractVector=Operation[], 
-                        params::AbstractVector=Operation[],
-                        iv=Variable(:t)())
+                        species::AbstractVector=Any[], 
+                        params::AbstractVector=Any[],
+                        iv=Variable(:t))
 
     sz = size(substoich)
     @assert sz == size(prodstoich)
@@ -24,10 +24,11 @@ function loadrxnetwork(ft::MatrixNetwork,
 
     # create the network
     rn = make_empty_network()    
-    t  = rn.iv()
+    t  = independent_variable(rn)
 
     # create the species if none passed in    
-    isempty(species) && (species = [Variable(:S,i)(t) for i=1:numspecs])
+    
+    isempty(species) && (species = [funcsym(:S,i)(t) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
@@ -37,9 +38,9 @@ function loadrxnetwork(ft::MatrixNetwork,
     # we need to create new vectors each time as the ReactionSystem
     # takes ownership of them
     for j = 1:numrxs
-        subs    = Vector{Operation}()
+        subs    = Any[]
         sstoich = Vector{eltype(substoich)}()
-        prods   = Vector{Operation}()
+        prods   = Any[]
         pstoich = Vector{eltype(prodstoich)}()
     
         # stoich
@@ -70,8 +71,8 @@ function loadrxnetwork(ft::MatrixNetwork,
                         rateexprs::AbstractVector, 
                         substoich::SparseMatrixCSC, 
                         prodstoich::SparseMatrixCSC; 
-                        species::AbstractVector=Operation[], 
-                        params::AbstractVector=Operation[])
+                        species::AbstractVector=Any[], 
+                        params::AbstractVector=Any[])
 
     sz = size(substoich)
     @assert sz == size(prodstoich)
@@ -80,10 +81,10 @@ function loadrxnetwork(ft::MatrixNetwork,
 
     # create the network
     rn = make_empty_network()
-    t  = rn.iv()
+    t  = independent_variable(rn)
 
     # create the species if none passed in
-    isempty(species) && (species = [Variable(:S,i)(t) for i=1:numspecs])
+    isempty(species) && (species = [funcsym(:S,i)(t) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
@@ -95,9 +96,9 @@ function loadrxnetwork(ft::MatrixNetwork,
     prows = rowvals(prodstoich)
     pvals = nonzeros(prodstoich)
     for j = 1:numrxs
-        subs    = Vector{Operation}()
+        subs    = Any[]
         sstoich = Vector{eltype(substoich)}()
-        prods   = Vector{Operation}()
+        prods   = Any[]
         pstoich = Vector{eltype(prodstoich)}()
 
         for ir in nzrange(substoich, j)
