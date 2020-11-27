@@ -33,7 +33,7 @@ prnbng = loadrxnetwork(BNGNetwork(), fname)
 ```
 Here `BNGNetwork` is a type specifying the file format that is being loaded.
 `prnbng` is a `ParsedReactionNetwork` structure with the following fields:
-- `rn`, a Catalyst `reaction_network`
+- `rn`, a Catalyst `ReactionSystem`
 - `u₀`, the initial condition (as a `Vector{Float64}`)
 - `p`, the parameter vector (as a `Vector{Float64}`)
 - `paramexprs`, the parameter vector as a mix of `Numbers`, `Symbols` and
