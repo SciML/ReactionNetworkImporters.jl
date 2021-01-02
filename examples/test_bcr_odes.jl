@@ -7,7 +7,6 @@ using TimerOutputs
 
 # parameters
 doplot = false
-networkname = "testbcrbng"
 tf = 10000.
 build_jac = false
 sparse_jac = false
