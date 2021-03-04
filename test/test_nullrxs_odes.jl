@@ -13,7 +13,7 @@ datadir  = joinpath(@__DIR__,"../data/nullrxs")
 fname    = joinpath(datadir, "birth-death.net")
 gdatfile = joinpath(datadir, "birth-death.gdat")
 print("getting gdat file...")
-gdatdf = DataFrame(load(File(format"CSV", gdatfile), header_exists=true, spacedelim=true))
+gdatdf = DataFrame(load(File{format"CSV"}(gdatfile), header_exists=true, spacedelim=true))
 println("done")
 
 # load the BNG reaction network in DiffEqBio
