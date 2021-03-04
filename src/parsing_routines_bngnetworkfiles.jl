@@ -219,11 +219,11 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     opmod = Module()
     Base.eval(opmod, :(using ModelingToolkit))
     Base.eval(opmod, :(@variables t))
-    for p in rn.ps
+    for p in params(rn)
         psym = nameof(p)
         Base.eval(opmod, :($(psym) = Num($p)))
     end
-    for s in rn.states
+    for s in species(rn)
         ssym = nameof(SymbolicUtils.operation(s))        
         Base.eval(opmod, :($(ssym) = Num($s)))
     end
