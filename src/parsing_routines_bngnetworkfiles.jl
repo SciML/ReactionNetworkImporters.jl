@@ -2,7 +2,7 @@
 Parsing routines for BioNetGen .net files. Note, this only handles a subset
 of the BioNetGen .net file format. In particular, any functions in the file
 that use non-Julia expressions (i.e. like conditional logic) or time-dependent
-features, will definitely not work. 
+features, will definitely not work.
 """
 
 """
@@ -10,7 +10,7 @@ Seek to a line matching `start_string`.
 """
 function seek_to_block(lines, idx, start_string)
     while lines[idx] != start_string
-        idx += 1        
+        idx += 1
         (idx > length(lines)) && error("Block: ", start_string, " was never found.")
     end
     idx += 1
@@ -42,7 +42,7 @@ function parse_params(ft::BNGNetwork, lines, idx)
         vals = split(lines[idx])
         pidx = parse(Int,vals[1])
         psym = Symbol(vals[2])
-        ptoids[psym] = pidx    
+        ptoids[psym] = pidx
 
         # value could be an expression
         pval = Meta.parse(vals[3])
@@ -92,17 +92,17 @@ function parse_reactions!(ft::BNGNetwork, rn, lines, idx, idstosyms, opmod)
     idx = seek_to_block(lines, idx, REACTIONS_BLOCK_START)
     cntdict = Dict{Int,Int}()
     while lines[idx] != REACTIONS_BLOCK_END
-        vals        = split(lines[idx])      
+        vals        = split(lines[idx])
         reactantids = (parse(Int,rid) for rid in split(vals[2],","))
-        productids  = (parse(Int,pid) for pid in split(vals[3],","))        
+        productids  = (parse(Int,pid) for pid in split(vals[3],","))
         rateexpr    = Meta.parse(vals[4])
         (typeof(rateexpr) <: Expr) && recursive_replace!(rateexpr)
-        
+
         # create a ModelingToolkitExpr from rateexpr
         if rateexpr isa Expr
             rate = Base.eval(opmod, rateexpr)
         elseif rateexpr isa Symbol
-            rate = Num(Variable{ModelingToolkit.Parameter{Real}}(rateexpr))
+            rate = (@parameters $rateexpr)[1]
         else
             rate = rateexpr
         end
@@ -117,7 +117,7 @@ function parse_reactions!(ft::BNGNetwork, rn, lines, idx, idstosyms, opmod)
         (!iszero(scalefactor)) && (rate = simplify(scalefactor * rate))
         rspecs  = Vector{Any}(undef,length(cntdict))
         rstoich = Vector{Int}(undef,length(cntdict))
-        t = Num(Variable{ModelingToolkit.Parameter{Real}}(:t))
+        @parameters t
         for (i,(rid,cnt)) in enumerate(cntdict)
             rspecs[i] = funcsym(idstosyms[rid])(t)
             rstoich[i] = cnt
@@ -146,7 +146,7 @@ end
 const GROUPS_BLOCK_START = "begin groups"
 const GROUPS_BLOCK_END = "end groups"
 function parse_groups(ft::BNGNetwork, lines, idx, idstoshortsyms, rn)
-    
+
     idx = seek_to_block(lines, idx, GROUPS_BLOCK_START)
     namestoids = Dict{Symbol,Vector{Int}}()
     specsmap = speciesmap(rn)
@@ -156,7 +156,7 @@ function parse_groups(ft::BNGNetwork, lines, idx, idstoshortsyms, rn)
         name = Symbol(vals[2])
 
         # map from BioNetGen id to reaction_network id
-        ids = [specsmap[funcsym(idstoshortsyms[parse(Int,val)])(t)] for val in split(vals[3],",")]        
+        ids = [specsmap[funcsym(idstoshortsyms[parse(Int,val)])(t)] for val in split(vals[3],",")]
 
         namestoids[name] = ids
         idx += 1
@@ -188,7 +188,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     file  = open(rxfilename, "r");
     lines = readlines(file)
     idx   = 1
-    
+
     print("Parsing parameters...")
     ptoids,pvals,idx = parse_params(ft, lines, idx)
     println("done")
@@ -197,7 +197,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     t  = independent_variable(rn)
 
     print("Adding parameters...")
-    foreach(psym -> addparam!(rn, Num(Variable{ModelingToolkit.Parameter{Real}}(psym))), keys(ptoids))
+    foreach(psym -> addparam!(rn, (@parameters $psym)[1]), keys(ptoids))
     println("done")
 
     print("Parsing species...")
@@ -214,7 +214,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     @assert all(s -> nameof(SymbolicUtils.operation(s[1])) == s[2], zip(species(rn),idstoshortsyms)) "species(rn) noteq to idstoshortsyms"
     println("done")
 
-    # we evaluate all the parameters and species names in a module    
+    # we evaluate all the parameters and species names in a module
     print("Creating ModelingToolkit versions of species and parameters...")
     opmod = Module()
     Base.eval(opmod, :(using ModelingToolkit))
@@ -224,7 +224,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
         Base.eval(opmod, :($(psym) = Num($p)))
     end
     for s in species(rn)
-        ssym = nameof(SymbolicUtils.operation(s))        
+        ssym = nameof(SymbolicUtils.operation(s))
         Base.eval(opmod, :($(ssym) = Num($s)))
     end
     println("done")
@@ -239,7 +239,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
 
     close(file)
 
-    # get numeric values for parameters and u₀ 
+    # get numeric values for parameters and u₀
     p,u₀ = exprs_to_nums(ptoids, pvals, u0exprs)
     sm = speciesmap(rn)
     @assert all( sm[funcsym(sym)(t)] == i for (i,sym) in enumerate(idstoshortsyms) )
