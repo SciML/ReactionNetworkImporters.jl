@@ -7,7 +7,7 @@ using TimerOutputs
 
 # parameters
 doplot = false
-tf = 10000.
+tf = 20000.
 build_jac = false
 sparse_jac = false
 zeroout_jac = false
