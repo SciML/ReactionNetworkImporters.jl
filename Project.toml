@@ -13,7 +13,7 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 [compat]
 Catalyst = "6.8, 7"
 DataStructures = "0.18"
-ModelingToolkit = "5.17.3"
+ModelingToolkit = "5.17.3, 6"
 SymbolicUtils = "0.11"
 julia = "1.3"
 
