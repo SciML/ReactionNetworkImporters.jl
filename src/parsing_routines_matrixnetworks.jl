@@ -26,7 +26,6 @@ function loadrxnetwork(::MatrixNetwork,
     rn = make_empty_network(; iv=t)        
 
     # create the species if none passed in        
-    #isempty(species) && (species = [funcsym(:S,i)(t) for i=1:numspecs])
     isempty(species) && (species = [funcsym(:S,t,i) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
