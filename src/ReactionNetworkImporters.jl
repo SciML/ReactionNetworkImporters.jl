@@ -1,14 +1,16 @@
 module ReactionNetworkImporters
 
-using DataStructures, SymbolicUtils, Catalyst, SparseArrays
+using DataStructures, Symbolics, SymbolicUtils, Catalyst, SparseArrays
 
 # creates a ModelingToolkit function-like Symbol
 # can then do stuff like
 # @parameters t
 # S₁ = funcsym(S,1)
 # u = S₁(t)
-function funcsym(S::Symbol, args...)
-    Num(Variable{ModelingToolkit.FnType{Tuple{Any},Real}}(S,args...))
+function funcsym(S::Symbol, t, args...)
+    #Num(Symbolics.variable(S,args...; T=ModelingToolkit.FnType{Tuple{Any},Real}))
+    S = Symbol(S,args...)
+    (@variables $(S)(t))[1]
 end
 
 abstract type NetworkFileFormat end

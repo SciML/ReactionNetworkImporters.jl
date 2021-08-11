@@ -1,10 +1,7 @@
 # ReactionNetworkImporters.jl
 
-[![Build Status](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/isaacsas/ReactionNetworkImporters.jl)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/isaacsas/reactionnetworkimporters-jl/branch/master) -->
-
-*Note, v0.3.0 and up now generate Catalyst.jl v6 `ReactionSystem`s. Do not upgrade if you rely on the
-previous DiffEqBiological.jl reaction network representation or Catalyst v5.X.X.*
+[![Build Status](https://travis-ci.org/SciML/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/SciML/ReactionNetworkImporters.jl)
+<!-- [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/SciML/reactionnetworkimporters-jl/branch/master) -->
 
 This package provides importers to load reaction networks into
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl)

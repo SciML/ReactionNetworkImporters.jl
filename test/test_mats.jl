@@ -2,11 +2,11 @@ using Catalyst, ReactionNetworkImporters, SparseArrays
 
 # version giving parameters and rates
 rs = @reaction_network begin
-    k1, 2S₁ --> S₂
-    k2, S₂ --> 2S₁
-    k3, S₁ + S₂ --> S₃
-    k4, S₃ --> S₁ + S₂
-    k5, 3S₃ --> 3S₁
+    k1, 2S1 --> S2
+    k2, S2 --> 2S1
+    k3, S1 + S2 --> S3
+    k4, S3 --> S1 + S2
+    k5, 3S3 --> 3S1
 end k1 k2 k3 k4 k5
 
 @parameters k1 k2 k3 k4 k5
@@ -30,11 +30,11 @@ prn = loadrxnetwork(MatrixNetwork(), pars, sparse(substoich), sparse(prodstoich)
 
 # version with hard coded rates (no parameter symbols)
 rs = @reaction_network begin
-    1., 2S₁ --> S₂
-    2., S₂ --> 2S₁
-    3., S₁ + S₂ --> S₃
-    4., S₃ --> S₁ + S₂
-    5., 3S₃ --> 3S₁
+    1., 2S1 --> S2
+    2., S2 --> 2S1
+    3., S1 + S2 --> S3
+    4., S3 --> S1 + S2
+    5., 3S3 --> 3S1
 end 
 prn = loadrxnetwork(MatrixNetwork(), convert.(Float64,1:5), substoich, prodstoich)
 @test rs == prn.rn
