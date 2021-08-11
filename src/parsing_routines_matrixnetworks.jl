@@ -14,8 +14,7 @@ function loadrxnetwork(::MatrixNetwork,
                         substoich::AbstractMatrix, 
                         prodstoich::AbstractMatrix; 
                         species::AbstractVector=Any[], 
-                        params::AbstractVector=Any[],
-                        t=Symbolics.variable(:t))
+                        params::AbstractVector=Any[])
 
     sz = size(substoich)
     @assert sz == size(prodstoich)
@@ -24,6 +23,7 @@ function loadrxnetwork(::MatrixNetwork,
 
     # create the network
     rn = make_empty_network(; iv=t)        
+    t  = ModelingToolkit.get_iv(rn)
 
     # create the species if none passed in        
     isempty(species) && (species = [funcsym(:S,t,i) for i=1:numspecs])
