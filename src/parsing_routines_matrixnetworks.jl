@@ -9,13 +9,12 @@
 """ 
     For dense matrices
 """
-function loadrxnetwork(ft::MatrixNetwork, 
+function loadrxnetwork(::MatrixNetwork, 
                         rateexprs::AbstractVector, 
                         substoich::AbstractMatrix, 
                         prodstoich::AbstractMatrix; 
                         species::AbstractVector=Any[], 
-                        params::AbstractVector=Any[],
-                        iv=Variable(:t))
+                        params::AbstractVector=Any[])
 
     sz = size(substoich)
     @assert sz == size(prodstoich)
@@ -23,12 +22,11 @@ function loadrxnetwork(ft::MatrixNetwork,
     numrxs = sz[2]
 
     # create the network
-    rn = make_empty_network()    
-    t  = independent_variable(rn)
+    rn = make_empty_network()        
+    t  = ModelingToolkit.get_iv(rn)
 
-    # create the species if none passed in    
-    
-    isempty(species) && (species = [funcsym(:S,i)(t) for i=1:numspecs])
+    # create the species if none passed in        
+    isempty(species) && (species = [funcsym(:S,t,i) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
@@ -81,10 +79,10 @@ function loadrxnetwork(ft::MatrixNetwork,
 
     # create the network
     rn = make_empty_network()
-    t  = independent_variable(rn)
+    t  = ModelingToolkit.get_iv(rn)
 
     # create the species if none passed in
-    isempty(species) && (species = [funcsym(:S,i)(t) for i=1:numspecs])
+    isempty(species) && (species = [funcsym(:S,t,i) for i=1:numspecs])
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters

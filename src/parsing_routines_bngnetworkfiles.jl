@@ -119,7 +119,7 @@ function parse_reactions!(ft::BNGNetwork, rn, lines, idx, idstosyms, opmod)
         rstoich = Vector{Int}(undef,length(cntdict))
         @parameters t
         for (i,(rid,cnt)) in enumerate(cntdict)
-            rspecs[i] = funcsym(idstosyms[rid])(t)
+            rspecs[i] = funcsym(idstosyms[rid],t)
             rstoich[i] = cnt
         end
 
@@ -129,7 +129,7 @@ function parse_reactions!(ft::BNGNetwork, rn, lines, idx, idstosyms, opmod)
         pspecs  = Vector{Any}(undef,length(cntdict))
         pstoich = Vector{Int}(undef,length(cntdict))
         for (i,(pid,cnt)) in enumerate(cntdict)
-            pspecs[i] = funcsym(idstosyms[pid])(t)
+            pspecs[i] = funcsym(idstosyms[pid],t)
             pstoich[i] = cnt
         end
 
@@ -150,13 +150,13 @@ function parse_groups(ft::BNGNetwork, lines, idx, idstoshortsyms, rn)
     idx = seek_to_block(lines, idx, GROUPS_BLOCK_START)
     namestoids = Dict{Symbol,Vector{Int}}()
     specsmap = speciesmap(rn)
-    t = independent_variable(rn)
+    t = ModelingToolkit.get_iv(rn)
     while lines[idx] != GROUPS_BLOCK_END
         vals = split(lines[idx])
         name = Symbol(vals[2])
 
         # map from BioNetGen id to reaction_network id
-        ids = [specsmap[funcsym(idstoshortsyms[parse(Int,val)])(t)] for val in split(vals[3],",")]
+        ids = [specsmap[funcsym(idstoshortsyms[parse(Int,val)],t)] for val in split(vals[3],",")]
 
         namestoids[name] = ids
         idx += 1
@@ -194,7 +194,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     println("done")
 
     rn = make_empty_network()
-    t  = independent_variable(rn)
+    t  = ModelingToolkit.get_iv(rn)
 
     print("Adding parameters...")
     foreach(psym -> addparam!(rn, (@parameters $psym)[1]), keys(ptoids))
@@ -209,7 +209,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     idstoshortsyms = Vector{Symbol}(undef,length(shortsymstoids))
     for (k,v) in shortsymstoids
         idstoshortsyms[v] = k
-        addspecies!(rn, funcsym(k)(t))
+        addspecies!(rn, funcsym(k,t))
     end
     @assert all(s -> nameof(SymbolicUtils.operation(s[1])) == s[2], zip(species(rn),idstoshortsyms)) "species(rn) noteq to idstoshortsyms"
     println("done")
@@ -242,7 +242,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
     # get numeric values for parameters and u₀
     p,u₀ = exprs_to_nums(ptoids, pvals, u0exprs)
     sm = speciesmap(rn)
-    @assert all( sm[funcsym(sym)(t)] == i for (i,sym) in enumerate(idstoshortsyms) )
+    @assert all( sm[funcsym(sym,t)] == i for (i,sym) in enumerate(idstoshortsyms) )
 
     ParsedReactionNetwork(rn, u₀; p = p, paramexprs = pvals, varstonames = shortsymstosyms, groupstoids = groupstoids)
 end
