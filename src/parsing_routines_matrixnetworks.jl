@@ -22,7 +22,7 @@ function loadrxnetwork(::MatrixNetwork,
     numrxs = sz[2]
 
     # create the network
-    rn = make_empty_network(; iv=t)        
+    rn = make_empty_network()        
     t  = ModelingToolkit.get_iv(rn)
 
     # create the species if none passed in        
