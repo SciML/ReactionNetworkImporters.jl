@@ -138,9 +138,7 @@ Notes:
          1, if the i'th complex is the product of the j'th reaction,
          0, otherwise
 """
-"""
-for dense matrices
-"""
+#  for dense matrices
 function LoadReacCompNetwork(rateexprs::AbstractVector,
                         compstoichmat::AbstractMatrix,
                         incidencemat::AbstractMatrix;
@@ -181,9 +179,8 @@ function LoadReacCompNetwork(rateexprs::AbstractVector,
     @named rs = ReactionSystem(rn, t, species, params)
 end
 
-"""
-for sparse matrices
-"""
+
+#  for sparse matrices
 function LoadReacCompNetwork(rateexprs::AbstractVector,
                         compstoichmat::SparseMatrixCSC,
                         incidencemat::SparseMatrixCSC;
