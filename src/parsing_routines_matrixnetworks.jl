@@ -122,3 +122,106 @@ function loadrxnetwork(ft::MatrixNetwork,
 
     ParsedReactionNetwork(rn, nothing)
 end
+
+
+"""
+    For loading networks with complex stoichiomatix ,incidence matrix.
+
+Notes:
+- Assumed that column of complex stoichiomatrix represents composition of reaction complexes,
+  with positive entries of size num_of_species x num_of_complexes, where
+  the non-zero positive entries in the kth column denote stoichiometric
+  coefficients of the species participating in the kth reaction complex.
+
+- The complex incidence matrix, is number of complexes by number of reactions with
+  Bᵢⱼ = -1, if the i'th complex is the substrate of the j'th reaction,
+         1, if the i'th complex is the product of the j'th reaction,
+         0, otherwise
+"""
+"""
+for dense matrices
+"""
+function LoadReacCompNetwork(rateexprs::AbstractVector,
+                        compstoichmat::AbstractMatrix,
+                        incidencemat::AbstractMatrix;
+                        species::AbstractVector = Any[],
+                        params::AbstractVector = Any[])
+
+    numspecs, numcomp = size(compstoichmat)
+    @assert all(>=(0),compstoichmat)
+    @assert numcomp == size(incidencemat, 1)
+    @assert all(∈([-1,0,1]),incidencemat)
+    numrxs = size(incidencemat, 2)
+
+    ModelingToolkit.@parameters t
+    isempty(species) && (species = [funcsym(:S,t,i) for i = 1:numspecs])
+
+    rn = Vector{Reaction}(undef,numrxs)
+    sub_indices = argmin(incidencemat, dims=1)     # cartesian indices of substrate complexes
+    prod_indices = argmax(incidencemat, dims=1)    # cartesian indicies of products complexes
+
+    for i ∈ 1:numrxs
+        subStoichInd = getindex.(findall(!iszero, compstoichmat[:,sub_indices[i][1]]))
+        prodStoichInd = getindex.(findall(!iszero, compstoichmat[:,prod_indices[i][1]]))
+
+        if subStoichInd == Int64[] &&  prodStoichInd != Int64[]
+            rn[i] = Reaction(rateexprs[i], nothing, species[prodStoichInd],
+                        nothing, compstoichmat[prodStoichInd,prod_indices[i][1]])
+
+        elseif subStoichInd != Int64[] &&  prodStoichInd == Int64[]
+            rn[i] = Reaction(rateexprs[i], species[subStoichInd], nothing,
+                        compstoichmat[subStoichInd,sub_indices[i][1]], nothing)
+        else
+            rn[i] = Reaction(rateexprs[i], species[subStoichInd],species[prodStoichInd],
+                        compstoichmat[subStoichInd,sub_indices[i][1]],
+                        compstoichmat[prodStoichInd,prod_indices[i][1]])
+        end
+    end
+
+    @named rs = ReactionSystem(rn, t, species, params)
+end
+
+"""
+for sparse matrices
+"""
+function LoadReacCompNetwork(rateexprs::AbstractVector,
+                        compstoichmat::SparseMatrixCSC,
+                        incidencemat::SparseMatrixCSC;
+                        species::AbstractVector = Any[],
+                        params::AbstractVector = Any[])
+
+    numspecs, numcomp = size(compstoichmat)
+    @assert all(>=(0),compstoichmat)
+    @assert numcomp == size(incidencemat, 1)
+    @assert all(∈([-1,0,1]),incidencemat)
+    numrxs = size(incidencemat, 2)
+
+    ModelingToolkit.@parameters t
+    isempty(species) && (species = [funcsym(:S,t,i) for i = 1:numspecs])
+
+    rn = Vector{Reaction}(undef,numrxs)
+
+    sub_indices = argmin(incidencemat, dims=1)     # cartesian indices of substrate complexes
+    prod_indices = argmax(incidencemat, dims=1)    # cartesian indicies of products complexes
+
+    for i ∈ 1:numrxs
+        subStoichInd = getindex.(findall(!iszero, compstoichmat[:,sub_indices[i][1]]))
+        prodStoichInd = getindex.(findall(!iszero, compstoichmat[:,prod_indices[i][1]]))
+
+        if subStoichInd == Int64[] &&  prodStoichInd != Int64[]
+            rn[i] = Reaction(rateexprs[i], nothing, species[prodStoichInd],
+                        nothing, compstoichmat[prodStoichInd,prod_indices[i][1]].nzval)
+
+        elseif subStoichInd != Int64[] &&  prodStoichInd == Int64[]
+            rn[i] = Reaction(rateexprs[i], species[subStoichInd], nothing,
+                        compstoichmat[subStoichInd,sub_indices[i][1]].nzval, nothing)
+        else
+            rn[i] = Reaction(rateexprs[i], species[subStoichInd],species[prodStoichInd],
+                        compstoichmat[subStoichInd,sub_indices[i][1]].nzval,
+                        compstoichmat[prodStoichInd,prod_indices[i][1]].nzval)
+        end
+    end
+
+    @named rs = ReactionSystem(rn, t, species, params)
+end
+
