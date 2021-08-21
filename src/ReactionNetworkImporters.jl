@@ -49,6 +49,6 @@ export RSSANetwork, BNGNetwork, MatrixNetwork, ParsedReactionNetwork
 include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
-export loadrxnetwork, LoadReacCompNetwork
+export loadrxnetwork
 
 end # module
