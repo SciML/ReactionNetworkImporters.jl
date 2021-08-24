@@ -38,7 +38,7 @@ prn = loadrxnetwork(MatrixNetwork(), pars, sparse(substoich), sparse(prodstoich)
 cmn1= ComplexMatrixNetwork(pars,compstoichmat,in_mat;params=pars)
 prn = loadrxnetwork(cmn1)
 @test rs == prn.rn
-cmn2= ComplexSparseMatrixNetwork(pars,sparse(compstoichmat),sparse(in_mat);params=pars)
+cmn2= ComplexMatrixNetwork(pars,sparse(compstoichmat),sparse(in_mat);params=pars)
 prn = loadrxnetwork(cmn2)
 @test rs == prn.rn
 
@@ -59,7 +59,7 @@ prn = loadrxnetwork(MatrixNetwork(), convert.(Float64,1:5), sparse(substoich), s
 cmn1 = ComplexMatrixNetwork(convert.(Float64,1:5), compstoichmat, in_mat)
 prn = loadrxnetwork(cmn1)
 @test rs == prn.rn
-cmn2 = ComplexSparseMatrixNetwork(convert.(Float64,1:5), sparse(compstoichmat),sparse(in_mat))
+cmn2 = ComplexMatrixNetwork(convert.(Float64,1:5), sparse(compstoichmat),sparse(in_mat))
 prn = loadrxnetwork(cmn2)
 @test rs == prn.rn
 
@@ -85,7 +85,7 @@ prn = loadrxnetwork(MatrixNetwork(), rates, sparse(substoich), sparse(prodstoich
 cmn1 = ComplexMatrixNetwork(rates,compstoichmat,in_mat;species=specs,params=pars)
 prn = loadrxnetwork(cmn1)
 @test rs == prn.rn
-cmn2 = ComplexSparseMatrixNetwork(rates,sparse(compstoichmat),sparse(in_mat);species=specs,params=pars)
+cmn2 = ComplexMatrixNetwork(rates,sparse(compstoichmat),sparse(in_mat);species=specs,params=pars)
 prn = loadrxnetwork(cmn2)
 @test rs == prn.rn
  
