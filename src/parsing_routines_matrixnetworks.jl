@@ -125,10 +125,11 @@ end
 
 
 """
-    For loading networks with complex stoichiomatix ,incidence matrix.
+Given complex stoichiometric matrix ,incidence matrix ,rate-expressions and list of species,parameters
+, return a ReactionSystem that describes the chemical reaction network
 
 Notes:
-- Assumed that column of complex stoichiomatrix represents composition of reaction complexes,
+- The column of complex stoichiometric represents composition of reaction complexes,
   with positive entries of size num_of_species x num_of_complexes, where
   the non-zero positive entries in the kth column denote stoichiometric
   coefficients of the species participating in the kth reaction complex.
@@ -139,108 +140,112 @@ Notes:
          0, otherwise
 """
 
-struct ComplexMatrixNetwork{S <: AbstractVector,T <: Matrix,
-                U <:Matrix{Int} ,V <: AbstractVector,W <: AbstractVector}
+struct ComplexMatrixNetwork{S ,T ,U ,V ,W,X}
+    """The symbolic expressions for each reaction rate."""
     rateexprs::S
-    cxstoichmat::T
-    in_mat::U  # all elements are integer always in incidence matrix
-    species::V
-    params::W
-end
-ComplexMatrixNetwork(rateexprs,cxstoichmat,in_mat; species=Any[],params=Any[]) =
-           ComplexMatrixNetwork(rateexprs,cxstoichmat,in_mat,species,params)
 
-struct ComplexSparseMatrixNetwork{S <: AbstractVector,T <: SparseMatrixCSC,
-                U <: SparseMatrixCSC{Int,Int} ,V <: AbstractVector,W <: AbstractVector}
-    rateexprs::S
-    cxstoichmat::T
-    in_mat::U  # all elements are integer always in incidence matrix
+    """stoichmat[i,j] = is the stoichiometric coefficient in the j'th reaction for the i'th species"""
+    stoichmat::T
+
+    """incidencemat[i,j] is the incidence matrix with incidencemat[i,j] = -1, if the i'th complex
+    is the substrate of the j'th reaction, 1, if the i'th complex is the product
+    of the j'th reaction, 0, otherwise"""
+    incidencemat::U  # all elements are integer always in incidence matrix
+
+    """species in the network """
     species::V
+
+    """ Parameters """
     params::W
+
+    """independent variable, time """
+    t::X
 end
-ComplexSparseMatrixNetwork(rateexprs,cxstoichmat,in_mat;species=Any[],params=Any[]) =
-           ComplexSparseMatrixNetwork(rateexprs,cxstoichmat,in_mat,species,params)
+ComplexMatrixNetwork(rateexprs,stoichmat,incidencemat; species=Any[],params=Any[],t=nothing) =
+           ComplexMatrixNetwork(rateexprs,stoichmat,incidencemat,species,params,t)
+
 
 
 # for Dense matrices version
-function loadrxnetwork(cmn::T) where {T <: ComplexMatrixNetwork}
-    numspecs, numcomp = size(cmn.cxstoichmat)
-    @assert all(>=(0),cmn.cxstoichmat)
-    @assert numcomp == size(cmn.in_mat, 1)
-    @assert all(∈([-1,0,1]),cmn.in_mat)
-    numrxs = size(cmn.in_mat, 2)
+function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}) where {S <: AbstractVector,
+                T <: Matrix, U <: Matrix{Int}, V <: AbstractVector,
+                                        W <: AbstractVector,X <: Any}
+   numspecs, numcomp = size(cmn.stoichmat)
+   @assert all(>=(0),cmn.stoichmat)
+   @assert numcomp == size(cmn.incidencemat, 1)
+   @assert all(∈([-1,0,1]),cmn.incidencemat)
+   numrxs = size(cmn.incidencemat, 2)
 
-    ModelingToolkit.@parameters t
+   t = (cmn.t === nothing) ? (@variables t)[1] : cmn.t
+   species = isempty(cmn.species) ? [funcsym(:S,t,i) for i = 1:numspecs] : cmn.species
 
-    isempty(cmn.species) ? species = [funcsym(:S,t,i) for i = 1:numspecs] : species = cmn.species
+   rn = Vector{Reaction}(undef,numrxs)
+   sc_ind = argmin(cmn.incidencemat, dims=1)  # cartesian indices of substrate complexes
+   pc_ind = argmax(cmn.incidencemat, dims=1)  # cartesian indicies of products complexes
 
-    rn = Vector{Reaction}(undef,numrxs)
-    sc_ind = argmin(cmn.in_mat, dims=1)  # cartesian indices of substrate complexes
-    pc_ind = argmax(cmn.in_mat, dims=1)  # cartesian indicies of products complexes
+   for i ∈ 1:numrxs
 
-    for i ∈ 1:numrxs
+       # substrate index for i'th reaction in species(rn)
+       ss_ind = findall(!iszero, @view cmn.stoichmat[:,sc_ind[i][1]])
 
-        # substrate index for i'th reaction in species(rn)
-        ss_ind = findall(!iszero, @view cmn.cxstoichmat[:,sc_ind[i][1]])
+       # products index for i'th reaction in species(rn)
+       ps_ind = findall(!iszero, @view cmn.stoichmat[:,pc_ind[i][1]])
 
-        # products index for i'th reaction in species(rn)
-        ps_ind = findall(!iszero, @view cmn.cxstoichmat[:,pc_ind[i][1]])
+       if isempty(ss_ind) && !isempty(ps_ind)
+           rn[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
+                       nothing, cmn.stoichmat[ps_ind,pc_ind[i][1]])
 
-        if isempty(ss_ind) && !isempty(ps_ind)
-            rn[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
-                        nothing, cmn.cxstoichmat[ps_ind,pc_ind[i][1]])
-
-        elseif !isempty(ss_ind) &&  isempty(ps_ind)
-            rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind], nothing,
-                        cmn.cxstoichmat[ss_ind,sc_ind[i][1]], nothing)
-        else
-            rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind],species[ps_ind],
-                        cmn.cxstoichmat[ss_ind,sc_ind[i][1]],
-                        cmn.cxstoichmat[ps_ind,pc_ind[i][1]])
-        end
-    end
-    @named rs = ReactionSystem(rn,t,species, cmn.params)
-    return ParsedReactionNetwork(rs,nothing)
+       elseif !isempty(ss_ind) &&  isempty(ps_ind)
+           rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind], nothing,
+                       cmn.stoichmat[ss_ind,sc_ind[i][1]], nothing)
+       else
+           rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind],species[ps_ind],
+                       cmn.stoichmat[ss_ind,sc_ind[i][1]],
+                       cmn.stoichmat[ps_ind,pc_ind[i][1]])
+       end
+   end
+   @named rs = ReactionSystem(rn,t,species, cmn.params)
+   return ParsedReactionNetwork(rs,nothing)
 end
 
 # for sparse matrices version
-function loadrxnetwork(cmn::T) where {T <: ComplexSparseMatrixNetwork}
-    numspecs, numcomp = size(cmn.cxstoichmat)
-    @assert all(>=(0),cmn.cxstoichmat)
-    @assert numcomp == size(cmn.in_mat, 1)
-    @assert all(∈([-1,0,1]),cmn.in_mat)
-    numrxs = size(cmn.in_mat, 2)
+function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}) where {S<:AbstractVector,
+                T<:SparseMatrixCSC,U<:SparseMatrixCSC{Int,Int},V<:AbstractVector,
+                                                    W<:AbstractVector,X <: Any}
+   numspecs, numcomp = size(cmn.stoichmat)
+   @assert all(>=(0),cmn.stoichmat)
+   @assert numcomp == size(cmn.incidencemat, 1)
+   @assert all(∈([-1,0,1]),cmn.incidencemat)
+   numrxs = size(cmn.incidencemat, 2)
 
-    cp = cmn.cxstoichmat;   inmat= cmn.in_mat
+   t = (cmn.t === nothing) ? (@variables t)[1] : cmn.t
+   species = isempty(cmn.species) ? [funcsym(:S,t,i) for i = 1:numspecs] : cmn.species
 
-    ModelingToolkit.@parameters t
+   rn = Vector{Reaction}(undef,numrxs)
+   sc_ind = argmin(cmn.incidencemat, dims=1)  # cartesian indices of substrate complexes
+   pc_ind = argmax(cmn.incidencemat, dims=1)  # cartesian indicies of products complexes
 
-    isempty(cmn.species) ? species = [funcsym(:S,t,i) for i = 1:numspecs] : species = cmn.species
+   rows = rowvals(cmn.stoichmat)
+   vals = nonzeros(cmn.stoichmat)
+   for i ∈ 1:numrxs
+       # substrate index for i'th reaction in species(rn)
+       ss_ind = rows[nzrange(cmn.stoichmat, sc_ind[i][1])]
+       # products index for i'th reaction in species(rn)
+       ps_ind = rows[nzrange(cmn.stoichmat, pc_ind[i][1])]
 
-    rn = Vector{Reaction}(undef,numrxs)
-    sc_ind = findall(x -> x == -1, inmat)  # cartesian indices of substrate complexes
-    pc_ind = findall(x -> x == 1, inmat)  # cartesian indicies of products complexes
+       if isempty(ss_ind) && !isempty(ps_ind)
+           rn[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
+                       nothing, vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
 
-
-    for i ∈ 1:numrxs
-        # substrate index for i'th reaction in species(rn)
-        ss_ind = rowvals(cp)[cp.colptr[sc_ind[i][1]]:cp.colptr[sc_ind[i][1]+1]-1]
-        # products index for i'th reaction in species(rn)
-        ps_ind = rowvals(cp)[cp.colptr[pc_ind[i][1]]:cp.colptr[pc_ind[i][1]+1]-1]
-
-        if isempty(ss_ind) && !isempty(ps_ind)
-            rn[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
-                        nothing, cp.nzval[cp.colptr[pc_ind[i][1]]:cp.colptr[pc_ind[i][1]+1]-1])
-
-        elseif !isempty(ss_ind) &&  isempty(ps_ind)
-            rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind], nothing,
-                        cp.nzval[cp.colptr[sc_ind[i][1]]:cp.colptr[sc_ind[i][1]+1]-1], nothing)
-        else
-            rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind],species[ps_ind],
-                        cp.nzval[cp.colptr[sc_ind[i][1]]:cp.colptr[sc_ind[i][1]+1]-1],
-                        cp.nzval[cp.colptr[pc_ind[i][1]]:cp.colptr[pc_ind[i][1]+1]-1])
-        end
-    end
-    @named rs = ReactionSystem(rn,t,species, cmn.params)
-    return ParsedReactionNetwork(rs,nothing)
+       elseif !isempty(ss_ind) &&  isempty(ps_ind)
+           rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind], nothing,
+                       vals[nzrange(cmn.stoichmat, sc_ind[i][1])], nothing)
+       else
+           rn[i] = Reaction(cmn.rateexprs[i], species[ss_ind],species[ps_ind],
+                       vals[nzrange(cmn.stoichmat, sc_ind[i][1])],
+                       vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
+       end
+   end
+   @named rs = ReactionSystem(rn,t,species, cmn.params)
+   return ParsedReactionNetwork(rs,nothing)
 end
