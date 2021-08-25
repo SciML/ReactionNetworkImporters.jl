@@ -35,10 +35,10 @@ prn = loadrxnetwork(MatrixNetwork(), pars, substoich, prodstoich; params=pars) #
 prn = loadrxnetwork(MatrixNetwork(), pars, sparse(substoich), sparse(prodstoich); params=pars) # sparse version
 @test rs == prn.rn
 
-cmn1= ComplexMatrixNetwork(pars,compstoichmat,in_mat;params=pars)
+cmn1= ComplexMatrixNetwork(pars,compstoichmat,incidencemat;params=pars)
 prn = loadrxnetwork(cmn1)
 @test rs == prn.rn
-cmn2= ComplexMatrixNetwork(pars,sparse(compstoichmat),sparse(in_mat);params=pars)
+cmn2= ComplexMatrixNetwork(pars,sparse(compstoichmat),sparse(incidencemat);params=pars)
 prn = loadrxnetwork(cmn2)
 @test rs == prn.rn
 
@@ -56,10 +56,10 @@ prn = loadrxnetwork(MatrixNetwork(), convert.(Float64,1:5), substoich, prodstoic
 prn = loadrxnetwork(MatrixNetwork(), convert.(Float64,1:5), sparse(substoich), sparse(prodstoich))  # sparse version 
 @test rs == prn.rn
 
-cmn1 = ComplexMatrixNetwork(convert.(Float64,1:5), compstoichmat, in_mat)
+cmn1 = ComplexMatrixNetwork(convert.(Float64,1:5), compstoichmat, incidencemat)
 prn = loadrxnetwork(cmn1)
 @test rs == prn.rn
-cmn2 = ComplexMatrixNetwork(convert.(Float64,1:5), sparse(compstoichmat),sparse(in_mat))
+cmn2 = ComplexMatrixNetwork(convert.(Float64,1:5), sparse(compstoichmat),sparse(incidencemat))
 prn = loadrxnetwork(cmn2)
 @test rs == prn.rn
 
@@ -82,10 +82,10 @@ prn = loadrxnetwork(MatrixNetwork(), rates, substoich, prodstoich; species=speci
 prn = loadrxnetwork(MatrixNetwork(), rates, sparse(substoich), sparse(prodstoich); species=species, params=pars) # sparse version
 @test rs == prn.rn
 
-cmn1 = ComplexMatrixNetwork(rates,compstoichmat,in_mat;species=specs,params=pars)
+cmn1 = ComplexMatrixNetwork(rates,compstoichmat,incidencemat;species=species,params=pars)
 prn = loadrxnetwork(cmn1)
 @test rs == prn.rn
-cmn2 = ComplexMatrixNetwork(rates,sparse(compstoichmat),sparse(in_mat);species=specs,params=pars)
+cmn2 = ComplexMatrixNetwork(rates,sparse(compstoichmat),sparse(incidencemat);species=species,params=pars)
 prn = loadrxnetwork(cmn2)
 @test rs == prn.rn
  
