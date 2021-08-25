@@ -42,7 +42,7 @@ end
 ParsedReactionNetwork(rn::ReactionSystem, u₀; p=nothing, paramexprs=nothing, varstonames=nothing, groupstoids=nothing) = 
                         ParsedReactionNetwork(rn, u₀, p, paramexprs, varstonames, groupstoids)
 
-export RSSANetwork, BNGNetwork, MatrixNetwork, ParsedReactionNetwork
+export RSSANetwork, BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
 
 # parsers
 #include("parsing_routines_rssafiles.jl")
