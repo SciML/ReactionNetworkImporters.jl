@@ -204,7 +204,7 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}) where {S <: Abstr
                        cmn.stoichmat[ps_ind,pc_ind[i][1]])
        end
    end
-   @named rs = ReactionSystem(rn,t,species, cmn.params)
+   rs = ReactionSystem(rn,t,species, cmn.params;name = gensym(:ReactionSystem))
    return ParsedReactionNetwork(rs,nothing)
 end
 
@@ -229,9 +229,9 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}) where {S<:Abstrac
    vals = nonzeros(cmn.stoichmat)
    for i ∈ 1:numrxs
        # substrate index for i'th reaction in species(rn)
-       ss_ind = rows[nzrange(cmn.stoichmat, sc_ind[i][1])]
+       ss_ind = @view rows[nzrange(cmn.stoichmat, sc_ind[i][1])]
        # products index for i'th reaction in species(rn)
-       ps_ind = rows[nzrange(cmn.stoichmat, pc_ind[i][1])]
+       ps_ind = @view rows[nzrange(cmn.stoichmat, pc_ind[i][1])]
 
        if isempty(ss_ind) && !isempty(ps_ind)
            rn[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
@@ -246,6 +246,6 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}) where {S<:Abstrac
                        vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
        end
    end
-   @named rs = ReactionSystem(rn,t,species, cmn.params)
+   rs = ReactionSystem(rn,t,species, cmn.params;name = gensym(:ReactionSystem))
    return ParsedReactionNetwork(rs,nothing)
 end
