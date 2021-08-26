@@ -17,7 +17,6 @@ abstract type NetworkFileFormat end
 # exported data types
 #struct RSSANetwork <: NetworkFileFormat end
 struct BNGNetwork <: NetworkFileFormat end
-struct MatrixNetwork <: NetworkFileFormat end
 
 struct ParsedReactionNetwork    
     "Catalyst Network"
