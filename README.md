@@ -11,6 +11,7 @@ following formats:
 1. A *subset* of the BioNetGen .net file format.
 2. Networks represented by dense or sparse substrate and product stoichiometric
    matrices.
+3. Networks represented by dense or sparse complex stoichiometric and incidence matrices.   
 <!-- 3. The basic format used by the [RSSA](https://www.cosbi.eu/research/prototypes/rssa) group at COSBI in their [model collection](https://www.cosbi.eu/prototypes/jLiexDeBIgFV4zxwnKiW97oc4BjTtIoRGajqdUz4.zip). -->
 
 ----
@@ -56,10 +57,13 @@ See the [Catalyst documentation](https://catalyst.sciml.ai/dev/) for how to
 generate ODE, SDE, jump and other types of models.
 
 ### Loading a matrix representation
-Catalyst `ReactionSystem`s can also be constructed from substrate and product
-stoichiometric matrices. For example, here we both directly build a Catalyst
+Catalyst `ReactionSystem`s can also be constructed from 
+- substrate and product stoichiometric matrices. 
+- complex stoichiometric and incidence matrices.
+
+For example, here we both directly build a Catalyst
 network using the `@reaction_network` macro, and then show how to build the same
-network from stoichiometry matrices using `ReactionNetworkImporters`:
+network from these matrices using `ReactionNetworkImporters`:
 ```julia
 # Catalyst network from the macro:
 rs = @reaction_network begin
@@ -79,52 +83,70 @@ substoich =[2 0 0;
             0 1 0;
             1 1 0;
             0 0 1;
-            0 0 3]'
+            0 0 3]
 prodstoich = [0 1 0;
               2 0 0;
               0 0 1;
               1 1 0;
-              3 0 0]'
-prn = loadrxnetwork(MatrixNetwork(), pars, substoich, prodstoich; 
-                    species=species, params=pars)
+              3 0 0]
+mn= MatrixNetwork(pars,substoich,prodstoich;params=pars) # matrix network
+prn = loadrxnetwork(mn) # dense version
+# test the two networks are the same
+@assert rs == prn.rn
+
+stoichmat =[2  0  1  0  0  3;
+                 0  1  1  0  0  0;
+                 0  0  0  1  3  0]
+incidencemat  = [-1   1   0   0   0;
+                 1  -1   0   0   0;
+                 0   0  -1   1   0;
+                 0   0   1  -1   0;
+                 0   0   0   0  -1;
+                 0   0   0   0   1]
+cmn= ComplexMatrixNetwork(pars,stoichmat,incidencemat;params=pars)  # complex matrix network
+prn = loadrxnetwork(cmn)
 
 # test the two networks are the same
 @assert rs == prn.rn
 ```
 
-The basic usage is
+The basic usages are
 ```julia
-prn = loadrxnetwork(MatrixNetwork(),  
-                    rateexprs::AbstractVector, 
-                    substoich::AbstractMatrix, 
-                    prodstoich::AbstractMatrix; 
-                    species::AbstractVector=Operation[], 
-                    params::AbstractVector=Operation[])
+prn = loadrxnetwork(mn::MatrixNetwork) #or
+prn = loadrxnetwork(cmn::ComplexMatrixNetwork)
 ```
-Here `MatrixNetwork()` is the dispatch type, which selects that we are
-constructing a matrix-based stoichiometric representation as input. The other
-parameters are:
+Here `MatrixNetwork` and `ComplexMatrixNetwork` are the types, which selects that we are
+constructing a substrate/products stoichiometric matrix-based or complex- matrix based stoichiometric representation as input. These types have 
+following fields :
 - `rateexprs` - Any valid `ModelingToolkit.Operation`s for the rates, or basic
   number types. This can be a hardcoded rate constant like `1.0`, a a parameter
   like `k1` above, or an `Operation` involving parameters and species like
   `k*A`. Note, the reaction `A+B --> C` with rate `k*B` would have rate law
   `k*A*B^2`.
-- `substoich` - A number of species by number of reactions matrix with entry
-  `(i,j)` giving the stoichiometric coefficient of species `i` as a substrate in
-  reaction `j`. 
-- `prodstoich` - A number of species by number of reactions matrix with entry
-  `(i,j)` giving the stoichiometric coefficient of species `i` as a product in
-  reaction `j`.
+- matrix inputs 
+  - For `MatrixNetwork`
+    - `substoich` - A number of species by number of reactions matrix with entry
+  ` (i,j)` giving the stoichiometric coefficient of species `i` as a substrate in
+    reaction `j`. 
+    - `prodstoich` - A number of species by number of reactions matrix with entry
+  `  (i,j)` giving the stoichiometric coefficient of species `i` as a product in
+     reaction `j`.
+  - For `ComplexMatrixNetwork`
+  
+    - `stoichmat` - Complex stoichiometrc matrix , [defined here](https://catalyst.sciml.ai/dev/api/catalyst_api/#Catalyst.complexstoichmat).
+    - `incidencemat` - Complex incidence matrix, [defined here](https://catalyst.sciml.ai/dev/api/catalyst_api/#Catalyst.reactioncomplexes)
+ 
 - `species` - Optional `ModelingToolkit.Operation`s representing each species in
   the network.
 - `parameters` - Optional `ModelingToolkit.Operation`s representing each
   parameter in the network.
+- `t` - Optional `ModelingToolkit.Operation`s representing time as independent variable of the reaction network
 
 `prn` is again a `ParsedReactionNetwork`, with only the `reaction_network`
 field, `prn.rn`, defined.
 
-A dispatch is added if `substoich` and `prodstoich` both have the type
-`SparseMatrixCSC`, in which case they are efficiently iterated through using the
+Dispatches are added if `substoich` and `prodstoich` both have the type
+`SparseMatrixCSC`in case of `MatrixNetwork`(or `stoichmat` and `incidencemat` both as `SparseMatrixCSC` type in case of `ComplexMatrixNetwork`), in which case they are efficiently iterated through using the
 `SparseArrays` interface.
 
 If the keyword argument `species` is not set, the resulting reaction network
