@@ -7,7 +7,7 @@ are stored as numspecies by numrxs matrices, with entry (i,j)
 giving the stoichiometric coefficient of species i within rx j.
 """
 
-struct MatrixNetwork{S ,T ,U ,V ,W,X}
+struct MatrixNetwork{S ,T ,U ,V ,W,X} <: NetworkFileFormat
     """The symbolic expressions for each reaction rate."""
     rateexprs::S
 
@@ -35,8 +35,8 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S <: AbstractVecto
 
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
-     numrxs= sz[1]
-    numspecs = sz[2]
+     numspecs= sz[1]
+    numrxs = sz[2]
 
     # create the network
     rn = make_empty_network()
@@ -52,28 +52,28 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S <: AbstractVecto
     # create the reactions
     # we need to create new vectors each time as the ReactionSystem
     # takes ownership of them
-    for i = 1:numrxs
+    for j = 1:numrxs
         subs    = Any[]
         sstoich = Vector{eltype(mn.substoich)}()
         prods   = Any[]
         pstoich = Vector{eltype(mn.prodstoich)}()
 
         # stoich
-        for j = 1:numspecs
+        for i = 1:numspecs
             scoef = mn.substoich[i,j]
             if (scoef > zero(scoef))
-                push!(subs, species[j])
+                push!(subs, species[i])
                 push!(sstoich, scoef)
             end
 
             pcoef = mn.prodstoich[i,j]
             if (pcoef > zero(pcoef))
-                push!(prods, species[j])
+                push!(prods, species[i])
                 push!(pstoich, pcoef)
             end
         end
 
-        addreaction!(rn, Reaction(mn.rateexprs[i], subs, prods, sstoich, pstoich))
+        addreaction!(rn, Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich))
     end
 
     ParsedReactionNetwork(rn, nothing)
@@ -84,8 +84,8 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S<:AbstractVector,
         T<:SparseMatrixCSC,U<:SparseMatrixCSC{Int,Int},V<:AbstractVector, W<:AbstractVector,X <: Any}
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
-     numrxs= sz[1]
-    numspecs = sz[2]
+     numspecs= sz[1]
+    numrxs = sz[2]
 
     # create the network
     rn = make_empty_network()
@@ -99,25 +99,35 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S<:AbstractVector,
     foreach(p -> addparam!(rn, p, disablechecks=true), mn.params)
 
     # create the reactions
-    for i = 1:numrxs
-        sstoich = mn.substoich[i,:].nzval
-        pstoich = mn.prodstoich[i,:].nzval
+    srows = rowvals(mn.substoich)
+    svals = nonzeros(mn.substoich)
+    prows = rowvals(mn.prodstoich)
+    pvals = nonzeros(mn.prodstoich)
+    for j = 1:numrxs
+        subs    = Any[]
+        sstoich = Vector{eltype(mn.substoich)}()
+        prods   = Any[]
+        pstoich = Vector{eltype(mn.prodstoich)}()
 
-        if isempty(sstoich) && !isempty(pstoich)
-            subs = nothing;     sstoich = nothing
-            prods = species[mn.prodstoich[i,:].nzind]
-        elseif  !isempty(sstoich) && isempty(pstoich)
-            subs = species[mn.substoich[i,:].nzind]
-            prods = nothing;    pstoich = nothing
-        else
-            subs = species[mn.substoich[i,:].nzind]
-            prods = species[mn.prodstoich[i,:].nzind]
+        for ir in nzrange(mn.substoich, j)
+           i     = srows[ir]
+           scoef = svals[ir]
+           if scoef > zero(scoef)
+                push!(subs, species[i])
+                push!(sstoich, scoef)
+           end
         end
 
-        subs = species[mn.substoich[i,:].nzind]
-        prods = species[mn.prodstoich[i,:].nzind]
+        for ir in nzrange(mn.prodstoich, j)
+            i     = prows[ir]
+            pcoef = pvals[ir]
+            if pcoef > zero(pcoef)
+                push!(prods, species[i])
+                push!(pstoich, pcoef)
+            end
+        end
 
-        addreaction!(rn, Reaction(mn.rateexprs[i], subs, prods, sstoich, pstoich))
+        addreaction!(rn, Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich))
      end
 
     ParsedReactionNetwork(rn, nothing)
@@ -140,7 +150,7 @@ Notes:
          0, otherwise
 """
 
-struct ComplexMatrixNetwork{S ,T ,U ,V ,W,X}
+struct ComplexMatrixNetwork{S ,T ,U ,V ,W,X} <: NetworkFileFormat
     """The symbolic expressions for each reaction rate."""
     rateexprs::S
 
