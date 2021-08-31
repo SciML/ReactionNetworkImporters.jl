@@ -79,16 +79,12 @@ end k1 k2 k3 k4 k5
 @variables A(t) B(t) C(t)
 species = [A,B,C]
 pars = [k1,k2,k3,k4,k5]
-substoich =[2 0 0;
-            0 1 0;
-            1 1 0;
-            0 0 1;
-            0 0 3]
-prodstoich = [0 1 0;
-              2 0 0;
-              0 0 1;
-              1 1 0;
-              3 0 0]
+substoich =[ 2  0  1  0  0;
+            0  1  1  0  0;
+            0  0  0  1  3]
+prodstoich =  [0  2  0  1  3;
+                1  0  0  1  0;
+                0  0  1  0  0]
 mn= MatrixNetwork(pars,substoich,prodstoich;params=pars) # matrix network
 prn = loadrxnetwork(mn) # dense version
 # test the two networks are the same
@@ -116,7 +112,7 @@ prn = loadrxnetwork(mn::MatrixNetwork) #or
 prn = loadrxnetwork(cmn::ComplexMatrixNetwork)
 ```
 Here `MatrixNetwork` and `ComplexMatrixNetwork` are the types, which selects that we are
-constructing a substrate/products stoichiometric matrix-based or complex- matrix based stoichiometric representation as input. These types have 
+constructing a substrate/products stoichiometric matrix-based or reaction complex matrix-based stoichiometric representation as input. These types have 
 following fields :
 - `rateexprs` - Any valid `ModelingToolkit.Operation`s for the rates, or basic
   number types. This can be a hardcoded rate constant like `1.0`, a a parameter
@@ -146,8 +142,7 @@ following fields :
 field, `prn.rn`, defined.
 
 Dispatches are added if `substoich` and `prodstoich` both have the type
-`SparseMatrixCSC`in case of `MatrixNetwork`(or `stoichmat` and `incidencemat` both as `SparseMatrixCSC` type in case of `ComplexMatrixNetwork`), in which case they are efficiently iterated through using the
-`SparseArrays` interface.
+`SparseMatrixCSC`in case of `MatrixNetwork`(or `stoichmat` and `incidencemat` both have the type `SparseMatrixCSC` in case of `ComplexMatrixNetwork`), in which case they are efficiently iterated through using the `SparseArrays` interface.
 
 If the keyword argument `species` is not set, the resulting reaction network
 will simply name the species `S1`, `S2`,..., `SN` for a system with `N` total
