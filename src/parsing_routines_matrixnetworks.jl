@@ -35,7 +35,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S <: AbstractVecto
 
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
-     numspecs= sz[1]
+    numspecs= sz[1]
     numrxs = sz[2]
 
     # create the network
@@ -84,7 +84,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S<:AbstractVector,
         T<:SparseMatrixCSC,U<:SparseMatrixCSC{Int,Int},V<:AbstractVector, W<:AbstractVector,X <: Any}
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
-     numspecs= sz[1]
+    numspecs= sz[1]
     numrxs = sz[2]
 
     # create the network
@@ -140,9 +140,9 @@ Given complex stoichiometric matrix ,incidence matrix ,rate-expressions and list
 
 Notes:
 - The column of complex stoichiometric represents composition of reaction complexes,
-  with positive entries of size num_of_species x num_of_complexes, where
-  the non-zero positive entries in the kth column denote stoichiometric
-  coefficients of the species participating in the kth reaction complex.
+  with positive entries of size num_of_species by num_of_complexes, where
+  the non-zero positive entries in the k'th column denote stoichiometric
+  coefficients of the species participating in the k'th reaction complex.
 
 - The complex incidence matrix, is number of complexes by number of reactions with
   Bᵢⱼ = -1, if the i'th complex is the substrate of the j'th reaction,
