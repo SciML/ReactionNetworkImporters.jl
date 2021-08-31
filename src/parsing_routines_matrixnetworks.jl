@@ -1,105 +1,115 @@
 """
-    For loading networks with stoichiometry stored in matrices.
-    Assumed that the substrate and product stoichiometry matrices
-    are stored as numspecies by numrxs matrices, with entry (i,j)
-    giving the stoichiometric coefficient of species i within rx j.
+Given substrate and product stoichiometric matrices ,rate-expressions and list of species,parameters
+, return a ReactionSystem that describes the chemical reaction network
+
+Assumed that the substrate and product stoichiometry matrices
+are stored as numspecies by numrxs matrices, with entry (i,j)
+giving the stoichiometric coefficient of species i within rx j.
 """
 
+struct MatrixNetwork{S ,T ,U ,V ,W,X} <: NetworkFileFormat
+    """The symbolic expressions for each reaction rate."""
+    rateexprs::S
 
-""" 
-    For dense matrices
-"""
-function loadrxnetwork(::MatrixNetwork, 
-                        rateexprs::AbstractVector, 
-                        substoich::AbstractMatrix, 
-                        prodstoich::AbstractMatrix; 
-                        species::AbstractVector=Any[], 
-                        params::AbstractVector=Any[])
+    """substoich[i,j] = is the substrate stoichiometric coefficient matrix"""
+    substoich::T
 
-    sz = size(substoich)
-    @assert sz == size(prodstoich)
-    numspecs = sz[1]
+    """prodstoich[i,j] is the product stoichiometric coefficient matrix"""
+    prodstoich::U
+
+    """species in the network """
+    species::V
+
+    """ Parameters """
+    params::W
+
+    """independent variable, time """
+    t::X
+end
+MatrixNetwork(rateexprs,substoich,prodstoich; species=Any[],params=Any[],t=nothing) =
+           MatrixNetwork(rateexprs,substoich,prodstoich,species,params,t)
+
+# for dense matrices
+function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S <: AbstractVector,
+        T <: Matrix, U <: Matrix{Int}, V <: AbstractVector, W <: AbstractVector,X <: Any}
+
+    sz = size(mn.substoich)
+    @assert sz == size(mn.prodstoich)
+    numspecs= sz[1]
     numrxs = sz[2]
 
     # create the network
-    rn = make_empty_network()        
-    t  = ModelingToolkit.get_iv(rn)
+    rn = make_empty_network()
+    t = (mn.t === nothing) ? (@variables t)[1] : mn.t
 
-    # create the species if none passed in        
-    isempty(species) && (species = [funcsym(:S,t,i) for i=1:numspecs])
+    # create the species if none passed in
+    species = isempty(mn.species) ? [funcsym(:S,t,i) for i = 1:numspecs] : mn.species
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
-    foreach(p -> addparam!(rn, p, disablechecks=true), params)
+    foreach(p -> addparam!(rn, p, disablechecks=true), mn.params)
 
     # create the reactions
     # we need to create new vectors each time as the ReactionSystem
     # takes ownership of them
     for j = 1:numrxs
         subs    = Any[]
-        sstoich = Vector{eltype(substoich)}()
+        sstoich = Vector{eltype(mn.substoich)}()
         prods   = Any[]
-        pstoich = Vector{eltype(prodstoich)}()
-    
+        pstoich = Vector{eltype(mn.prodstoich)}()
+
         # stoich
         for i = 1:numspecs
-            scoef = substoich[i,j]
-            if (scoef > zero(scoef)) 
+            scoef = mn.substoich[i,j]
+            if (scoef > zero(scoef))
                 push!(subs, species[i])
                 push!(sstoich, scoef)
             end
 
-            pcoef = prodstoich[i,j]
-            if (pcoef > zero(pcoef)) 
+            pcoef = mn.prodstoich[i,j]
+            if (pcoef > zero(pcoef))
                 push!(prods, species[i])
                 push!(pstoich, pcoef)
             end
         end
 
-        addreaction!(rn, Reaction(rateexprs[j], subs, prods, sstoich, pstoich))
+        addreaction!(rn, Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich))
     end
 
     ParsedReactionNetwork(rn, nothing)
 end
 
-""" 
-    For sparse matrices
-"""
-function loadrxnetwork(ft::MatrixNetwork,
-                        rateexprs::AbstractVector, 
-                        substoich::SparseMatrixCSC, 
-                        prodstoich::SparseMatrixCSC; 
-                        species::AbstractVector=Any[], 
-                        params::AbstractVector=Any[])
-
-    sz = size(substoich)
-    @assert sz == size(prodstoich)
-    numspecs = sz[1]
+# for sparse matrices
+function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}) where {S<:AbstractVector,
+        T<:SparseMatrixCSC,U<:SparseMatrixCSC{Int,Int},V<:AbstractVector, W<:AbstractVector,X <: Any}
+    sz = size(mn.substoich)
+    @assert sz == size(mn.prodstoich)
+    numspecs= sz[1]
     numrxs = sz[2]
 
     # create the network
     rn = make_empty_network()
-    t  = ModelingToolkit.get_iv(rn)
+    t = (mn.t === nothing) ? (@variables t)[1] : mn.t
 
     # create the species if none passed in
-    isempty(species) && (species = [funcsym(:S,t,i) for i=1:numspecs])
+    species = isempty(mn.species) ? [funcsym(:S,t,i) for i = 1:numspecs] : mn.species
     foreach(s -> addspecies!(rn, s, disablechecks=true), species)
 
     # create the parameters
-    foreach(p -> addparam!(rn, p, disablechecks=true), params)
+    foreach(p -> addparam!(rn, p, disablechecks=true), mn.params)
 
     # create the reactions
-    srows = rowvals(substoich)
-    svals = nonzeros(substoich)
-    prows = rowvals(prodstoich)
-    pvals = nonzeros(prodstoich)
+    srows = rowvals(mn.substoich)
+    svals = nonzeros(mn.substoich)
+    prows = rowvals(mn.prodstoich)
+    pvals = nonzeros(mn.prodstoich)
     for j = 1:numrxs
         subs    = Any[]
-        sstoich = Vector{eltype(substoich)}()
+        sstoich = Vector{eltype(mn.substoich)}()
         prods   = Any[]
-        pstoich = Vector{eltype(prodstoich)}()
+        pstoich = Vector{eltype(mn.prodstoich)}()
 
-        for ir in nzrange(substoich, j)
+        for ir in nzrange(mn.substoich, j)
            i     = srows[ir]
            scoef = svals[ir]
            if scoef > zero(scoef)
@@ -108,7 +118,7 @@ function loadrxnetwork(ft::MatrixNetwork,
            end
         end
 
-        for ir in nzrange(prodstoich, j)
+        for ir in nzrange(mn.prodstoich, j)
             i     = prows[ir]
             pcoef = pvals[ir]
             if pcoef > zero(pcoef)
@@ -117,7 +127,7 @@ function loadrxnetwork(ft::MatrixNetwork,
             end
         end
 
-        addreaction!(rn, Reaction(rateexprs[j], subs, prods, sstoich, pstoich))
+        addreaction!(rn, Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich))
      end
 
     ParsedReactionNetwork(rn, nothing)
@@ -130,9 +140,9 @@ Given complex stoichiometric matrix ,incidence matrix ,rate-expressions and list
 
 Notes:
 - The column of complex stoichiometric represents composition of reaction complexes,
-  with positive entries of size num_of_species x num_of_complexes, where
-  the non-zero positive entries in the kth column denote stoichiometric
-  coefficients of the species participating in the kth reaction complex.
+  with positive entries of size num_of_species by num_of_complexes, where
+  the non-zero positive entries in the k'th column denote stoichiometric
+  coefficients of the species participating in the k'th reaction complex.
 
 - The complex incidence matrix, is number of complexes by number of reactions with
   Bᵢⱼ = -1, if the i'th complex is the substrate of the j'th reaction,
@@ -140,7 +150,7 @@ Notes:
          0, otherwise
 """
 
-struct ComplexMatrixNetwork{S ,T ,U ,V ,W,X}
+struct ComplexMatrixNetwork{S ,T ,U ,V ,W,X} <: NetworkFileFormat
     """The symbolic expressions for each reaction rate."""
     rateexprs::S
 
