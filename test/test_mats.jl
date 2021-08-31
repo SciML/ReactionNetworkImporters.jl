@@ -11,16 +11,12 @@ end k1 k2 k3 k4 k5
 
 @parameters k1 k2 k3 k4 k5
 pars = [k1,k2,k3,k4,k5]
-substoich =[2 0 0;
-            0 1 0;
-            1 1 0;
-            0 0 1;
-            0 0 3]
-prodstoich = [0 1 0;
-              2 0 0;
-              0 0 1;
-              1 1 0;
-              3 0 0]
+substoich =[ 2  0  1  0  0;
+            0  1  1  0  0;
+            0  0  0  1  3]
+prodstoich =  [0  2  0  1  3;
+                1  0  0  1  0;
+                0  0  1  0  0]
 compstoichmat =[2  0  1  0  0  3;
                  0  1  1  0  0  0;
                  0  0  0  1  3  0]
