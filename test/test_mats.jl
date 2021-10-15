@@ -42,7 +42,7 @@ prn = loadrxnetwork(cmn2; networkname = rs.name)
 
 
 # version with hard coded rates (no parameter symbols)
-rs = @reaction_network begin
+rs = @reaction_network rs2 begin
     1., 2S1 --> S2
     2., S2 --> 2S1
     3., S1 + S2 --> S3
@@ -66,7 +66,7 @@ prn = loadrxnetwork(cmn2; networkname = rs.name)
 
 
 # version with species names, rate functions and symbolic parameters
-rs = @reaction_network begin
+rs = @reaction_network rs3 begin
     k1*A, 2A --> B
     k2, B --> 2A
     k3, A + B --> C
