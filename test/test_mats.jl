@@ -81,7 +81,7 @@ mn1 = MatrixNetwork(rates, substoich, prodstoich; species=species, params=pars)
 prn = loadrxnetwork(mn1; networkname = rs.name) # dense version
 @test rs == prn.rn
 mn2 = MatrixNetwork(rates,sparse(substoich), sparse(prodstoich); species=species, params=pars)
-prn = loadrxnetwork(mn2) # sparse version
+prn = loadrxnetwork(mn2; networkname = rs.name) # sparse version
 @test rs == prn.rn
 
 cmn1 = ComplexMatrixNetwork(rates,compstoichmat,incidencemat;species=species,params=pars)
