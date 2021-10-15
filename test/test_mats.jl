@@ -87,6 +87,7 @@ prn = loadrxnetwork(mn2) # sparse version
 cmn1 = ComplexMatrixNetwork(rates,compstoichmat,incidencemat;species=species,params=pars)
 prn = loadrxnetwork(cmn1; networkname = rs.name)
 @test rs == prn.rn
+cmn2 = ComplexMatrixNetwork(rates,sparse(compstoichmat),sparse(incidencemat);species=species,params=pars)
 prn = loadrxnetwork(cmn2; networkname = rs.name)
 @test rs == prn.rn
  
