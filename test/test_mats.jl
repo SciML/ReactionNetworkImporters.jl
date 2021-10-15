@@ -37,7 +37,7 @@ cmn1= ComplexMatrixNetwork(pars,compstoichmat,incidencemat;params=pars)
 prn = loadrxnetwork(cmn1; networkname = rs.name)
 @test rs == prn.rn
 cmn2= ComplexMatrixNetwork(pars,sparse(compstoichmat),sparse(incidencemat);params=pars)
-prn = loadrxnetwork(cmn1; networkname = rs.name)
+prn = loadrxnetwork(cmn2; networkname = rs.name)
 @test rs == prn.rn
 
 
@@ -60,7 +60,7 @@ cmn1 = ComplexMatrixNetwork(convert.(Float64,1:5), compstoichmat, incidencemat)
 prn = loadrxnetwork(cmn1; networkname = rs.name)
 @test rs == prn.rn
 cmn2 = ComplexMatrixNetwork(convert.(Float64,1:5), sparse(compstoichmat),sparse(incidencemat))
-prn = loadrxnetwork(cmn1; networkname = rs.name)
+prn = loadrxnetwork(cmn2; networkname = rs.name)
 @test rs == prn.rn
 
 
