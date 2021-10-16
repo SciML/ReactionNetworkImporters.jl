@@ -27,17 +27,17 @@ incidencemat  = [-1   1   0   0   0;
                  0   0   0   0  -1;
                  0   0   0   0   1]
 mn1= MatrixNetwork(pars,substoich,prodstoich;params=pars)
-prn = loadrxnetwork(mn1; networkname = rs.name) # dense version
+prn = loadrxnetwork(mn1; name = rs.name) # dense version
 @test rs == prn.rn
 mn2= MatrixNetwork(pars,sparse(substoich), sparse(prodstoich);params=pars)
-prn = loadrxnetwork(mn2; networkname = rs.name) # sparse version
+prn = loadrxnetwork(mn2; name = rs.name) # sparse version
 @test rs == prn.rn
 
 cmn1= ComplexMatrixNetwork(pars,compstoichmat,incidencemat;params=pars)
-prn = loadrxnetwork(cmn1; networkname = rs.name)
+prn = loadrxnetwork(cmn1; name = rs.name)
 @test rs == prn.rn
 cmn2= ComplexMatrixNetwork(pars,sparse(compstoichmat),sparse(incidencemat);params=pars)
-prn = loadrxnetwork(cmn2; networkname = rs.name)
+prn = loadrxnetwork(cmn2; name = rs.name)
 @test rs == prn.rn
 
 
@@ -50,17 +50,17 @@ rs = @reaction_network rs2 begin
     5., 3S3 --> 3S1
 end 
 mn1= MatrixNetwork(convert.(Float64,1:5), substoich, prodstoich)
-prn = loadrxnetwork(mn1; networkname = rs.name)   # dense version
+prn = loadrxnetwork(mn1; name = rs.name)   # dense version
 @test rs == prn.rn
 mn2= MatrixNetwork(convert.(Float64,1:5), sparse(substoich), sparse(prodstoich))
-prn = loadrxnetwork(mn2; networkname = rs.name) # sparse version
+prn = loadrxnetwork(mn2; name = rs.name) # sparse version
 @test rs == prn.rn
 
 cmn1 = ComplexMatrixNetwork(convert.(Float64,1:5), compstoichmat, incidencemat)
-prn = loadrxnetwork(cmn1; networkname = rs.name)
+prn = loadrxnetwork(cmn1; name = rs.name)
 @test rs == prn.rn
 cmn2 = ComplexMatrixNetwork(convert.(Float64,1:5), sparse(compstoichmat),sparse(incidencemat))
-prn = loadrxnetwork(cmn2; networkname = rs.name)
+prn = loadrxnetwork(cmn2; name = rs.name)
 @test rs == prn.rn
 
 
@@ -78,17 +78,17 @@ end k1 k2 k3 k4 k5
 species = [A,B,C]
 rates = [k1*A,k2,k3,k4,k5]
 mn1 = MatrixNetwork(rates, substoich, prodstoich; species=species, params=pars)
-prn = loadrxnetwork(mn1; networkname = rs.name) # dense version
+prn = loadrxnetwork(mn1; name = rs.name) # dense version
 @test rs == prn.rn
 mn2 = MatrixNetwork(rates,sparse(substoich), sparse(prodstoich); species=species, params=pars)
-prn = loadrxnetwork(mn2; networkname = rs.name) # sparse version
+prn = loadrxnetwork(mn2; name = rs.name) # sparse version
 @test rs == prn.rn
 
 cmn1 = ComplexMatrixNetwork(rates,compstoichmat,incidencemat;species=species,params=pars)
-prn = loadrxnetwork(cmn1; networkname = rs.name)
+prn = loadrxnetwork(cmn1; name = rs.name)
 @test rs == prn.rn
 cmn2 = ComplexMatrixNetwork(rates,sparse(compstoichmat),sparse(incidencemat);species=species,params=pars)
-prn = loadrxnetwork(cmn2; networkname = rs.name)
+prn = loadrxnetwork(cmn2; name = rs.name)
 @test rs == prn.rn
  
 
