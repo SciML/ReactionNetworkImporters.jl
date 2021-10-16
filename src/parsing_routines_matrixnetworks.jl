@@ -30,7 +30,7 @@ MatrixNetwork(rateexprs,substoich,prodstoich; species=Any[],params=Any[],t=nothi
            MatrixNetwork(rateexprs,substoich,prodstoich,species,params,t)
 
 # for dense matrices
-function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:ReactionSystem)) where {S <: AbstractVector,
+function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; name = gensym(:ReactionSystem)) where {S <: AbstractVector,
         T <: Matrix, U <: Matrix{Int}, V <: AbstractVector, W <: AbstractVector,X <: Any}
 
     sz = size(mn.substoich)
@@ -39,7 +39,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:Rea
     numrxs = sz[2]
 
     # create the network
-    rn = make_empty_network(;name = networkname)
+    rn = make_empty_network(;name = name)
     t = (mn.t === nothing) ? (@variables t)[1] : mn.t
 
     # create the species if none passed in
@@ -80,7 +80,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:Rea
 end
 
 # for sparse matrices
-function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:ReactionSystem)) where {S<:AbstractVector,
+function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; name = gensym(:ReactionSystem)) where {S<:AbstractVector,
         T<:SparseMatrixCSC,U<:SparseMatrixCSC{Int,Int},V<:AbstractVector, W<:AbstractVector,X <: Any}
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
@@ -88,7 +88,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:Rea
     numrxs = sz[2]
 
     # create the network
-    rn = make_empty_network(;name = networkname)
+    rn = make_empty_network(;name = name)
     t = (mn.t === nothing) ? (@variables t)[1] : mn.t
 
     # create the species if none passed in
@@ -177,7 +177,7 @@ ComplexMatrixNetwork(rateexprs,stoichmat,incidencemat; species=Any[],params=Any[
 
 
 # for Dense matrices version
-function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:ReactionSystem)) where {S <: AbstractVector,
+function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; name = gensym(:ReactionSystem)) where {S <: AbstractVector,
                 T <: Matrix, U <: Matrix{Int}, V <: AbstractVector,
                                         W <: AbstractVector,X <: Any}
    numspecs, numcomp = size(cmn.stoichmat)
@@ -214,12 +214,12 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; networkname = gen
                        cmn.stoichmat[ps_ind,pc_ind[i][1]])
        end
    end
-   rs = ReactionSystem(rn,t,species, cmn.params;name = networkname)
+   rs = ReactionSystem(rn,t,species, cmn.params;name = name)
    return ParsedReactionNetwork(rs,nothing)
 end
 
 # for sparse matrices version
-function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; networkname = gensym(:ReactionSystem)) where {S<:AbstractVector,
+function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; name = gensym(:ReactionSystem)) where {S<:AbstractVector,
                 T<:SparseMatrixCSC,U<:SparseMatrixCSC{Int,Int},V<:AbstractVector,
                                                     W<:AbstractVector,X <: Any}
    numspecs, numcomp = size(cmn.stoichmat)
@@ -256,6 +256,6 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; networkname = gen
                        vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
        end
    end
-   rs = ReactionSystem(rn,t,species, cmn.params;name = networkname)
+   rs = ReactionSystem(rn,t,species, cmn.params;name = name)
    return ParsedReactionNetwork(rs,nothing)
 end
