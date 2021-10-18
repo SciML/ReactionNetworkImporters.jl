@@ -190,7 +190,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     idx   = 1
 
     print("Parsing parameters...")
-    ptoids,pvals,idx = parse_parameters(ft, lines, idx)
+    ptoids,pvals,idx = parse_params(ft, lines, idx)
     println("done")
 
     rn = make_empty_network(name = name)
@@ -219,7 +219,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     opmod = Module()
     Base.eval(opmod, :(using ModelingToolkit))
     Base.eval(opmod, :(@variables t))
-    for p in params(rn)
+    for p in parameters(rn)
         psym = nameof(p)
         Base.eval(opmod, :($(psym) = Num($p)))
     end
