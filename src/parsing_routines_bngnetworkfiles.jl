@@ -183,17 +183,17 @@ end
 
 
 # for parsing a subset of the BioNetGen .net file format
-function loadrxnetwork(ft::BNGNetwork, rxfilename; kwargs...)
+function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem), kwargs...)
 
     file  = open(rxfilename, "r");
     lines = readlines(file)
     idx   = 1
 
     print("Parsing parameters...")
-    ptoids,pvals,idx = parse_params(ft, lines, idx)
+    ptoids,pvals,idx = parse_parameters(ft, lines, idx)
     println("done")
 
-    rn = make_empty_network()
+    rn = make_empty_network(name = name)
     t  = ModelingToolkit.get_iv(rn)
 
     print("Adding parameters...")

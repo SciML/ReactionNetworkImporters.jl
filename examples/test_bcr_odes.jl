@@ -30,7 +30,7 @@ show(to)
 rnbng = prnbng.rn; u0 = prnbng.u₀; p = prnbng.p; 
 @timeit to "bODESystem" bosys = convert(ODESystem, rnbng)
 show(to)
-@timeit to "bODEProb" boprob = ODEProblem(bosys, Pair.(species(rnbng),u0), (0.,tf), Pair.(params(rnbng),p))
+@timeit to "bODEProb" boprob = ODEProblem(bosys, Pair.(species(rnbng),u0), (0.,tf), Pair.(parameters(rnbng),p))
 show(to)
 u = copy(u0);
 du = similar(u);
