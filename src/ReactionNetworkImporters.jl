@@ -1,6 +1,7 @@
 module ReactionNetworkImporters
 
-using DataStructures, Symbolics, SymbolicUtils, Catalyst, SparseArrays
+using DataStructures, Catalyst, SparseArrays
+using Symbolics: operation, unwrap
 
 # creates a ModelingToolkit function-like Symbol
 # can then do stuff like
