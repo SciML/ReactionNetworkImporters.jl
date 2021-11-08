@@ -32,15 +32,15 @@ struct ParsedReactionNetwork
     "Expressions for the Parameters"
     paramexprs
 
-    "Dict from `Variable` in species(rn) to full string for species name"
+    "Dict from symbolic variable in species(rn) to full string for species name"
     varstonames
 
-    "Dict from lumped species name (as string) to group of species ids"
-    groupstoids
+    "Dict from group name (as string) to corresponding symbolic variable"
+    groupstosyms
 
 end
-ParsedReactionNetwork(rn::ReactionSystem, u₀; p=nothing, paramexprs=nothing, varstonames=nothing, groupstoids=nothing) = 
-                        ParsedReactionNetwork(rn, u₀, p, paramexprs, varstonames, groupstoids)
+ParsedReactionNetwork(rn::ReactionSystem, u₀; p=nothing, paramexprs=nothing, varstonames=nothing, groupstosyms=nothing) = 
+                        ParsedReactionNetwork(rn, u₀, p, paramexprs, varstonames, groupstosyms)
 
 export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
 

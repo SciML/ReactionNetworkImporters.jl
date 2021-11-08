@@ -62,6 +62,7 @@ hasstripchars = (s) -> occursin(Regex("[$CHARS_TO_STRIP]"), s)
 const SPECIES_BLOCK_START = "begin species"
 const SPECIES_BLOCK_END = "end species"
 const MAX_SYM_LEN = 8
+make_shortsym(name,sidx) = length(name) < MAX_SYM_LEN ? Symbol(stripchars(name)) : Symbol(string("S$sidx"))
 function parse_species(ft::BNGNetwork, lines, idx)
 
     idx = seek_to_block(lines, idx, SPECIES_BLOCK_START)
@@ -74,7 +75,7 @@ function parse_species(ft::BNGNetwork, lines, idx)
         vals = split(lines[idx])
         sidx = parse(Int,vals[1])
         sym = Symbol(vals[2])
-        shortsym = length(vals[2]) < MAX_SYM_LEN ? Symbol(stripchars(vals[2])) : Symbol(string("S$sidx"))
+        shortsym = make_shortsym(vals[2], sidx)
         shortsymstoids[shortsym] = sidx
         shortsymstosyms[shortsym] = sym
         push!(u0exprs,  Meta.parse(vals[3]))
@@ -145,25 +146,39 @@ end
 
 const GROUPS_BLOCK_START = "begin groups"
 const GROUPS_BLOCK_END = "end groups"
-function parse_groups(ft::BNGNetwork, lines, idx, idstoshortsyms, rn)
+function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsyms, specs, t)
 
     idx = seek_to_block(lines, idx, GROUPS_BLOCK_START)
-    namestoids = Dict{Symbol,Vector{Int}}()
-    specsmap = speciesmap(rn)
-    t = ModelingToolkit.get_iv(rn)
+    namestosyms = Dict{String,Any}()
+    obseqs = Equation[]
     while lines[idx] != GROUPS_BLOCK_END
         vals = split(lines[idx])
         name = Symbol(vals[2])
+        obs = (@variables $name($t))[1]
+        namestosyms[vals[2]] = obs
 
         # map from BioNetGen id to reaction_network id
-        ids = [specsmap[funcsym(idstoshortsyms[parse(Int,val)],t)] for val in split(vals[3],",")]
+        rhs = Num(0)
+        groupterms = split(vals[3], ",")
+        for groupterm in groupterms
+            splitterm = split(groupterm, "*")
+            if length(splitterm) == 1
+                ssym = idstoshortsyms[parse(Int,splitterm[1])]
+                rhs += funcsym(ssym,t)
+            elseif length(splitterm) == 2
+                ssym = idstoshortsyms[parse(Int,splitterm[2])]
+                rhs += parse(Int,splitterm[1]) * funcsym(ssym,t)
+            else
+                error("Don't know how to handle term: $groupterm, appearing in a Group")
+            end
+        end
+        push!(obseqs, Equation(obs, rhs))        
 
-        namestoids[name] = ids
         idx += 1
         (idx > length(lines)) && error("Block: ", GROUPS_BLOCK_END, " was never found.")
     end
 
-    namestoids,idx
+    obseqs,namestosyms,idx
 end
 
 function exprs_to_nums(ptoids, pvals, u0exprs)
@@ -232,18 +247,18 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     rxs,idx = parse_reactions!(ft, specs, ps, t, lines, idx, idstoshortsyms, opmod)
     println("done")
 
-    rn = ReactionSystem(rxs, t, specs, ps; name=name, kwargs...)
-
     print("Parsing groups...")
-    groupstoids,idx = parse_groups(ft, lines, idx, idstoshortsyms, rn)
+    obseqs,groupstosyms,idx = parse_groups(ft, lines, idx, shortsymstosyms, idstoshortsyms, specs, t)
     println("done")
 
     close(file)
+
+    rn = ReactionSystem(rxs, t, specs, ps; name=name, observed=obseqs, kwargs...)
 
     # get numeric values for parameters and u₀
     p,u₀ = exprs_to_nums(ptoids, pvals, u0exprs)
     sm = speciesmap(rn)
     @assert all( sm[funcsym(sym,t)] == i for (i,sym) in enumerate(idstoshortsyms) )
 
-    ParsedReactionNetwork(rn, u₀; p = p, paramexprs = pvals, varstonames = shortsymstosyms, groupstoids = groupstoids)
+    ParsedReactionNetwork(rn, u₀; p = p, paramexprs = pvals, varstonames = shortsymstosyms, groupstosyms = groupstosyms)
 end
