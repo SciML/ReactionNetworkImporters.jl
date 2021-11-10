@@ -21,19 +21,19 @@ rnbng = prnbng.rn; u0 = prnbng.u₀; p = prnbng.p;
 boprob = ODEProblem(rnbng, u0, (0.,tf), p)
 
 # BNG simulation data testing
-pTetRid = prnbng.groupstoids[:pTetR][1]
 bngsol = gdatdf[!,:pTetR]
 
 # note solvers run _much_ faster the second time 
 bsol = solve(boprob, Tsit5(), abstol=1e-12, reltol=1e-12, saveat=tf/nsteps); 
+@unpack pTetR = prnbng.rn
 
-if doplot
+if doplot    
     plotlyjs()
     p1 = plot(gdatdf[!,:time], gdatdf[!,:pTetR], label=:BNGPTetR)    
-    plot!(p1, bsol.t, bsol[pTetRid,:], label=:DEBPTetR) 
+    plot!(p1, bsol.t, bsol[pTetR], label=:DEBPTetR) 
     display(p1)    
 end
 
 @test all(bsol.t .== gdatdf[!,:time])
-@test all( abs.(gdatdf[!,:pTetR] - bsol[pTetRid,:]) .< 1e-6 .* abs.(gdatdf[!,:pTetR]))
+@test all( abs.(gdatdf[!,:pTetR] - bsol[pTetR]) .< 1e-6 .* abs.(gdatdf[!,:pTetR]))
 
