@@ -59,7 +59,7 @@ println()
 @timeit to "KenCarp4-2" begin bsol = solve(boprob,KenCarp4(autodiff=false), abstol=1e-8, reltol=1e-8, saveat=1.); end; show(to)
 
 # Activated Syk from DiffEq
-@unpack Activated_Syk = bosys
+@unpack Activated_Syk = rnbng
 
 if doplot
     plotlyjs()
