@@ -17,11 +17,11 @@ println("done")
 
 # load the BNG reaction network in DiffEqBio
 prnbng = loadrxnetwork(BNGNetwork(), fname)
-rnbng = prnbng.rn; u0 = prnbng.u₀; p = prnbng.p; 
-boprob = ODEProblem(rnbng, u0, (0.,tf), p)
+rn = prnbng.rn
+boprob = ODEProblem(rn, Float64[], (0.,tf), Float64[])
 
 # BNG simulation data testing
-@unpack A = rnbng
+@unpack A = rn
 Asol = gdatdf[!,:A]
 
 # note solvers run _much_ faster the second time 
