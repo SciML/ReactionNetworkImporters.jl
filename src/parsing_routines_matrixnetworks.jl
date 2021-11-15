@@ -76,7 +76,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; name = gensym(:ReactionSy
         addreaction!(rn, Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich))
     end
 
-    ParsedReactionNetwork(rn, nothing)
+    ParsedReactionNetwork(rn)
 end
 
 # for sparse matrices
@@ -130,7 +130,7 @@ function loadrxnetwork(mn::MatrixNetwork{S,T,U,V,W,X}; name = gensym(:ReactionSy
         addreaction!(rn, Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich))
      end
 
-    ParsedReactionNetwork(rn, nothing)
+    ParsedReactionNetwork(rn)
 end
 
 
@@ -214,8 +214,8 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; name = gensym(:Re
                        cmn.stoichmat[ps_ind,pc_ind[i][1]])
        end
    end
-   rs = ReactionSystem(rn,t,species, cmn.params;name = name)
-   return ParsedReactionNetwork(rs,nothing)
+   rs = ReactionSystem(rn,t,species, cmn.params; name = name)
+   ParsedReactionNetwork(rs)
 end
 
 # for sparse matrices version
@@ -256,6 +256,6 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S,T,U,V,W,X}; name = gensym(:Re
                        vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
        end
    end
-   rs = ReactionSystem(rn,t,species, cmn.params;name = name)
-   return ParsedReactionNetwork(rs,nothing)
+   rs = ReactionSystem(rn,t,species, cmn.params; name = name)
+   ParsedReactionNetwork(rs)
 end

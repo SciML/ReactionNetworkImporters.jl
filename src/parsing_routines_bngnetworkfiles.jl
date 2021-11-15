@@ -196,6 +196,35 @@ function exprs_to_nums(ptoids, pvals, u0exprs)
     p,u0
 end
 
+function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
+    pmap = Dict()
+    for (psym,pid) in ptoids
+        pvar      = getproperty(opmod, psym)
+        parsedval = pvals[pid]
+        if (parsedval isa Expr) || (parsedval isa Symbol)
+            pval = Base.eval(opmod, :($parsedval))
+        else 
+            @assert parsedval isa Number
+            pval = parsedval
+        end
+        push!(pmap, pvar => pval)
+    end
+
+    u0map = Dict()
+    for (i,u0expr) in enumerate(u0exprs)
+        uvar = specs[i]
+        if (u0expr isa Expr) || (u0expr isa Symbol)
+            u0val = Base.eval(opmod, :($u0expr))
+        else 
+            @assert u0expr isa Number
+            u0val = u0expr
+        end
+        push!(u0map, uvar => u0val)
+    end
+
+    union(pmap,u0map),pmap,u0map
+end
+
 
 # for parsing a subset of the BioNetGen .net file format
 function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem), kwargs...)
@@ -253,12 +282,15 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
 
     close(file)
 
-    rn = ReactionSystem(rxs, t, specs, ps; name=name, observed=obseqs, kwargs...)
+    # setup default values / expressions for params and initial conditions
+    defmap,pmap,u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
+    
+    # build the model    
+    rn = ReactionSystem(rxs, t, specs, ps; name=name, observed=obseqs, defaults=defmap, kwargs...)
 
     # get numeric values for parameters and u₀
-    p,u₀ = exprs_to_nums(ptoids, pvals, u0exprs)
     sm = speciesmap(rn)
     @assert all( sm[funcsym(sym,t)] == i for (i,sym) in enumerate(idstoshortsyms) )
 
-    ParsedReactionNetwork(rn, u₀; p = p, paramexprs = pvals, varstonames = shortsymstosyms, groupstosyms = groupstosyms)
+    ParsedReactionNetwork(rn; u₀=u0map, p=pmap, varstonames=shortsymstosyms, groupstosyms=groupstosyms)
 end
