@@ -181,21 +181,6 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
     obseqs,namestosyms,idx
 end
 
-function exprs_to_nums(ptoids, pvals, u0exprs)
-    p    = zeros(Float64, length(ptoids))
-    pmod = Module()
-    for (psym,pid) in ptoids
-        p[pid] = Base.eval(pmod, :($psym = $(pvals[pid])))
-    end
-
-    u0 = zeros(Float64, length(u0exprs))
-    for (i,u0expr) in enumerate(u0exprs)
-        u0[i] = Base.eval(pmod, :($u0expr))
-    end
-
-    p,u0
-end
-
 function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
     pmap = Dict()
     for (psym,pid) in ptoids
