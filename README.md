@@ -91,7 +91,8 @@ substoich =[ 2  0  1  0  0;
 prodstoich =  [0  2  0  1  3;
                 1  0  0  1  0;
                 0  0  1  0  0]
-mn= MatrixNetwork(pars, substoich, prodstoich; species=species, params=pars) # matrix network
+mn= MatrixNetwork(pars, substoich, prodstoich; species=species, 
+                  params=pars) # a matrix network
 prn = loadrxnetwork(mn) # dense version
 
 # test the two networks are the same
@@ -107,7 +108,8 @@ incidencemat  = [-1   1   0   0   0;
                  0   0   1  -1   0;
                  0   0   0   0  -1;
                  0   0   0   0   1]
-cmn= ComplexMatrixNetwork(pars, stoichmat, incidencemat; species=species, params=pars)  # complex matrix network
+cmn= ComplexMatrixNetwork(pars, stoichmat, incidencemat; species=species, 
+                          params=pars)  # a complex matrix network
 prn = loadrxnetwork(cmn)
 
 # test the two networks are the same
@@ -116,10 +118,12 @@ prn = loadrxnetwork(cmn)
 
 The basic usages are
 ```julia
-mn = MatrixNetwork(rateexprs, substoich, prodstoich; species=Any[], params=Any[], t=nothing)
+mn = MatrixNetwork(rateexprs, substoich, prodstoich; species=Any[], 
+                   params=Any[], t=nothing)
 prn = loadrxnetwork(mn::MatrixNetwork) 
 
-cmn = ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species=Any[], params=Any[], t=nothing)
+cmn = ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species=Any[], 
+                           params=Any[], t=nothing)
 prn = loadrxnetwork(cmn::ComplexMatrixNetwork)
 ```
 Here `MatrixNetwork` and `ComplexMatrixNetwork` are the types, which select that
@@ -150,10 +154,10 @@ reaction rate expressions. These two types have the following fields:
   in the network. Can be constructed using the Symbolics.jl `@variables` macro.
   Each species should be dependent on the same time variable (`t` in the example
   above). 
-- `parameters`, an optional vector of symbolic variables representing each
-  parameter in the network. Can be constructed with the
+- `parameters`, a vector of symbolic variables representing each parameter in
+  the network. Can be constructed with the
   [ModelingToolkit.jl](https://github.com/SciML/ModelingToolkit.jl)
-  `@parameters` macro.
+  `@parameters` macro. If no parameters are used it is an optional keyword.
 - `t`, an optional Symbolics.jl variable representing time as the independent
   variable of the reaction network. If not provided `Catalyst.DEFAULT_IV` is
   used to determine the default time variable.
