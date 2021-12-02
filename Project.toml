@@ -15,7 +15,7 @@ Catalyst = "10.1"
 DataStructures = "0.18"
 ModelingToolkit = "7"
 Symbolics = "4"
-julia = "1.5"
+julia = "1.6"
 
 [extras]
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
