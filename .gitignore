@@ -6,3 +6,6 @@
 */.ipynb_checkpoints/*
 .DS_Store
 Manifest.toml
+.vscode
+.vscode/*
+
