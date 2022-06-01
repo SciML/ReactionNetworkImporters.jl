@@ -1,7 +1,7 @@
 name = "ReactionNetworkImporters"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 authors = ["Samuel Isaacson <isaacsas@users.noreply.github.com>"]
-version = "0.13.2"
+version = "0.13.3"
 
 [deps]
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
