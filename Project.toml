@@ -11,7 +11,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
-Catalyst = "10.1"
+Catalyst = "10.1, 11"
 DataStructures = "0.18"
 ModelingToolkit = "7, 8"
 Symbolics = "4"
