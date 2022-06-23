@@ -9,7 +9,7 @@ using Symbolics: operation, unwrap
 # S₁ = funcsym(S,1)
 # u = S₁(t)
 function funcsym(S::Symbol, t, args...)
-    S = Symbol(S,args...)
+    S = Symbol(S, args...)
     (@variables $(S)(t))[1]
 end
 
@@ -19,25 +19,26 @@ abstract type NetworkFileFormat end
 #struct RSSANetwork <: NetworkFileFormat end
 struct BNGNetwork <: NetworkFileFormat end
 
-struct ParsedReactionNetwork    
+struct ParsedReactionNetwork
     "Catalyst Network"
     rn::ReactionSystem
 
     "Dict mapping initial condition symbolic variables to values."
-    u₀
+    u₀::Any
 
     "Dict mapping parameter symbolic variables to values."
-    p
+    p::Any
 
     "Dict mapping symbolic variable for species names to full string for species name"
-    varstonames
+    varstonames::Any
 
     "Dict from group name (as string) to corresponding symbolic variable"
-    groupstosyms
-
+    groupstosyms::Any
 end
-ParsedReactionNetwork(rn::ReactionSystem; u₀=nothing, p=nothing, varstonames=nothing, groupstosyms=nothing) = 
-                        ParsedReactionNetwork(rn, u₀, p, varstonames, groupstosyms)
+function ParsedReactionNetwork(rn::ReactionSystem; u₀ = nothing, p = nothing,
+                               varstonames = nothing, groupstosyms = nothing)
+    ParsedReactionNetwork(rn, u₀, p, varstonames, groupstosyms)
+end
 
 export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
 
