@@ -1,8 +1,8 @@
 using ReactionNetworkImporters, Catalyst, ModelingToolkit, DiffEqJump
 using Plots
 
-datadir  = joinpath(@__DIR__,"../data/bcr_ssa")
-fname    = joinpath(datadir, "BCRSSA.net")
+datadir = joinpath(@__DIR__, "../data/bcr_ssa")
+fname = joinpath(datadir, "BCRSSA.net")
 
 prn = loadrxnetwork(BNGNetwork(), fname)
 rn = prn.rn
@@ -28,9 +28,9 @@ rn = prn.rn
 tf = 20000.0
 jsys = convert(JumpSystem, rn)
 u0 = convert.(Int, ModelingToolkit.varmap_to_vars(ModelingToolkit.defaults(jsys), states(jsys)))
-dprob = DiscreteProblem(jsys, u0, (0.0,tf), [])
+dprob = DiscreteProblem(jsys, u0, (0.0, tf), [])
 @assert eltype(dprob.u0) <: Int
-jprob = JumpProblem(jsys, dprob, RSSACR(), save_positions=(false,false))
-sol = solve(jprob, SSAStepper(), saveat=tf/20000)
+jprob = JumpProblem(jsys, dprob, RSSACR(); save_positions = (false, false))
+sol = solve(jprob, SSAStepper(); saveat = tf / 20000)
 @unpack Activated_Syk = rn
-plot(sol, vars=Activated_Syk)
+plot(sol; vars = Activated_Syk)
