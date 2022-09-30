@@ -8,7 +8,7 @@ This package provides importers to load reaction networks into
 [`ReactionSystem`s](https://catalyst.sciml.ai/dev/api/catalyst_api/#ModelingToolkit.ReactionSystem)
 from several file formats. Currently it supports loading networks in the
 following formats:
-1. A *subset* of the BioNetGen .net file format.
+1. A *subset* of the BioNetGen .net file format. Alternatively, add `writeSBML()` at the bottom of a BioNetGen model and import SBML with [SBMLToolkit.jl](https://github.com/SciML/SBMLToolkit.jl).
 2. Networks represented by dense or sparse substrate and product stoichiometric
    matrices.
 3. Networks represented by dense or sparse complex stoichiometric and incidence matrices.   
