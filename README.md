@@ -13,7 +13,7 @@ following formats:
    matrices.
 3. Networks represented by dense or sparse complex stoichiometric and incidence matrices.   
 
-[SBMLToolkit.jl](https://github.com/SciML/SBMLToolkit.jl) provides an alternative for loading SBML files into Catalyst models, offering a much broader set of supported features. It allows the import of models that include features such as constant species, boundary condition species, events, constraint equations and more.
+[SBMLToolkit.jl](https://github.com/SciML/SBMLToolkit.jl) provides an alternative for loading SBML files into Catalyst models, offering a much broader set of supported features. It allows the import of models that include features such as constant species, boundary condition species, events, constraint equations and more. SBML files can be generated from many standard modeling tools, including BioNetGen, COPASI, and Virtual Cell.
 
 ----
 ## Examples
