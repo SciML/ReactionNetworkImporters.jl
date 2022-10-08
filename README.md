@@ -12,7 +12,8 @@ following formats:
 2. Networks represented by dense or sparse substrate and product stoichiometric
    matrices.
 3. Networks represented by dense or sparse complex stoichiometric and incidence matrices.   
-<!-- 3. The basic format used by the [RSSA](https://www.cosbi.eu/research/prototypes/rssa) group at COSBI in their [model collection](https://www.cosbi.eu/prototypes/jLiexDeBIgFV4zxwnKiW97oc4BjTtIoRGajqdUz4.zip). -->
+
+[SBMLToolkit.jl](https://github.com/SciML/SBMLToolkit.jl) provides an alternative for loading SBML files into Catalyst models, offering a much broader set of supported features. It allows the import of models that include features such as constant species, boundary condition species, events, constraint equations and more.
 
 ----
 ## Examples
