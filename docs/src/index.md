@@ -1,8 +1,5 @@
 # ReactionNetworkImporters.jl
 
-[![Build Status](https://travis-ci.org/SciML/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/SciML/ReactionNetworkImporters.jl)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/SciML/reactionnetworkimporters-jl/branch/master) -->
-
 This package provides importers to load reaction networks into
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl)
 [`ReactionSystem`s](https://catalyst.sciml.ai/dev/api/catalyst_api/#ModelingToolkit.ReactionSystem)
@@ -25,10 +22,11 @@ tools, including BioNetGen, COPASI, and Virtual Cell.
 
 ### Loading a BioNetGen .net file
 A simple network from the builtin BioNetGen bngl examples is the
-[repressilator](data/repressilator/Repressilator.bngl). The `generate_network`
-command in the bngl file outputs a reduced network description, i.e. a
-[.net](data/repressilator/Repressilator.net) file, which can be loaded into a
-Catalyst `ReactionSystem` as:
+[repressilator](https://github.com/SciML/ReactionNetworkImporters.jl/blob/65f5f23bc52a7eefe32ca2ccabef0298e8e5772d/data/repressilator/Repressilator.bngl).
+The `generate_network` command in the bngl file outputs a reduced network
+description, i.e. a
+[.net](https://github.com/SciML/ReactionNetworkImporters.jl/blob/65f5f23bc52a7eefe32ca2ccabef0298e8e5772d/data/repressilator/Repressilator.net)
+file, which can be loaded into a Catalyst `ReactionSystem` as:
 ```julia
 using ReactionNetworkImporters
 fname = "PATH/TO/Repressilator.net"
@@ -184,12 +182,3 @@ If the keyword argument `species` is not set, the resulting reaction network
 will simply name the species `S1`, `S2`,..., `SN` for a system with `N` total
 species. `params` defaults to an empty vector, so that it does not need to be
 set for systems with no parameters.
-
-<!-- ### Loading a RSSA format network file
-As the licensing is unclear we can not redistribute any example RSSA formatted networks. They can be downloaded from the model collection link listed above. Assuming you've saved both a reaction network file and corresponding initial condition file, they can be loaded as
-```julia
-initialconditionf = "PATH/TO/FILE"
-networkf = "PATH/TO/FILE"
-rssarn = loadrxnetwork(RSSANetwork(), "RSSARxSys", initialconditionf, networkf)
-```
-Here `RSSANetwork` specifies the type of the file to parse, and `RSSARxSys` gives the type of the generated `reaction_network`. `rssarn` is again a `ParsedReactionNetwork`, but only the `rn` and `u₀` fields will now be relevant (the remaining fields will be set to `nothing`). -->
