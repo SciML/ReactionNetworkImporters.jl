@@ -1,7 +1,9 @@
 # ReactionNetworkImporters.jl
 
 [![Build Status](https://travis-ci.org/SciML/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/SciML/ReactionNetworkImporters.jl)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/wqq5flk2w8asad78/branch/master?svg=true)](https://ci.appveyor.com/project/SciML/reactionnetworkimporters-jl/branch/master) -->
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://sciml.github.io/ReactionNetworkImporters.jl/stable/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://sciml.github.io/ReactionNetworkImporters.jl/dev/)
+
 
 This package provides importers to load reaction networks into
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl)
