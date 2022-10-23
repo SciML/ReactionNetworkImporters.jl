@@ -1,10 +1,10 @@
 # ReactionNetworkImporters.jl
 
 [![Join the chat at https://julialang.zulipchat.com #sciml-bridged](https://img.shields.io/static/v1?label=Zulip&message=chat&color=9558b2&labelColor=389826)](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
-[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/CellMLToolkit/stable/)
+[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/ReactionNetworkImporters/stable/)
 
-[![codecov](https://codecov.io/gh/SciML/CellMLToolkit.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/CellMLToolkit.jl)
-[![Build Status](https://github.com/SciML/CellMLToolkit.jl/workflows/CI/badge.svg)](https://github.com/SciML/CellMLToolkit.jl/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/SciML/ReactionNetworkImporters.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/ReactionNetworkImporters.jl)
+[![Build Status](https://github.com/SciML/ReactionNetworkImporters.jl/workflows/CI/badge.svg)](https://github.com/SciML/ReactionNetworkImporters.jl/actions?query=workflow%3ACI)
 
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
@@ -27,8 +27,8 @@ equations and more. SBML files can be generated from many standard modeling
 tools, including BioNetGen, COPASI, and Virtual Cell.
 
 For information on using the package,
-[see the stable documentation](https://docs.sciml.ai/CellMLToolkit/stable/). Use the
-[in-development documentation](https://docs.sciml.ai/CellMLToolkit/dev/) for the version of
+[see the stable documentation](https://docs.sciml.ai/ReactionNetworkImporters/stable/). Use the
+[in-development documentation](https://docs.sciml.ai/ReactionNetworkImporters/dev/) for the version of
 the documentation which contains the unreleased features.
 
 ## Examples
