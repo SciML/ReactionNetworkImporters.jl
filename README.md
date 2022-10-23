@@ -1,13 +1,17 @@
 # ReactionNetworkImporters.jl
 
-[![Build Status](https://travis-ci.org/SciML/ReactionNetworkImporters.jl.svg?branch=master)](https://travis-ci.org/SciML/ReactionNetworkImporters.jl)
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://sciml.github.io/ReactionNetworkImporters.jl/stable/)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://sciml.github.io/ReactionNetworkImporters.jl/dev/)
+[![Join the chat at https://julialang.zulipchat.com #sciml-bridged](https://img.shields.io/static/v1?label=Zulip&message=chat&color=9558b2&labelColor=389826)](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
+[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/CellMLToolkit/stable/)
 
+[![codecov](https://codecov.io/gh/SciML/CellMLToolkit.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/CellMLToolkit.jl)
+[![Build Status](https://github.com/SciML/CellMLToolkit.jl/workflows/CI/badge.svg)](https://github.com/SciML/CellMLToolkit.jl/actions?query=workflow%3ACI)
+
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
 This package provides importers to load reaction networks into
-[Catalyst.jl](https://github.com/SciML/Catalyst.jl)
-[`ReactionSystem`s](https://catalyst.sciml.ai/dev/api/catalyst_api/#ModelingToolkit.ReactionSystem)
+[Catalyst.jl](https://docs.sciml.ai/Catalyst/stable/)
+[`ReactionSystem`s](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#ModelingToolkit.ReactionSystem)
 from several file formats. Currently it supports loading networks in the
 following formats:
 1. A *subset* of the BioNetGen .net file format.
@@ -15,14 +19,18 @@ following formats:
    matrices.
 3. Networks represented by dense or sparse complex stoichiometric and incidence matrices.
 
-[SBMLToolkit.jl](https://github.com/SciML/SBMLToolkit.jl) provides an
+[SBMLToolkit.jl](https://docs.sciml.ai/SBMLToolkit/stable/) provides an
 alternative for loading SBML files into Catalyst models, offering a much broader
 set of supported features. It allows the import of models that include features
 such as constant species, boundary condition species, events, constraint
 equations and more. SBML files can be generated from many standard modeling
 tools, including BioNetGen, COPASI, and Virtual Cell.
 
-----
+For information on using the package,
+[see the stable documentation](https://docs.sciml.ai/CellMLToolkit/stable/). Use the
+[in-development documentation](https://docs.sciml.ai/CellMLToolkit/dev/) for the version of
+the documentation which contains the unreleased features.
+
 ## Examples
 
 ### Loading a BioNetGen .net file
@@ -67,7 +75,7 @@ already stored in the generated `ReactionSystem`, `rn`. A `Dict` mapping each
 symbolic species and parameter to its initial value or symbolic expression can
 be obtained using `ModelingToolkit.defaults(rn)`.
 
-See the [Catalyst documentation](https://catalyst.sciml.ai/dev/) for how to
+See the [Catalyst documentation](https://docs.sciml.ai/Catalyst/stable/) for how to
 generate ODE, SDE, jump and other types of models.
 
 ### Loading a matrix representation
@@ -137,11 +145,11 @@ prn = loadrxnetwork(cmn::ComplexMatrixNetwork)
 Here `MatrixNetwork` and `ComplexMatrixNetwork` are the types, which select that
 we are constructing a substrate/product stoichiometric matrix-based or a
 reaction complex matrix-based stoichiometric representation as input. See the
-[Catalyst.jl API](https://catalyst.sciml.ai/dev/api/catalyst_api/) for more
+[Catalyst.jl API](hhttps://docs.sciml.ai/Catalyst/stable/api/catalyst_api/) for more
 discussion on these matrix representations, and how Catalyst handles symbolic
 reaction rate expressions. These two types have the following fields:
 - `rateexprs`, any valid
-  [Symbolics.jl](https://github.com/JuliaSymbolics/Symbolics.jl) expression for
+  [Symbolics.jl](https://docs.sciml.ai/Symbolics/stable/) expression for
   the rates, or any basic number type. This can be a hardcoded rate constant
   like `1.0`, a parameter like `k1` above, or an general Symbolics expression
   involving parameters and species like `k*A`.
@@ -155,16 +163,16 @@ reaction rate expressions. These two types have the following fields:
       in reaction `j`.
   - For `ComplexMatrixNetwork`
     - `stoichmat`, the complex stoichiometry matrix [defined
-      here](https://catalyst.sciml.ai/dev/api/catalyst_api/#Catalyst.complexstoichmat).
+      here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
     - `incidencemat`, the complex incidence matrix [defined
-      here](https://catalyst.sciml.ai/dev/api/catalyst_api/#Catalyst.reactioncomplexes).
+      here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.reactioncomplexes).
 - `species`, an optional vector of symbolic variables representing each species
   in the network. Can be constructed using the Symbolics.jl `@variables` macro.
   Each species should be dependent on the same time variable (`t` in the example
   above).
 - `parameters`, a vector of symbolic variables representing each parameter in
   the network. Can be constructed with the
-  [ModelingToolkit.jl](https://github.com/SciML/ModelingToolkit.jl)
+  [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/)
   `@parameters` macro. If no parameters are used it is an optional keyword.
 - `t`, an optional Symbolics.jl variable representing time as the independent
   variable of the reaction network. If not provided `Catalyst.DEFAULT_IV` is
@@ -173,7 +181,7 @@ reaction rate expressions. These two types have the following fields:
 For both input types, `loadrxnetwork` returns a `ParsedReactionNetwork`, `prn`,
 with only the field, `prn.rn`, filled in. `prn.rn` corresponds to the generated
 [Catalyst.jl
-`ReactionSystem`](https://catalyst.sciml.ai/dev/api/catalyst_api/#Catalyst.ReactionSystem)
+`ReactionSystem`](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.ReactionSystem)
 that represents the network.
 
 Dispatches are added if `substoich` and `prodstoich` both have the type
