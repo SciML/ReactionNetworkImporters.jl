@@ -16,6 +16,7 @@ mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/require", "[tex]/ma
 makedocs(sitename = "ReactionNetworkImporters.jl",
          authors = "Samuel Isaacson",
          format = Documenter.HTML(; analytics = "UA-90474609-3",
+                                  assets = ["assets/favicon.ico"],
                                   mathengine,
                                   prettyurls = (get(ENV, "CI", nothing) == "true"),
                                   canonical = "https://docs.sciml.ai/ReactionNetworkImporters/stable/"),
