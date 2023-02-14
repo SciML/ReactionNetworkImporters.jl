@@ -24,8 +24,15 @@ makedocs(sitename = "ReactionNetworkImporters.jl",
                                   prettyurls = (get(ENV, "CI", nothing) == "true"),
                                   canonical = "https://docs.sciml.ai/ReactionNetworkImporters/stable/"),
          modules = [ReactionNetworkImporters],
-         doctest = false,
-         clean = true,
+         clean = true, doctest = false, linkcheck = true,
+         strict = [
+             :doctest,
+             :linkcheck,
+             :parse_error,
+             :example_block,
+             # Other available options are
+             # :autodocs_block, :cross_references, :docs_block, :eval_block, :example_block, :footnote, :meta_block, :missing_docs, :setup_block
+         ],
          pages = pages)
 
 deploydocs(repo = "github.com/SciML/ReactionNetworkImporters.jl.git";
