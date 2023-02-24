@@ -1,7 +1,7 @@
 name = "ReactionNetworkImporters"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 authors = ["Samuel Isaacson <isaacsas@users.noreply.github.com>"]
-version = "0.13.5"
+version = "0.2"
 
 [deps]
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
@@ -11,10 +11,10 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
-Catalyst = "10.1, 11, 12"
+Catalyst = "13"
 DataStructures = "0.18"
-ModelingToolkit = "7, 8"
-Symbolics = "4"
+ModelingToolkit = "8.47"
+Symbolics = "5.0.3"
 julia = "1.6"
 
 [extras]

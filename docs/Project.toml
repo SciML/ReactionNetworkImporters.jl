@@ -4,6 +4,6 @@ Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 ReactionNetworkImporters = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 
 [compat]
-Catalyst = "12.3"
+Catalyst = "13.0"
 Documenter = "0.27"
-ReactionNetworkImporters = "0.13"
+ReactionNetworkImporters = "0.2"

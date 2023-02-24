@@ -8,7 +8,7 @@ rs = @reaction_network rs1 begin
     k3, S1 + S2 --> S3
     k4, S3 --> S1 + S2
     k5, 3S3 --> 3S1
-end k1 k2 k3 k4 k5
+end
 
 @parameters k1 k2 k3 k4 k5
 pars = [k1, k2, k3, k4, k5]
@@ -72,9 +72,9 @@ rs = @reaction_network rs3 begin
     k3, A + B --> C
     k4, C --> A + B
     k5, 3C --> 3A
-end k1 k2 k3 k4 k5
-@parameters t
-@variables A(t) B(t) C(t)
+end
+@variables t
+@species A(t) B(t) C(t)
 species = [A, B, C]
 rates = [k1 * A, k2, k3, k4, k5]
 mn1 = MatrixNetwork(rates, substoich, prodstoich; species = species, params = pars)
