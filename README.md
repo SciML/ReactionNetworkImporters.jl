@@ -169,18 +169,18 @@ reaction rate expressions. These two types have the following fields:
     involving parameters and species like `k*A`.
 
   - matrix inputs
-
+    
       + For `MatrixNetwork`
-
+        
           * `substoich`, a number of species by number of reactions matrix with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a
             substrate in reaction `j`.
           * `prodstoich`, a number of species by number of reactions matrix with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a product
             in reaction `j`.
-
+    
       + For `ComplexMatrixNetwork`
-
+        
           * `stoichmat`, the complex stoichiometry matrix [defined
             here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined
