@@ -35,7 +35,7 @@ Pkg.add("ReactionNetworkImporters")
 
   - See the [SciML Style Guide](https://github.com/SciML/SciMLStyle) for common coding practices and other style decisions.
   - There are a few community forums:
-    
+
       + The #diffeq-bridged and #sciml-bridged channels in the
         [Julia Slack](https://julialang.org/slack/)
       + The #diffeq-bridged and #sciml-bridged channels in the
@@ -110,17 +110,18 @@ network from these matrices using `ReactionNetworkImporters`:
 
 ```julia
 # Catalyst network from the macro:
-rs = @reaction_network begin
+rs = @reaction_network testnetwork begin
     k1, 2A --> B
     k2, B --> 2A
     k3, A + B --> C
     k4, C --> A + B
     k5, 3C --> 3A
-end k1 k2 k3 k4 k5
+end
 
 # network from basic stoichiometry using ReactionNetworkImporters
 @parameters k1 k2 k3 k4 k5
-@variables t A(t) B(t) C(t)
+@variables t
+@species A(t) B(t) C(t)
 species = [A, B, C]
 pars = [k1, k2, k3, k4, k5]
 substoich = [2 0 1 0 0;
@@ -148,7 +149,7 @@ incidencemat = [-1 1 0 0 0;
                 0 0 0 0 1]
 cmn = ComplexMatrixNetwork(pars, stoichmat, incidencemat; species = species,
                            params = pars)  # a complex matrix network
-prn = loadrxnetwork(cmn)
+prn = loadrxnetwork(cmn; name = :testnetwork)
 
 # test the two networks are the same
 @assert rs == prn.rn
@@ -180,24 +181,24 @@ reaction rate expressions. These two types have the following fields:
     involving parameters and species like `k*A`.
 
   - matrix inputs
-    
+
       + For `MatrixNetwork`
-        
+
           * `substoich`, a number of species by number of reactions matrix, with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a
             substrate in reaction `j`.
           * `prodstoich`, a number of species by number of reactions matrix, with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a product
             in reaction `j`.
-    
+
       + For `ComplexMatrixNetwork`
-        
+
           * `stoichmat`, the complex stoichiometry matrix [defined
             here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined
             here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.reactioncomplexes).
   - `species`, an optional vector of symbolic variables representing each species
-    in the network. Can be constructed using the Symbolics.jl `@variables` macro.
+    in the network. Can be constructed using the Catalyst.jl `@species` macro.
     Each species should be dependent on the same time variable (`t` in the example
     above).
   - `parameters`, a vector of symbolic variables representing each parameter in
@@ -267,7 +268,7 @@ Pkg.status(; mode = PKGMODE_MANIFEST) # hide
 ```
 
 ```@raw html
-You can also download the 
+You can also download the
 <a href="
 ```
 
