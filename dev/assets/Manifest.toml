@@ -2,7 +2,7 @@
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "5a0a58b2782945c5c495180b89c4e07e6ea65239"
+project_hash = "261a10e1a1b9d5a1e246d204bf8a2940e9aec273"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -694,7 +694,7 @@ version = "1.5.3"
 deps = ["Catalyst", "DataStructures", "ModelingToolkit", "SparseArrays", "Symbolics"]
 path = "/home/runner/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
-version = "0.2.0"
+version = "0.14.0"
 
 [[deps.RecipesBase]]
 deps = ["SnoopPrecompile"]
