@@ -20,7 +20,7 @@ reset_timer!(to)
 @timeit to "netgen" prn=loadrxnetwork(RSSAFile(), networkname, speciesf, rxsf;
                                       printrxs = false)
 rn = prn.rn;
-initialpop = prn.u₀;
+initialpop = prn.u0;
 @timeit to "addodes" addodes!(rn; build_jac = false, build_symfuncs = false,
                               build_paramjac = false)
 @timeit to "ODEProb" oprob=ODEProblem(rn, convert.(Float64, initialpop), (0.0, tf))

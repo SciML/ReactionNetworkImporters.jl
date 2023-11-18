@@ -21,18 +21,18 @@ reset_timer!(to)
 @timeit to "netgen" prn=loadrxnetwork(RSSANetwork(), networkname, speciesf, rxsf;
                                       printrxs = false)
 rn = prn.rn
-initialpop = prn.u₀
+initialpop = prn.u0
 println("network parsed")
 
 # get the BioNetGen reaction network
 @timeit to "bionetgen" prnbng=loadrxnetwork(BNGNetwork(), string(networkname, "bng"),
                                             bngfname)
 rnbng = prnbng.rn;
-u₀ = prnbng.u₀;
+u0 = prnbng.u0;
 p = prnbng.p;
 shortsymstosyms = prnbng.symstonames;
 
-u0 = round.(Int, u₀)
+u0 = round.(Int, u0)
 println(typeof(u0))
 
 # one simulation

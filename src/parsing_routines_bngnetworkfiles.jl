@@ -279,10 +279,10 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     rn = ReactionSystem(rxs, t, specs, ps; name = name, observed = obseqs,
                         defaults = defmap, kwargs...)
 
-    # get numeric values for parameters and u₀
+    # get numeric values for parameters and u0
     sm = speciesmap(rn)
     @assert all(sm[funcsym(sym, t)] == i for (i, sym) in enumerate(idstoshortsyms))
 
-    ParsedReactionNetwork(rn; u₀ = u0map, p = pmap, varstonames = shortsymstosyms,
+    ParsedReactionNetwork(rn; u0 = u0map, p = pmap, varstonames = shortsymstosyms,
                           groupstosyms = groupstosyms)
 end

@@ -16,7 +16,7 @@ reset_timer!(to)
 # get the reaction network
 @timeit to "netgen" prnbng=loadrxnetwork(BNGNetwork(), string(networkname, "bng"), fname);
 rn = prnbng.rn;
-u0 = prnbng.u₀;
+u0 = prnbng.u0;
 p = prnbng.p;
 @timeit to "addodes" addodes!(rn; build_jac = build_jac, sparse_jac = sparse_jac,
                               build_symfuncs = false, build_paramjac = false)
