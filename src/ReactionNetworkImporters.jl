@@ -46,6 +46,11 @@ export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
 include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
+# Overload ensuring that u0 and u₀ can be used interchangeably.
+# (introduced when the u₀ field was changed to u0)
+# Should be deleted whenever u₀ is fully deprecated.
+include("u0_index_change.jl")
+
 export loadrxnetwork
 
 end # module
