@@ -11,13 +11,25 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
+Aqua = "0.8"
+CSVFiles = "1"
 Catalyst = "13"
+DataFrames = "1"
 DataStructures = "0.18"
+DiffEqBase = "6"
+LinearAlgebra = "1"
 ModelingToolkit = "8.47"
+OrdinaryDiffEq = "6"
+Plots = "1"
+SparseArrays = "1"
+Sundials = "4"
 Symbolics = "5.0.3"
+TimerOutputs = "0.5"
+Test = "1"
 julia = "1.6"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DiffEqBase = "2b5f629d-d688-5b77-993f-72d75c75574e"
@@ -29,4 +41,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [targets]
-test = ["CSVFiles", "DataFrames", "DiffEqBase", "LinearAlgebra", "OrdinaryDiffEq", "Plots", "Sundials", "Test", "TimerOutputs"]
+test = ["Aqua", "CSVFiles", "DataFrames", "DiffEqBase", "LinearAlgebra", "OrdinaryDiffEq", "Plots", "Sundials", "Test", "TimerOutputs"]

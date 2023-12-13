@@ -187,7 +187,7 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
 
     rxs = Vector{Reaction}(undef, numrxs)
     sc_ind = argmin(cmn.incidencemat, dims = 1)  # cartesian indices of substrate complexes
-    pc_ind = argmax(cmn.incidencemat, dims = 1)  # cartesian indicies of products complexes
+    pc_ind = argmax(cmn.incidencemat, dims = 1)  # cartesian indices of products complexes
     for i in 1:numrxs
 
         # substrate index for i'th reaction in species(rn)
@@ -232,7 +232,7 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
 
     rxs = Vector{Reaction}(undef, numrxs)
     sc_ind = argmin(cmn.incidencemat, dims = 1)  # cartesian indices of substrate complexes
-    pc_ind = argmax(cmn.incidencemat, dims = 1)  # cartesian indicies of products complexes
+    pc_ind = argmax(cmn.incidencemat, dims = 1)  # cartesian indices of products complexes
     rows = rowvals(cmn.stoichmat)
     vals = nonzeros(cmn.stoichmat)
     for i in 1:numrxs
