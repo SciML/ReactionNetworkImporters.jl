@@ -23,6 +23,9 @@ u0 = Float64[];
 p = Float64[];
 boprob = ODEProblem(rn, u0, (0.0, tf), p)
 
+# Test that u0 == u₀ (used when the u0 indexing was introduced).
+@test isequal(prnbng.u0, prnbng.u₀)
+
 # BNG simulation data testing
 bngsol = gdatdf[!, :pTetR]
 

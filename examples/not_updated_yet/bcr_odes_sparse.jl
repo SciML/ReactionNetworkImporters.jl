@@ -32,7 +32,7 @@ reset_timer!(to)
 # BioNetGen network
 @timeit to "bionetgen" prnbng=loadrxnetwork(BNGNetwork(), string(networkname, "bng"), fname);
 rnbng = prnbng.rn;
-u0 = prnbng.u₀;
+u0 = prnbng.u0;
 p = prnbng.p;
 @timeit to "baddodes" addodes!(rnbng; build_jac = build_jac, zeroout_jac = zeroout_jac,
                                sparse_jac = sparse_jac, build_symfuncs = false,

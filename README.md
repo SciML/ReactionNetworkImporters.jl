@@ -52,7 +52,7 @@ Here `BNGNetwork` is a type specifying the file format that is being loaded.
 `prnbng` is a `ParsedReactionNetwork` structure with the following fields:
 
   - `rn`, a Catalyst `ReactionSystem`
-  - `u₀`, a `Dict` mapping initial condition symbolic variables to numeric values
+  - `u0`, a `Dict` mapping initial condition symbolic variables to numeric values
     and/or symbolic expressions.
   - `p`, a `Dict` mapping parameter symbolic variables to numeric values and/or
     symbolic expressions.
@@ -221,4 +221,4 @@ initialconditionf = "PATH/TO/FILE"
 networkf = "PATH/TO/FILE"
 rssarn = loadrxnetwork(RSSANetwork(), "RSSARxSys", initialconditionf, networkf)
 ```
-Here `RSSANetwork` specifies the type of the file to parse, and `RSSARxSys` gives the type of the generated `reaction_network`. `rssarn` is again a `ParsedReactionNetwork`, but only the `rn` and `u₀` fields will now be relevant (the remaining fields will be set to `nothing`). -->
+Here `RSSANetwork` specifies the type of the file to parse, and `RSSARxSys` gives the type of the generated `reaction_network`. `rssarn` is again a `ParsedReactionNetwork`, but only the `rn` and `u0` fields will now be relevant (the remaining fields will be set to `nothing`). -->

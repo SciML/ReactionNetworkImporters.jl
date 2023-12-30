@@ -24,7 +24,7 @@ struct ParsedReactionNetwork
     rn::ReactionSystem
 
     "Dict mapping initial condition symbolic variables to values."
-    u₀::Any
+    u0::Any
 
     "Dict mapping parameter symbolic variables to values."
     p::Any
@@ -35,9 +35,9 @@ struct ParsedReactionNetwork
     "Dict from group name (as string) to corresponding symbolic variable"
     groupstosyms::Any
 end
-function ParsedReactionNetwork(rn::ReactionSystem; u₀ = nothing, p = nothing,
+function ParsedReactionNetwork(rn::ReactionSystem; u0 = nothing, p = nothing,
                                varstonames = nothing, groupstosyms = nothing)
-    ParsedReactionNetwork(rn, u₀, p, varstonames, groupstosyms)
+    ParsedReactionNetwork(rn, u0, p, varstonames, groupstosyms)
 end
 
 export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
@@ -47,5 +47,28 @@ include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
 export loadrxnetwork
+
+
+# Overload ensuring that u0 and u₀ can be used interchangeably.
+# (introduced when the u₀ field was changed to u0)
+# Should be deleted whenever u₀ is fully deprecated.
+
+# Ensures that `prnbng.u₀` works.
+function Base.getproperty(prnbng::ParsedReactionNetwork, name::Symbol)
+    if name === :u₀
+        return getfield(prnbng, :u0)
+    else
+        return getfield(prnbng, name)
+    end
+end
+
+# Ensures that `prnbng.u₀ = ...` works.
+function Base.setproperty!(prnbng::ParsedReactionNetwork, name::Symbol, x)
+    if name === :u₀
+        return setfield!(prnbng, :u0, x)
+    else
+        return setfield!(prnbng, name, x)
+    end
+end
 
 end # module
