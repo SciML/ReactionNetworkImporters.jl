@@ -42,6 +42,18 @@ end
 
 export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
 
+# parsers
+include("parsing_routines_bngnetworkfiles.jl")
+include("parsing_routines_matrixnetworks.jl")
+include("u0_index_change.jl")
+
+export loadrxnetwork
+
+
+# Overload ensuring that u0 and u₀ can be used interchangeably.
+# (introduced when the u₀ field was changed to u0)
+# Should be deleted whenever u₀ is fully deprecated.
+
 # Ensures that `prnbng.u₀` works.
 function Base.getproperty(prnbng::ParsedReactionNetwork, name::Symbol)
     if name === :u₀
@@ -59,16 +71,5 @@ function Base.setproperty!(prnbng::ParsedReactionNetwork, name::Symbol, x)
         return setfield!(prnbng, name, x)
     end
 end
-
-# parsers
-include("parsing_routines_bngnetworkfiles.jl")
-include("parsing_routines_matrixnetworks.jl")
-
-# Overload ensuring that u0 and u₀ can be used interchangeably.
-# (introduced when the u₀ field was changed to u0)
-# Should be deleted whenever u₀ is fully deprecated.
-include("u0_index_change.jl")
-
-export loadrxnetwork
 
 end # module
