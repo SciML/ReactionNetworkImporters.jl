@@ -45,7 +45,6 @@ export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
 # parsers
 include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
-include("u0_index_change.jl")
 
 export loadrxnetwork
 
