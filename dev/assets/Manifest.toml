@@ -1088,7 +1088,7 @@ version = "1.5.3"
 deps = ["Catalyst", "DataStructures", "ModelingToolkit", "SparseArrays", "Symbolics"]
 path = "/home/runner/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
-version = "0.14.1"
+version = "0.14.0"
 
 [[deps.RecipesBase]]
 deps = ["PrecompileTools"]
