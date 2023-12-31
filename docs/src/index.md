@@ -15,7 +15,7 @@ following formats:
 alternative for loading SBML files into Catalyst models, offering a much broader
 set of supported features. It allows the import of models that include features
 such as constant species, boundary condition species, events, constraint
-equations and more. SBML files can be generated from many standard modeling
+equations, and more. SBML files can be generated from many standard modeling
 tools, including BioNetGen, COPASI, and Virtual Cell.
 
 ## Installation
@@ -206,7 +206,7 @@ reaction rate expressions. These two types have the following fields:
     [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/)
     `@parameters` macro. If no parameters are used, it is an optional keyword.
   - `t`, an optional Symbolics.jl variable representing time as the independent
-    variable of the reaction network. If not provided `Catalyst.DEFAULT_IV` is
+    variable of the reaction network. If not provided, `Catalyst.DEFAULT_IV` is
     used to determine the default time variable.
 
 For both input types, `loadrxnetwork` returns a `ParsedReactionNetwork`, `prn`,
@@ -267,32 +267,19 @@ Pkg.status(; mode = PKGMODE_MANIFEST) # hide
 </details>
 ```
 
-```@raw html
-You can also download the
-<a href="
-```
-
 ```@eval
 using TOML
+using Markdown
 version = TOML.parse(read("../../Project.toml", String))["version"]
 name = TOML.parse(read("../../Project.toml", String))["name"]
-link = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
-       "/assets/Manifest.toml"
-```
-
-```@raw html
-">manifest</a> file and the
-<a href="
-```
-
-```@eval
-using TOML
-version = TOML.parse(read("../../Project.toml", String))["version"]
-name = TOML.parse(read("../../Project.toml", String))["name"]
-link = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
-       "/assets/Project.toml"
-```
-
-```@raw html
-">project</a> file.
+link_manifest = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
+                "/assets/Manifest.toml"
+link_project = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
+               "/assets/Project.toml"
+Markdown.parse("""You can also download the
+[manifest]($link_manifest)
+file and the
+[project]($link_project)
+file.
+""")
 ```
