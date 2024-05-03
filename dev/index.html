@@ -61,9 +61,9 @@ cmn = ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species = Any[],
                            params = Any[], t = nothing)
 prn = loadrxnetwork(cmn::ComplexMatrixNetwork)</code></pre><p>Here <code>MatrixNetwork</code> and <code>ComplexMatrixNetwork</code> are the types, which select that we are constructing a substrate/product stoichiometric matrix-based or a reaction complex matrix-based stoichiometric representation as input. See the <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/">Catalyst.jl API</a> for more discussion on these matrix representations, and how Catalyst handles symbolic reaction rate expressions. These two types have the following fields:</p><ul><li><p><code>rateexprs</code>, any valid <a href="https://docs.sciml.ai/Symbolics/stable/">Symbolics.jl</a> expression for the rates, or any basic number type. This can be a hard-coded rate constant like <code>1.0</code>, a parameter like <code>k1</code> above, or a general Symbolics expression involving parameters and species like <code>k*A</code>.</p></li><li><p>matrix inputs</p><ul><li><p>For <code>MatrixNetwork</code></p><ul><li><code>substoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a substrate in reaction <code>j</code>.</li><li><code>prodstoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a product in reaction <code>j</code>.</li></ul></li><li><p>For <code>ComplexMatrixNetwork</code></p><ul><li><code>stoichmat</code>, the complex stoichiometry matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat">defined here</a>.</li><li><code>incidencemat</code>, the complex incidence matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.reactioncomplexes">defined here</a>.</li></ul></li></ul></li><li><p><code>species</code>, an optional vector of symbolic variables representing each species in the network. Can be constructed using the Catalyst.jl <code>@species</code> macro. Each species should be dependent on the same time variable (<code>t</code> in the example above).</p></li><li><p><code>parameters</code>, a vector of symbolic variables representing each parameter in the network. Can be constructed with the <a href="https://docs.sciml.ai/ModelingToolkit/stable/">ModelingToolkit.jl</a> <code>@parameters</code> macro. If no parameters are used, it is an optional keyword.</p></li><li><p><code>t</code>, an optional Symbolics.jl variable representing time as the independent variable of the reaction network. If not provided, <code>Catalyst.DEFAULT_IV</code> is used to determine the default time variable.</p></li></ul><p>For both input types, <code>loadrxnetwork</code> returns a <code>ParsedReactionNetwork</code>, <code>prn</code>, with only the field, <code>prn.rn</code>, filled in. <code>prn.rn</code> corresponds to the generated <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.ReactionSystem">Catalyst.jl <code>ReactionSystem</code></a> that represents the network.</p><p>Dispatches are added if <code>substoich</code> and <code>prodstoich</code> both have the type <code>SparseMatrixCSC</code>in case of <code>MatrixNetwork</code> (or <code>stoichmat</code> and <code>incidencemat</code> both have the type <code>SparseMatrixCSC</code> in case of <code>ComplexMatrixNetwork</code>), in which case they are efficiently iterated through using the <code>SparseArrays</code> interface.</p><p>If the keyword argument <code>species</code> is not set, the resulting reaction network will simply name the species <code>S1</code>, <code>S2</code>,..., <code>SN</code> for a system with <code>N</code> total species. <code>params</code> defaults to an empty vector, so that it does not need to be set for systems with no parameters.</p><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl/docs/Project.toml`
   [479239e8] Catalyst v13.5.1
-  [e30172f5] Documenter v1.4.0
-  [b4db0fb7] ReactionNetworkImporters v0.14.1 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.10.2
-Commit bd47eca2c8a (2024-03-01 10:14 UTC)
+  [e30172f5] Documenter v1.4.1
+  [b4db0fb7] ReactionNetworkImporters v0.14.1 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.10.3
+Commit 0b4590a5507 (2024-04-30 10:59 UTC)
 Build Info:
   Official https://julialang.org/ release
 Platform Info:
@@ -78,7 +78,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [1520ce14] AbstractTrees v0.4.5
   [7d9f7c33] Accessors v0.1.36
   [79e6a3ab] Adapt v4.0.4
-  [66dad0bd] AliasTables v1.1.0
+  [66dad0bd] AliasTables v1.1.1
   [ec485272] ArnoldiMethod v0.4.0
   [4fba245c] ArrayInterface v7.10.0
   [4c555306] ArrayLayouts v1.9.2
@@ -112,17 +112,17 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [b4f34e82] Distances v0.10.11
   [31c24e10] Distributions v0.25.108
   [ffbed154] DocStringExtensions v0.9.3
-  [e30172f5] Documenter v1.4.0
+  [e30172f5] Documenter v1.4.1
 ⌅ [5b8099bc] DomainSets v0.6.7
   [fa6b7ba4] DualNumbers v0.6.8
-  [7c1d4256] DynamicPolynomials v0.5.6
+  [7c1d4256] DynamicPolynomials v0.5.7
   [4e289a0a] EnumX v1.0.4
 ⌃ [f151be2c] EnzymeCore v0.6.6
   [d4d017d3] ExponentialUtilities v1.26.1
   [e2ba6199] ExprTools v0.1.10
   [7034ab61] FastBroadcast v0.2.8
   [9aa1b823] FastClosures v0.3.2
-  [29a986be] FastLapackInterface v2.0.2
+  [29a986be] FastLapackInterface v2.0.3
   [1a297f60] FillArrays v1.10.2
   [6a86dc24] FiniteDiff v2.23.1
   [1fa38f19] Format v1.3.7
@@ -149,9 +149,9 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [98e50ef6] JuliaFormatter v1.0.56
   [ccbc3e58] JumpProcesses v9.11.1
   [ef3ab10e] KLU v0.6.0
-  [ba0b0d4f] Krylov v0.9.5
+  [ba0b0d4f] Krylov v0.9.6
   [b964fa9f] LaTeXStrings v1.3.1
-  [2ee39098] LabelledArrays v1.15.1
+  [2ee39098] LabelledArrays v1.16.0
   [984bce1d] LambertW v0.4.6
   [23fbe1c1] Latexify v0.16.3
   [10f19ff3] LayoutPointers v0.1.15
@@ -160,7 +160,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [d3d80556] LineSearches v7.2.0
   [7ed4a6bd] LinearSolve v2.29.1
   [2ab3a3ac] LogExpFunctions v0.3.27
-  [bdcacae8] LoopVectorization v0.12.169
+  [bdcacae8] LoopVectorization v0.12.170
   [d8e11817] MLStyle v0.4.17
   [1914dd2f] MacroTools v0.5.13
   [d125e4d3] ManualMemory v0.1.8
@@ -193,7 +193,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [e6cf234a] RandomNumbers v1.5.3
   [b4db0fb7] ReactionNetworkImporters v0.14.1 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`
   [3cdcf5f2] RecipesBase v1.3.4
-  [731186ca] RecursiveArrayTools v3.13.0
+  [731186ca] RecursiveArrayTools v3.14.0
   [f2c3362d] RecursiveFactorization v0.2.23
   [189a3867] Reexport v1.2.2
   [2792f1a3] RegistryInstances v0.1.0
@@ -202,7 +202,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [7e49a35a] RuntimeGeneratedFunctions v0.5.13
   [94e857df] SIMDTypes v0.1.0
   [476501e8] SLEEFPirates v0.6.42
-  [0bca4576] SciMLBase v2.35.0
+  [0bca4576] SciMLBase v2.36.0
   [c0aeaf25] SciMLOperators v0.3.8
   [53ae85a6] SciMLStructures v1.1.0
   [efcf1570] Setfield v1.1.1
@@ -221,7 +221,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [2913bbd2] StatsBase v0.34.3
   [4c63d2b9] StatsFuns v1.3.1
   [7792a7ef] StrideArraysCore v0.5.6
-  [2efcf032] SymbolicIndexingInterface v0.3.16
+  [2efcf032] SymbolicIndexingInterface v0.3.21
   [19f23fe9] SymbolicLimits v0.2.0
   [d1185830] SymbolicUtils v1.5.1
   [0c5d862f] Symbolics v5.28.0
@@ -238,9 +238,9 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [3a884ed6] UnPack v1.0.2
   [1986cc42] Unitful v1.19.0
   [a7c27f48] Unityper v0.1.6
-  [3d5dd08c] VectorizationBase v0.21.66
+  [3d5dd08c] VectorizationBase v0.21.67
   [19fa3120] VertexSafeGraphs v0.2.0
-  [2e619515] Expat_jll v2.5.0+0
+  [2e619515] Expat_jll v2.6.2+0
   [f8c6e375] Git_jll v2.44.0+2
   [1d5cc7b8] IntelOpenMP_jll v2024.1.0+0
   [94ce4f54] Libiconv_jll v1.17.0+0
@@ -283,7 +283,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8dfed614] Test
   [cf7118a7] UUIDs
   [4ec0a83e] Unicode
-  [e66e0078] CompilerSupportLibraries_jll v1.1.0+0
+  [e66e0078] CompilerSupportLibraries_jll v1.1.1+0
   [deac9b47] LibCURL_jll v8.4.0+0
   [e37daf67] LibGit2_jll v1.6.4+0
   [29816b5a] LibSSH2_jll v1.11.0+1
@@ -297,4 +297,4 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8e850b90] libblastrampoline_jll v5.8.0+1
   [8e850ede] nghttp2_jll v1.52.0+1
   [3f19e933] p7zip_jll v17.4.0+2
-Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.14.1/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.14.1/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.0 on <span class="colophon-date" title="Sunday 28 April 2024 13:15">Sunday 28 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.14.1/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.14.1/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.1 on <span class="colophon-date" title="Friday 3 May 2024 10:36">Friday 3 May 2024</span>. Using Julia version 1.10.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
