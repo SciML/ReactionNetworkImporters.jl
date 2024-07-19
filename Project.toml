@@ -1,7 +1,7 @@
 name = "ReactionNetworkImporters"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 authors = ["Samuel Isaacson <isaacsas@users.noreply.github.com>"]
-version = "0.14.1"
+version = "0.15.0"
 
 [deps]
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
@@ -13,20 +13,18 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 [compat]
 Aqua = "0.8"
 CSVFiles = "1"
-Catalyst = "13"
+Catalyst = "14"
 DataFrames = "1.3"
 DataStructures = "0.18.13"
-DiffEqBase = "6.117"
+DiffEqBase = "6.151"
 LinearAlgebra = "1.10"
-ModelingToolkit = "8.51"
-OrdinaryDiffEq = "6.47"
-Plots = "1.30"
+ModelingToolkit = "9.24"
+OrdinaryDiffEq = "6.8"
 SafeTestsets = "0.1"
 SparseArrays = "1.10"
 Sundials = "4.4"
-Symbolics = "5.2"
+Symbolics = "5.33"
 Test = "1"
-TimerOutputs = "0.5"
 julia = "1.10"
 
 [extras]
@@ -43,4 +41,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [targets]
-test = ["Aqua", "CSVFiles", "DataFrames", "DiffEqBase", "LinearAlgebra", "OrdinaryDiffEq", "Plots", "SafeTestsets", "Sundials", "Test", "TimerOutputs"]
+test = ["Aqua", "CSVFiles", "DataFrames", "DiffEqBase", "LinearAlgebra", "OrdinaryDiffEq", "SafeTestsets", "Sundials", "Test"]

@@ -35,7 +35,7 @@ Pkg.add("ReactionNetworkImporters")
 
   - See the [SciML Style Guide](https://github.com/SciML/SciMLStyle) for common coding practices and other style decisions.
   - There are a few community forums:
-    
+
       + The #diffeq-bridged and #sciml-bridged channels in the
         [Julia Slack](https://julialang.org/slack/)
       + The #diffeq-bridged and #sciml-bridged channels in the
@@ -181,18 +181,18 @@ reaction rate expressions. These two types have the following fields:
     involving parameters and species like `k*A`.
 
   - matrix inputs
-    
+
       + For `MatrixNetwork`
-        
+
           * `substoich`, a number of species by number of reactions matrix, with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a
             substrate in reaction `j`.
           * `prodstoich`, a number of species by number of reactions matrix, with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a product
             in reaction `j`.
-    
+
       + For `ComplexMatrixNetwork`
-        
+
           * `stoichmat`, the complex stoichiometry matrix [defined
             here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined
@@ -206,7 +206,7 @@ reaction rate expressions. These two types have the following fields:
     [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/)
     `@parameters` macro. If no parameters are used, it is an optional keyword.
   - `t`, an optional Symbolics.jl variable representing time as the independent
-    variable of the reaction network. If not provided, `Catalyst.DEFAULT_IV` is
+    variable of the reaction network. If not provided, `Catalyst.default_t()` is
     used to determine the default time variable.
 
 For both input types, `loadrxnetwork` returns a `ParsedReactionNetwork`, `prn`,

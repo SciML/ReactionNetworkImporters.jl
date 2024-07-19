@@ -42,7 +42,7 @@ function loadrxnetwork(mn::MatrixNetwork{S, T, U, V, W, X};
     numspecs = sz[1]
     numrxs = sz[2]
 
-    t = (mn.t === nothing) ? Catalyst.DEFAULT_IV : mn.t
+    t = (mn.t === nothing) ? Catalyst.default_t() : mn.t
     species = isempty(mn.species) ? [funcsym(:S, t, i) for i in 1:numspecs] : mn.species
 
     # create the reactions
@@ -89,7 +89,7 @@ function loadrxnetwork(mn::MatrixNetwork{S, T, U, V, W, X};
     numspecs = sz[1]
     numrxs = sz[2]
 
-    t = (mn.t === nothing) ? Catalyst.DEFAULT_IV : mn.t
+    t = (mn.t === nothing) ? Catalyst.default_t() : mn.t
     species = isempty(mn.species) ? [funcsym(:S, t, i) for i in 1:numspecs] : mn.species
 
     # create the reactions
@@ -182,7 +182,7 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
     @assert all(∈([-1, 0, 1]), cmn.incidencemat)
     numrxs = size(cmn.incidencemat, 2)
 
-    t = (cmn.t === nothing) ? Catalyst.DEFAULT_IV : cmn.t
+    t = (cmn.t === nothing) ? Catalyst.default_t() : cmn.t
     species = isempty(cmn.species) ? [funcsym(:S, t, i) for i in 1:numspecs] : cmn.species
 
     rxs = Vector{Reaction}(undef, numrxs)
@@ -227,7 +227,7 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
     @assert all(∈([-1, 0, 1]), cmn.incidencemat)
     numrxs = size(cmn.incidencemat, 2)
 
-    t = (cmn.t === nothing) ? Catalyst.DEFAULT_IV : cmn.t
+    t = (cmn.t === nothing) ? Catalyst.default_t() : cmn.t
     species = isempty(cmn.species) ? [funcsym(:S, t, i) for i in 1:numspecs] : cmn.species
 
     rxs = Vector{Reaction}(undef, numrxs)

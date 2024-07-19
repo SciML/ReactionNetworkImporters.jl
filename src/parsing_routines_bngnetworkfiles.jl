@@ -221,7 +221,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     file = open(rxfilename, "r")
     lines = readlines(file)
     idx = 1
-    t = Catalyst.DEFAULT_IV
+    t = Catalyst.default_t()
 
     print("Parsing parameters...")
     ptoids, pvals, idx = parse_params(ft, lines, idx)
@@ -250,7 +250,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     print("Creating species and parameters for evaluating expressions...")
     opmod = Module()
     Base.eval(opmod, :(using Catalyst))
-    Base.eval(opmod, :(t = Catalyst.DEFAULT_IV))
+    Base.eval(opmod, :(t = Catalyst.default_t()))
     for p in ps
         psym = nameof(p)
         Base.eval(opmod, :($(psym) = $p))
@@ -275,7 +275,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     # setup default values / expressions for params and initial conditions
     defmap, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
 
-    # build the model    
+    # build the model
     rn = ReactionSystem(rxs, t, specs, ps; name = name, observed = obseqs,
                         defaults = defmap, kwargs...)
 
