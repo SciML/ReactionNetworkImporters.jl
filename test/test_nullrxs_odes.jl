@@ -19,16 +19,16 @@ println("done")
 
 # load the BNG reaction network in DiffEqBio
 prnbng = loadrxnetwork(BNGNetwork(), fname)
-rn = prnbng.rn;
-u0 = Float64[];
-p = Float64[];
+rn = complete(prnbng.rn)
+u0 = Float64[]
+p = Float64[]
 boprob = ODEProblem(rn, u0, (0.0, tf), p)
 
 # Test that u0 == u₀ (used when the u0 indexing was introduced).
 @test isequal(prnbng.u0, prnbng.u₀)
 
-# note solvers run _much_ faster the second time 
-bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nsteps);
+# note solvers run _much_ faster the second time
+bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nsteps)
 
 if doplot
     plotlyjs()
