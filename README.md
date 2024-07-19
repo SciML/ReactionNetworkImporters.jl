@@ -73,7 +73,7 @@ reaction system by
 
 ```julia
 using OrdinaryDiffEq, Catalyst
-rn = complete(prnbng.rn)   # get the reaction network any mark it complete
+rn = complete(prnbng.rn)   # get the reaction network and mark it complete
 tf = 100000.0
 oprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
 sol = solve(oprob, Tsit5(), saveat = tf / 1000.0)
