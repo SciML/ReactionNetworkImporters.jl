@@ -51,7 +51,9 @@ prnbng = loadrxnetwork(BNGNetwork(), fname)
 Here `BNGNetwork` is a type specifying the file format that is being loaded.
 `prnbng` is a `ParsedReactionNetwork` structure with the following fields:
 
-  - `rn`, a Catalyst `ReactionSystem`
+  - `rn`, a Catalyst `ReactionSystem`. **Note** this system is *not* marked
+    complete by default (see the [Catalyst docs](https://catalyst.sciml.ai/) for
+    a discussion of completeness of systems).
   - `u0`, a `Dict` mapping initial condition symbolic variables to numeric values
     and/or symbolic expressions.
   - `p`, a `Dict` mapping parameter symbolic variables to numeric values and/or
@@ -71,7 +73,7 @@ reaction system by
 
 ```julia
 using OrdinaryDiffEq, Catalyst
-rn = prnbng.rn
+rn = complete(prnbng.rn)   # get the reaction network and mark it complete
 tf = 100000.0
 oprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
 sol = solve(oprob, Tsit5(), saveat = tf / 1000.0)
@@ -169,18 +171,18 @@ reaction rate expressions. These two types have the following fields:
     involving parameters and species like `k*A`.
 
   - matrix inputs
-    
+
       + For `MatrixNetwork`
-        
+
           * `substoich`, a number of species by number of reactions matrix with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a
             substrate in reaction `j`.
           * `prodstoich`, a number of species by number of reactions matrix with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a product
             in reaction `j`.
-    
+
       + For `ComplexMatrixNetwork`
-        
+
           * `stoichmat`, the complex stoichiometry matrix [defined
             here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined
@@ -194,14 +196,16 @@ reaction rate expressions. These two types have the following fields:
     [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/)
     `@parameters` macro. If no parameters are used it is an optional keyword.
   - `t`, an optional Symbolics.jl variable representing time as the independent
-    variable of the reaction network. If not provided `Catalyst.DEFAULT_IV` is
+    variable of the reaction network. If not provided `Catalyst.default_t()` is
     used to determine the default time variable.
 
 For both input types, `loadrxnetwork` returns a `ParsedReactionNetwork`, `prn`,
 with only the field, `prn.rn`, filled in. `prn.rn` corresponds to the generated
 [Catalyst.jl
 `ReactionSystem`](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.ReactionSystem)
-that represents the network.
+that represents the network. **Note**, `prn.rn` is not marked as complete by
+default and must be manually completed by setting `rn = complete(prn.rn)` before
+creating an `ODEProblem` or such, see the Catalyst docs for details.
 
 Dispatches are added if `substoich` and `prodstoich` both have the type
 `SparseMatrixCSC`in case of `MatrixNetwork` (or `stoichmat` and `incidencemat`

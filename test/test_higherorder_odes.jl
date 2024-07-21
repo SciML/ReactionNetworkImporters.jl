@@ -1,5 +1,6 @@
-using DiffEqBase, Catalyst, Plots, OrdinaryDiffEq, DataFrames, CSVFiles, LinearAlgebra
+using DiffEqBase, Catalyst, OrdinaryDiffEq, DataFrames, CSVFiles, LinearAlgebra
 using ReactionNetworkImporters
+# using Plots
 
 # parameters
 doplot = false
@@ -18,7 +19,7 @@ println("done")
 
 # load the BNG reaction network in DiffEqBio
 prnbng = loadrxnetwork(BNGNetwork(), fname)
-rn = prnbng.rn
+rn = complete(prnbng.rn)
 boprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
 
 # Test that u0 == u₀ (used when the u0 indexing was introduced).
@@ -28,16 +29,16 @@ boprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
 @unpack A = rn
 Asol = gdatdf[!, :A]
 
-# note solvers run _much_ faster the second time 
+# note solvers run _much_ faster the second time
 bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nsteps);
 
-if doplot
-    plotlyjs()
-    p1 = plot(gdatdf[!, :time], gdatdf[!, :A], label = :A_BNG)
-    plot!(p1, bsol.t, bsol[A], label = :A_DE)
-    display(p1)
-    println("Err = ", norm(gdatdf[!, :A] - bsol[Aid, :], Inf))
-end
+# if doplot
+#     plotlyjs()
+#     p1 = plot(gdatdf[!, :time], gdatdf[!, :A], label = :A_BNG)
+#     plot!(p1, bsol.t, bsol[A], label = :A_DE)
+#     display(p1)
+#     println("Err = ", norm(gdatdf[!, :A] - bsol[Aid, :], Inf))
+# end
 
 @test all(bsol.t .== gdatdf[!, :time])
 @test all(abs.(gdatdf[!, :A] - bsol[A]) .< 1e-6 .* abs.(gdatdf[!, :A]))

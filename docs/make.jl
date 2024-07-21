@@ -1,8 +1,10 @@
 using Documenter
 using ReactionNetworkImporters
 
-cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml", force = true)
-cp("./docs/Project.toml", "./docs/src/assets/Project.toml", force = true)
+docpath = Base.source_dir()
+assetpath = joinpath(docpath, "src", "assets")
+cp(joinpath(docpath, "Manifest.toml"), joinpath(assetpath, "Manifest.toml"), force = true)
+cp(joinpath(docpath, "Project.toml"), joinpath(assetpath, "Project.toml"), force = true)
 
 include("pages.jl")
 
@@ -25,8 +27,7 @@ makedocs(sitename = "ReactionNetworkImporters.jl",
                                   canonical = "https://docs.sciml.ai/ReactionNetworkImporters/stable/"),
          modules = [ReactionNetworkImporters],
          checkdocs = :exports, warnonly = [:missing_docs],
-         clean = true, doctest = false, linkcheck = true,
-         pages = pages)
+         clean = true, doctest = false, pages = pages)
 
 deploydocs(repo = "github.com/SciML/ReactionNetworkImporters.jl.git";
            push_preview = true)
