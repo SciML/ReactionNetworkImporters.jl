@@ -1,0 +1,9 @@
+[deps]
+Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+ReactionNetworkImporters = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
+
+[compat]
+Catalyst = "14.0"
+Documenter = "1"
+ReactionNetworkImporters = "0.15"
