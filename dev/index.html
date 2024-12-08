@@ -62,8 +62,8 @@ cmn = ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species = Any[],
 prn = loadrxnetwork(cmn::ComplexMatrixNetwork)</code></pre><p>Here <code>MatrixNetwork</code> and <code>ComplexMatrixNetwork</code> are the types, which select that we are constructing a substrate/product stoichiometric matrix-based or a reaction complex matrix-based stoichiometric representation as input. See the <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/">Catalyst.jl API</a> for more discussion on these matrix representations, and how Catalyst handles symbolic reaction rate expressions. These two types have the following fields:</p><ul><li><p><code>rateexprs</code>, any valid <a href="https://docs.sciml.ai/Symbolics/stable/">Symbolics.jl</a> expression for the rates, or any basic number type. This can be a hard-coded rate constant like <code>1.0</code>, a parameter like <code>k1</code> above, or a general Symbolics expression involving parameters and species like <code>k*A</code>.</p></li><li><p>matrix inputs</p><ul><li><p>For <code>MatrixNetwork</code></p><ul><li><code>substoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a substrate in reaction <code>j</code>.</li><li><code>prodstoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a product in reaction <code>j</code>.</li></ul></li><li><p>For <code>ComplexMatrixNetwork</code></p><ul><li><code>stoichmat</code>, the complex stoichiometry matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat">defined here</a>.</li><li><code>incidencemat</code>, the complex incidence matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.reactioncomplexes">defined here</a>.</li></ul></li></ul></li><li><p><code>species</code>, an optional vector of symbolic variables representing each species in the network. Can be constructed using the Catalyst.jl <code>@species</code> macro. Each species should be dependent on the same time variable (<code>t</code> in the example above).</p></li><li><p><code>parameters</code>, a vector of symbolic variables representing each parameter in the network. Can be constructed with the <a href="https://docs.sciml.ai/ModelingToolkit/stable/">ModelingToolkit.jl</a> <code>@parameters</code> macro. If no parameters are used, it is an optional keyword.</p></li><li><p><code>t</code>, an optional Symbolics.jl variable representing time as the independent variable of the reaction network. If not provided, <code>Catalyst.default_t()</code> is used to determine the default time variable.</p></li></ul><p>For both input types, <code>loadrxnetwork</code> returns a <code>ParsedReactionNetwork</code>, <code>prn</code>, with only the field, <code>prn.rn</code>, filled in. <code>prn.rn</code> corresponds to the generated <a href="https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.ReactionSystem">Catalyst.jl <code>ReactionSystem</code></a> that represents the network. <strong>Note</strong>, <code>prn.rn</code> is not marked as complete by default and must be manually completed by setting <code>rn = complete(prn.rn)</code> before creating an <code>ODEProblem</code> or such, see the Catalyst docs for details.</p><p>Dispatches are added if <code>substoich</code> and <code>prodstoich</code> both have the type <code>SparseMatrixCSC</code>in case of <code>MatrixNetwork</code> (or <code>stoichmat</code> and <code>incidencemat</code> both have the type <code>SparseMatrixCSC</code> in case of <code>ComplexMatrixNetwork</code>), in which case they are efficiently iterated through using the <code>SparseArrays</code> interface.</p><p>If the keyword argument <code>species</code> is not set, the resulting reaction network will simply name the species <code>S1</code>, <code>S2</code>,..., <code>SN</code> for a system with <code>N</code> total species. <code>params</code> defaults to an empty vector, so that it does not need to be set for systems with no parameters.</p><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl/docs/Project.toml`
   [479239e8] Catalyst v14.4.1
   [e30172f5] Documenter v1.8.0
-  [b4db0fb7] ReactionNetworkImporters v0.15.1 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.11.1
-Commit 8f5b7ca12ad (2024-10-16 10:53 UTC)
+  [b4db0fb7] ReactionNetworkImporters v0.15.1 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.11.2
+Commit 5e9a32e7af2 (2024-12-01 20:02 UTC)
 Build Info:
   Official https://julialang.org/ release
 Platform Info:
@@ -109,10 +109,10 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [e2d170a0] DataValueInterfaces v1.0.0
   [2b5f629d] DiffEqBase v6.160.0
   [459566f4] DiffEqCallbacks v4.2.2
-  [77a26b50] DiffEqNoiseProcess v5.23.0
+  [77a26b50] DiffEqNoiseProcess v5.24.0
   [163ba53b] DiffResults v1.1.0
   [b552c78f] DiffRules v1.15.1
-  [a0c0ee7d] DifferentiationInterface v0.6.23
+  [a0c0ee7d] DifferentiationInterface v0.6.24
   [8d63f2c5] DispatchDoctor v0.4.17
   [31c24e10] Distributions v0.25.113
   [ffbed154] DocStringExtensions v0.9.3
@@ -121,7 +121,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [7c1d4256] DynamicPolynomials v0.6.1
   [06fc5a27] DynamicQuantities v1.4.0
   [4e289a0a] EnumX v1.0.4
-  [f151be2c] EnzymeCore v0.8.6
+  [f151be2c] EnzymeCore v0.8.7
   [e2ba6199] ExprTools v0.1.10
 ⌅ [6b7a57c9] Expronicon v0.8.5
   [7034ab61] FastBroadcast v0.3.5
@@ -136,8 +136,8 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [f62d2435] FunctionProperties v0.1.2
   [069b7b12] FunctionWrappers v1.1.3
   [77dc65aa] FunctionWrappersWrappers v0.1.3
-  [d9f16b24] Functors v0.5.1
-⌅ [46192b85] GPUArraysCore v0.1.6
+  [d9f16b24] Functors v0.5.2
+  [46192b85] GPUArraysCore v0.2.0
   [d7ba0133] Git v1.3.1
   [c27321d9] Glob v1.3.1
   [86223c79] Graphs v1.12.0
@@ -161,7 +161,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [23fbe1c1] Latexify v0.16.5
   [10f19ff3] LayoutPointers v0.1.17
   [0e77f7df] LazilyInitializedFields v1.3.0
-  [5078a376] LazyArrays v2.2.2
+  [5078a376] LazyArrays v2.2.4
   [87fe0de2] LineSearch v0.1.4
   [d3d80556] LineSearches v7.3.0
   [7ed4a6bd] LinearSolve v2.37.0
@@ -173,7 +173,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [d0879d2d] MarkdownAST v0.1.2
   [bb5d69b7] MaybeInplace v0.1.4
   [e1d29d7a] Missings v1.2.0
-  [961ee093] ModelingToolkit v9.53.0
+  [961ee093] ModelingToolkit v9.54.0
   [46d2c3a1] MuladdMacro v0.2.4
   [102ac46a] MultivariatePolynomials v0.5.7
   [d8a4904e] MutableArithmetics v1.6.0
@@ -186,7 +186,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [26075421] NonlinearSolveSpectralMethods v1.0.0
   [6fe1bfb0] OffsetArrays v1.14.1
   [429524aa] Optim v1.10.0
-  [bac558e1] OrderedCollections v1.6.3
+  [bac558e1] OrderedCollections v1.7.0
   [90014a1f] PDMats v0.11.31
   [d96e819e] Parameters v0.12.3
   [69de0a69] Parsers v2.8.1
@@ -214,7 +214,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [7e49a35a] RuntimeGeneratedFunctions v0.5.13
   [94e857df] SIMDTypes v0.1.0
   [476501e8] SLEEFPirates v0.6.43
-  [0bca4576] SciMLBase v2.63.1
+  [0bca4576] SciMLBase v2.65.1
   [19f34311] SciMLJacobianOperators v0.1.1
   [c0aeaf25] SciMLOperators v0.3.12
   [53ae85a6] SciMLStructures v1.6.1
@@ -251,7 +251,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [781d530d] TruncatedStacktraces v1.4.0
   [5c2747f8] URIs v1.5.1
   [3a884ed6] UnPack v1.0.2
-  [1986cc42] Unitful v1.21.0
+  [1986cc42] Unitful v1.21.1
   [a7c27f48] Unityper v0.1.6
   [3d5dd08c] VectorizationBase v0.21.71
   [2e619515] Expat_jll v2.6.4+0
@@ -311,4 +311,4 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8e850b90] libblastrampoline_jll v5.11.0+0
   [8e850ede] nghttp2_jll v1.59.0+0
   [3f19e933] p7zip_jll v17.4.0+2
-Info Packages marked with ⌅ have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.15.1/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.15.1/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Sunday 1 December 2024 13:08">Sunday 1 December 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Info Packages marked with ⌅ have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.15.1/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v0.15.1/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Sunday 8 December 2024 13:10">Sunday 8 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
