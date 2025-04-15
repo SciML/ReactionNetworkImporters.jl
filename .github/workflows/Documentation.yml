@@ -1,4 +1,4 @@
-name: "Documentation"
+name: Documentation
 
 on:
   push:
@@ -6,15 +6,78 @@ on:
       - master
     tags: '*'
   pull_request:
-  schedule:
-    - cron: '53 12 * * 0'
+
+permissions:
+  actions: write  # Allows the workflow to delete old caches created by previous runs, ensuring efficient cache management and preventing the cache from growing indefinitely. https://github.com/julia-actions/cache?tab=readme-ov-file#cache-retention
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch || github.ref != 'refs/tags/v*' }}
+  group: docs-${{ github.ref }} # Group name for concurrency control
+  cancel-in-progress: true # Ensures only one doc build runs at a time for each branch/ref, regardless of the trigger
 
 jobs:
-  build-and-deploy-docs:
-    name: "Documentation"
-    uses: "SciML/.github/.github/workflows/documentation.yml@v1"
-    secrets: "inherit"
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # # Install all required X11 and OpenGL libraries
+      # # These are needed for GLMakie to work in a headless environment
+      # - name: Install binary dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y xvfb libgl1 mesa-utils freeglut3-dev xorg-dev \
+      #       libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+
+      # # Start Xvfb explicitly instead of using xvfb-run
+      # # This gives us more control and visibility into the virtual display setup
+      # - name: Setup virtual framebuffer
+      #   run: |
+      #     # Start Xvfb and wait for it to be ready
+      #     /usr/bin/Xvfb :99 -screen 0 1024x768x24
+      #     echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      - name: Install Julia
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: '1'
+
+      # Cache to speed up subsequent runs
+      - uses: julia-actions/cache@v2
+        with:
+          cache-name: docs-cache
+
+      # Install dependencies with the virtual display already running
+      - name: Install dependencies
+        run: |
+          julia --project=docs/ -e '
+            ENV["JULIA_PKG_SERVER"] = "";
+            using Pkg;
+            Pkg.develop(PackageSpec(path=pwd()));
+            Pkg.instantiate()'
+
+      # Build documentation with the stable virtual display
+      - name: Build and deploy
+        env:
+          GKSwstype: "100"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        run: xvfb-run julia --project=docs --color=yes --code-coverage=user docs/make.jl
+
+      - name: Upload site as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-artifact
+          path: ./docs/build
+          retention-days: 3
+          compression-level: 9
+          overwrite: true
+
+      - uses: julia-actions/julia-processcoverage@v1
+
+      - uses: codecov/codecov-action@v5
+        with:
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
