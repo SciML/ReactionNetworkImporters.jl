@@ -13,7 +13,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 [compat]
 Aqua = "0.8"
 CSVFiles = "1"
-Catalyst = "15"
+Catalyst = "15.0"
 DataFrames = "1.7"
 DataStructures = "0.18.13"
 LinearAlgebra = "1.10"
