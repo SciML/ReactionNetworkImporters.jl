@@ -156,9 +156,12 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
     idx = seek_to_block(lines, idx, GROUPS_BLOCK_START)
     namestosyms = Dict{String, Any}()
     obseqs = Equation[]
+    syms_set = Set(keys(shortsymstosyms))
     while lines[idx] != GROUPS_BLOCK_END
         vals = split(lines[idx])
-        name = Symbol(vals[2])
+        idx += 1
+        name = Symbol(vals[2])        
+        (name in syms_set) && continue
         obs = (@variables $name($t))[1]
         namestosyms[vals[2]] = obs
 
@@ -179,7 +182,6 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
         end
         push!(obseqs, Equation(obs, rhs))
 
-        idx += 1
         (idx > length(lines)) && error("Block: ", GROUPS_BLOCK_END, " was never found.")
     end
 
@@ -216,27 +218,56 @@ function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
 end
 
 # for parsing a subset of the BioNetGen .net file format
+"""
+    loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem), verbose = false, kwargs...)
+
+Parses a BioNetGen `.net` file and constructs a `ParsedReactionNetwork` object.
+
+# Arguments
+- `ft::BNGNetwork`: Indicates the file to be parsed is a BioNetGen ".net" file.
+- `rxfilename::String`: Path to the `.net` file to be parsed.
+- `name::Symbol`: (Optional) Name for the resulting `ReactionSystem`. Defaults to a generated symbol.
+- `verbose::Bool`: (Optional) If `true`, prints detailed progress information during parsing. Defaults to `false`.
+- `kwargs...`: Additional keyword arguments passed to the `ReactionSystem` constructor.
+
+# Returns
+A `ParsedReactionNetwork` object containing:
+- The `ReactionSystem` with reactions, species, and parameters.
+- Initial conditions (`u0`) and parameter values (`p`).
+- Mappings between variable names and symbols.
+
+# Notes
+This function parses a subset of the BioNetGen `.net` file format. It assumes:
+- Expressions are compatible with Julia syntax.
+- Time-dependent or conditional logic is not supported.
+- More complicated functional constructs may not be supported.
+
+# Example
+```julia
+parsed_network = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = true)
+```
+"""
 function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem),
-                       kwargs...)
+                       verbose = false, kwargs...)
     file = open(rxfilename, "r")
     lines = readlines(file)
     idx = 1
     t = Catalyst.default_t()
 
-    print("Parsing parameters...")
+    verbose && print("Parsing parameters...")
     ptoids, pvals, idx = parse_params(ft, lines, idx)
-    println("done")
+    verbose && println("done")
 
-    print("Creating parameters...")
+    verbose && print("Creating parameters...")
     ps = [(@parameters $psym)[1] for psym in keys(ptoids)]
-    println("done")
+    verbose && println("done")
 
-    print("Parsing species...")
+    verbose && print("Parsing species...")
     u0exprs, shortsymstoids, shortsymstosyms, idx = parse_species(ft, lines, idx)
-    println("done")
+    verbose && println("done")
 
     # map from species id to short sym
-    print("Creating species...")
+    verbose && print("Creating species...")
     idstoshortsyms = Vector{Symbol}(undef, length(shortsymstoids))
     specs = []
     for (k, v) in shortsymstoids
@@ -244,10 +275,10 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
         push!(specs, funcsym(k, t))
     end
     @assert all(s -> nameof(operation(unwrap(s[1]))) == s[2], zip(specs, idstoshortsyms)) "species ≂̸ to idstoshortsyms"
-    println("done")
+    verbose && println("done")
 
     # we evaluate all the parameters and species names in a module
-    print("Creating species and parameters for evaluating expressions...")
+    verbose && print("Creating species and parameters for evaluating expressions...")
     opmod = Module()
     Base.eval(opmod, :(using Catalyst))
     Base.eval(opmod, :(t = Catalyst.default_t()))
@@ -259,16 +290,16 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
         ssym = nameof(operation(unwrap(s)))
         Base.eval(opmod, :($(ssym) = $s))
     end
-    println("done")
+    verbose && println("done")
 
-    print("Parsing and adding reactions...")
+    verbose && print("Parsing and adding reactions...")
     rxs, idx = parse_reactions!(ft, specs, ps, t, lines, idx, idstoshortsyms, opmod)
-    println("done")
+    verbose && println("done")
 
-    print("Parsing groups...")
+    verbose && print("Parsing groups...")
     obseqs, groupstosyms, idx = parse_groups(ft, lines, idx, shortsymstosyms,
                                              idstoshortsyms, specs, t)
-    println("done")
+    verbose && println("done")
 
     close(file)
 
