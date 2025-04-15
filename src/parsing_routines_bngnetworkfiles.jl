@@ -250,7 +250,7 @@ parsed_network = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = tr
 ```
 """
 function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem),
-                       verbose = false, kwargs...)
+                       verbose = true, kwargs...)
     file = open(rxfilename, "r")
     lines = readlines(file)
     idx = 1
