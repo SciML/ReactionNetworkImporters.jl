@@ -11,7 +11,7 @@
 
 This package provides importers to load reaction networks into
 [Catalyst.jl](https://docs.sciml.ai/Catalyst/stable/)
-[`ReactionSystem`s](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#ModelingToolkit.ReactionSystem)
+`ReactionSystem`s
 from several file formats. Currently it supports loading networks in the
 following formats:
 
