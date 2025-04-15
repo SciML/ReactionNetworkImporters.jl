@@ -161,6 +161,8 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
         vals = split(lines[idx])
         idx += 1
         name = Symbol(vals[2])        
+
+        # if the .net file obs name is the same as a Catalyst species name don't add it
         (name in syms_set) && continue
         obs = (@variables $name($t))[1]
         namestosyms[vals[2]] = obs
