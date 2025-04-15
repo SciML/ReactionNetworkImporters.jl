@@ -1,4 +1,4 @@
-using DiffEqBase, Catalyst, OrdinaryDiffEq, DataFrames, CSVFiles, LinearAlgebra
+using Catalyst, OrdinaryDiffEqTsit5, DataFrames, CSVFiles, LinearAlgebra
 using ReactionNetworkImporters
 
 # using Plots

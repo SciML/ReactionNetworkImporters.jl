@@ -1,4 +1,4 @@
-using DiffEqBase, Catalyst, OrdinaryDiffEq, DataFrames, CSVFiles, LinearAlgebra
+using Catalyst, OrdinaryDiffEqTsit5, DataFrames, CSVFiles, LinearAlgebra
 using ReactionNetworkImporters
 # using Plots
 
@@ -24,6 +24,8 @@ boprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
 
 # Test that u0 == u₀ (used when the u0 indexing was introduced).
 @test isequal(prnbng.u0, prnbng.u₀)
+
+@show observed(rn)
 
 # BNG simulation data testing
 @unpack A = rn
