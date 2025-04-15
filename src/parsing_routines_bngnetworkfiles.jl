@@ -228,8 +228,10 @@ Parses a BioNetGen `.net` file and constructs a `ParsedReactionNetwork` object.
 # Arguments
 - `ft::BNGNetwork`: Indicates the file to be parsed is a BioNetGen ".net" file.
 - `rxfilename::String`: Path to the `.net` file to be parsed.
-- `name::Symbol`: (Optional) Name for the resulting `ReactionSystem`. Defaults to a generated symbol.
-- `verbose::Bool`: (Optional) If `true`, prints detailed progress information during parsing. Defaults to `false`.
+- `name::Symbol`: (Optional) Name for the resulting `ReactionSystem`. Defaults to a
+  generated symbol.
+- `verbose::Bool`: (Optional) If `true`, prints detailed progress information during
+  parsing. Defaults to `true`.
 - `kwargs...`: Additional keyword arguments passed to the `ReactionSystem` constructor.
 
 # Returns
