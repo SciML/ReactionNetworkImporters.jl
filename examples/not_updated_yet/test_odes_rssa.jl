@@ -18,11 +18,11 @@ reset_timer!(to)
 
 # get the reaction network
 @timeit to "netgen" prn=loadrxnetwork(RSSAFile(), networkname, speciesf, rxsf;
-                                      printrxs = false)
+    printrxs = false)
 rn = prn.rn;
 initialpop = prn.u0;
 @timeit to "addodes" addodes!(rn; build_jac = false, build_symfuncs = false,
-                              build_paramjac = false)
+    build_paramjac = false)
 @timeit to "ODEProb" oprob=ODEProblem(rn, convert.(Float64, initialpop), (0.0, tf))
 show(to)
 println()
@@ -40,8 +40,12 @@ println()
 
 # CVODE_BDF with LU seems to finish, on my machine it takes upwards of 500 seconds
 reset_timer!(to);
-@timeit to "CVODE_BDF" begin sol = solve(oprob, CVODE_BDF(), dense = false) end;
+@timeit to "CVODE_BDF" begin
+    sol = solve(oprob, CVODE_BDF(), dense = false)
+end;
 show(to);
 reset_timer!(to);
-@timeit to "CVODE_BDF" begin sol = solve(oprob, CVODE_BDF(), dense = false) end;
+@timeit to "CVODE_BDF" begin
+    sol = solve(oprob, CVODE_BDF(), dense = false)
+end;
 show(to);

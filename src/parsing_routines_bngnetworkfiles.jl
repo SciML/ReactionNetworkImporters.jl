@@ -19,7 +19,7 @@ end
 # for swapping out BioNetGen symbols
 const REPLACEMENT_DICT = Dict(:ln => :log)
 function recursive_replace!(expr::Any,
-                            replace_requests::Dict{Symbol, Symbol} = REPLACEMENT_DICT)
+        replace_requests::Dict{Symbol, Symbol} = REPLACEMENT_DICT)
     if expr isa Symbol
         haskey(replace_requests, expr) && return replace_requests[expr]
     elseif expr isa Expr
@@ -116,9 +116,10 @@ function parse_reactions!(ft::BNGNetwork, specs, ps, t, lines, idx, idstosyms, o
 
         # reactants and correct for higher-order rate rescalings by BioNetGen
         empty!(cntdict)
-        foreach(rid -> (rid > 0) &&
-                    (haskey(cntdict, rid) ? (cntdict[rid] += 1) : (cntdict[rid] = 1)),
-                reactantids)
+        foreach(
+            rid -> (rid > 0) &&
+                (haskey(cntdict, rid) ? (cntdict[rid] += 1) : (cntdict[rid] = 1)),
+            reactantids)
         scalefactor = isempty(cntdict) ? 0 : prod(factorial, values(cntdict))
         (!iszero(scalefactor)) && (rate = simplify(scalefactor * rate))
         rspecs = Vector{Any}(undef, length(cntdict))
@@ -130,9 +131,10 @@ function parse_reactions!(ft::BNGNetwork, specs, ps, t, lines, idx, idstosyms, o
 
         # product stoichiometry
         empty!(cntdict)
-        foreach(pid -> (pid > 0) &&
-                    (haskey(cntdict, pid) ? (cntdict[pid] += 1) : (cntdict[pid] = 1)),
-                productids)
+        foreach(
+            pid -> (pid > 0) &&
+                (haskey(cntdict, pid) ? (cntdict[pid] += 1) : (cntdict[pid] = 1)),
+            productids)
         pspecs = Vector{Any}(undef, length(cntdict))
         pstoich = Vector{Int}(undef, length(cntdict))
         for (i, (pid, cnt)) in enumerate(cntdict)
@@ -160,7 +162,7 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
     while lines[idx] != GROUPS_BLOCK_END
         vals = split(lines[idx])
         idx += 1
-        name = Symbol(vals[2])        
+        name = Symbol(vals[2])
 
         # if the .net file obs name is the same as a Catalyst species name don't add it
         (name in syms_set) && continue
@@ -252,7 +254,7 @@ parsed_network = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = tr
 ```
 """
 function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem),
-                       verbose = true, kwargs...)
+        verbose = true, kwargs...)
     file = open(rxfilename, "r")
     lines = readlines(file)
     idx = 1
@@ -302,7 +304,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
 
     verbose && print("Parsing groups...")
     obseqs, groupstosyms, idx = parse_groups(ft, lines, idx, shortsymstosyms,
-                                             idstoshortsyms, specs, t)
+        idstoshortsyms, specs, t)
     verbose && println("done")
 
     close(file)
@@ -312,12 +314,12 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
 
     # build the model
     rn = ReactionSystem(rxs, t, specs, ps; name = name, observed = obseqs,
-                        defaults = defmap, kwargs...)
+        defaults = defmap, kwargs...)
 
     # get numeric values for parameters and u0
     sm = speciesmap(rn)
     @assert all(sm[funcsym(sym, t)] == i for (i, sym) in enumerate(idstoshortsyms))
 
     ParsedReactionNetwork(rn; u0 = u0map, p = pmap, varstonames = shortsymstosyms,
-                          groupstosyms = groupstosyms)
+        groupstosyms = groupstosyms)
 end

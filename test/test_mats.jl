@@ -38,7 +38,7 @@ cmn1 = ComplexMatrixNetwork(pars, compstoichmat, incidencemat; params = pars)
 prn = loadrxnetwork(cmn1; name = nameof(rs))
 @test rs == complete(prn.rn)
 cmn2 = ComplexMatrixNetwork(pars, sparse(compstoichmat), sparse(incidencemat);
-                            params = pars)
+    params = pars)
 prn = loadrxnetwork(cmn2; name = nameof(rs))
 @test rs == complete(prn.rn)
 
@@ -61,7 +61,7 @@ cmn1 = ComplexMatrixNetwork(convert.(Float64, 1:5), compstoichmat, incidencemat)
 prn = loadrxnetwork(cmn1; name = nameof(rs))
 @test rs == complete(prn.rn)
 cmn2 = ComplexMatrixNetwork(convert.(Float64, 1:5), sparse(compstoichmat),
-                            sparse(incidencemat))
+    sparse(incidencemat))
 prn = loadrxnetwork(cmn2; name = nameof(rs))
 @test rs == complete(prn.rn)
 
@@ -81,15 +81,15 @@ mn1 = MatrixNetwork(rates, substoich, prodstoich; species = species, params = pa
 prn = loadrxnetwork(mn1; name = nameof(rs)) # dense version
 @test rs == complete(prn.rn)
 mn2 = MatrixNetwork(rates, sparse(substoich), sparse(prodstoich); species = species,
-                    params = pars)
+    params = pars)
 prn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
 @test rs == complete(prn.rn)
 
 cmn1 = ComplexMatrixNetwork(rates, compstoichmat, incidencemat; species = species,
-                            params = pars)
+    params = pars)
 prn = loadrxnetwork(cmn1; name = nameof(rs))
 @test rs == complete(prn.rn)
 cmn2 = ComplexMatrixNetwork(rates, sparse(compstoichmat), sparse(incidencemat);
-                            species = species, params = pars)
+    species = species, params = pars)
 prn = loadrxnetwork(cmn2; name = nameof(rs))
 @test rs == complete(prn.rn)
