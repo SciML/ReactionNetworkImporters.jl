@@ -19,7 +19,7 @@ rn = prnbng.rn;
 u0 = prnbng.u0;
 p = prnbng.p;
 @timeit to "addodes" addodes!(rn; build_jac = build_jac, sparse_jac = sparse_jac,
-                              build_symfuncs = false, build_paramjac = false)
+    build_symfuncs = false, build_paramjac = false)
 @timeit to "ODEProb" oprob=ODEProblem(rn, u0, (0.0, tf), p)
 u = copy(u0);
 du = similar(u);
@@ -47,16 +47,24 @@ calck = true
 # @timeit to "CVODE_BDF-GMRES-2" begin sol = solve(oprob,CVODE_BDF(linear_solver=:GMRES),dense=dense, abstol=1e-8, reltol=1e-8); end; 
 
 # CVODE_BDF with LU 
-@timeit to "CVODE_BDF-1" begin sol = solve(oprob, CVODE_BDF(), dense = dense, abstol = 1e-8,
-                                           reltol = 1e-8) end;
+@timeit to "CVODE_BDF-1" begin
+    sol = solve(oprob, CVODE_BDF(), dense = dense, abstol = 1e-8,
+        reltol = 1e-8)
+end;
 show(to);
-@timeit to "CVODE_BDF-2" begin sol = solve(oprob, CVODE_BDF(), dense = dense, abstol = 1e-8,
-                                           reltol = 1e-8) end;
+@timeit to "CVODE_BDF-2" begin
+    sol = solve(oprob, CVODE_BDF(), dense = dense, abstol = 1e-8,
+        reltol = 1e-8)
+end;
 show(to);
-@timeit to "KenCarp4-1" begin sol = solve(oprob, KenCarp4(autodiff = false), dense = dense,
-                                          calck = calck, abstol = 1e-8, reltol = 1e-8) end;
+@timeit to "KenCarp4-1" begin
+    sol = solve(oprob, KenCarp4(autodiff = false), dense = dense,
+        calck = calck, abstol = 1e-8, reltol = 1e-8)
+end;
 show(to);
-@timeit to "KenCarp4-2" begin sol = solve(oprob, KenCarp4(autodiff = false), dense = dense,
-                                          calck = calck, abstol = 1e-8, reltol = 1e-8) end;
+@timeit to "KenCarp4-2" begin
+    sol = solve(oprob, KenCarp4(autodiff = false), dense = dense,
+        calck = calck, abstol = 1e-8, reltol = 1e-8)
+end;
 
 show(to)

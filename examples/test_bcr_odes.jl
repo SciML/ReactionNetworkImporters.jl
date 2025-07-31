@@ -19,7 +19,7 @@ fname = joinpath(datadir, "bcr.net")
 gdatfile = joinpath(datadir, "bcr.gdat")
 print("getting gdat file...")
 gdatdf = DataFrame(load(File(format"CSV", gdatfile), header_exists = true,
-                        spacedelim = true))
+    spacedelim = true))
 println("done")
 
 # we'll time the DiffEq solvers 
@@ -57,11 +57,15 @@ println()
 # #reset_timer!(to); @timeit to "BNG_RODAS5_BDF" begin bsol2 = solve(boprob, rodas5(autodiff=false), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
 #@timeit to "KenCarp4-1" begin sol = solve(boprob,KenCarp4(autodiff=false,linsolve=LinSolveFactorize(lu)), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
 #@timeit to "KenCarp4-2" begin bsol = solve(boprob,KenCarp4(autodiff=false,linsolve=LinSolveFactorize(lu)), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-@timeit to "KenCarp4-1" begin sol = solve(boprob, KenCarp4(autodiff = false), abstol = 1e-8,
-                                          reltol = 1e-8, saveat = 1.0) end;
+@timeit to "KenCarp4-1" begin
+    sol = solve(boprob, KenCarp4(autodiff = false), abstol = 1e-8,
+        reltol = 1e-8, saveat = 1.0)
+end;
 show(to);
-@timeit to "KenCarp4-2" begin bsol = solve(boprob, KenCarp4(autodiff = false),
-                                           abstol = 1e-8, reltol = 1e-8, saveat = 1.0) end;
+@timeit to "KenCarp4-2" begin
+    bsol = solve(boprob, KenCarp4(autodiff = false),
+        abstol = 1e-8, reltol = 1e-8, saveat = 1.0)
+end;
 show(to);
 
 # Activated Syk from DiffEq
@@ -70,9 +74,9 @@ show(to);
 if doplot
     plotlyjs()
     plot(gdatdf[!, :time][2:end], gdatdf[!, :Activated_Syk][2:end], xscale = :log10,
-         label = "AsykGroup", linestyle = :dot)
+        label = "AsykGroup", linestyle = :dot)
     plot!(bsol.t[2:end], sol[Activated_Syk][2:end], label = "Activated_Syk",
-          xscale = :log10)
+        xscale = :log10)
 end
 
 # test the error, note may be large in abs value though small relatively

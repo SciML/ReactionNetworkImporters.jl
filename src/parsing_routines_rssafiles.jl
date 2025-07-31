@@ -29,7 +29,7 @@ function parse_reactions(ft::RSSANetwork, fname)
 end
 
 function build_rxnetwork(ft::RSSANetwork, networkname, rxstrs, rxrates; printrxs = false,
-                         kwargs...)
+        kwargs...)
 
     # string representing the network
     rxiobuf = IOBuffer()

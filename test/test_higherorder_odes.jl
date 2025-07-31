@@ -14,7 +14,7 @@ fname = joinpath(datadir, "higherorder.net")
 gdatfile = joinpath(datadir, "higherorder.gdat")
 print("getting gdat file...")
 gdatdf = DataFrame(load(File{format"CSV"}(gdatfile), header_exists = true,
-                        spacedelim = true))
+    spacedelim = true))
 println("done")
 
 # load the BNG reaction network in DiffEqBio
