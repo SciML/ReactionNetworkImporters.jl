@@ -15,7 +15,7 @@ fname = joinpath(datadir, "Repressilator.net")
 gdatfile = joinpath(datadir, "Repressilator.gdat")
 print("getting gdat file...")
 gdatdf = DataFrame(load(File{format"CSV"}(gdatfile), header_exists = true,
-                        spacedelim = true))
+    spacedelim = true))
 println("done")
 
 # load the BNG reaction network in DiffEqBio

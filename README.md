@@ -121,7 +121,7 @@ prodstoich = [0 2 0 1 3;
               1 0 0 1 0;
               0 0 1 0 0]
 mn = MatrixNetwork(pars, substoich, prodstoich; species = species,
-                   params = pars) # a matrix network
+    params = pars) # a matrix network
 prn = loadrxnetwork(mn; name = :testnetwork) # dense version
 
 # test the two networks are the same
@@ -138,7 +138,7 @@ incidencemat = [-1 1 0 0 0;
                 0 0 0 0 -1;
                 0 0 0 0 1]
 cmn = ComplexMatrixNetwork(pars, stoichmat, incidencemat; species = species,
-                           params = pars)  # a complex matrix network
+    params = pars)  # a complex matrix network
 prn = loadrxnetwork(cmn)
 
 # test the two networks are the same
@@ -149,11 +149,11 @@ The basic usages are
 
 ```julia
 mn = MatrixNetwork(rateexprs, substoich, prodstoich; species = Any[],
-                   params = Any[], t = nothing)
+    params = Any[], t = nothing)
 prn = loadrxnetwork(mn::MatrixNetwork)
 
 cmn = ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species = Any[],
-                           params = Any[], t = nothing)
+    params = Any[], t = nothing)
 prn = loadrxnetwork(cmn::ComplexMatrixNetwork)
 ```
 
@@ -171,18 +171,18 @@ reaction rate expressions. These two types have the following fields:
     involving parameters and species like `k*A`.
 
   - matrix inputs
-
+    
       + For `MatrixNetwork`
-
+        
           * `substoich`, a number of species by number of reactions matrix with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a
             substrate in reaction `j`.
           * `prodstoich`, a number of species by number of reactions matrix with entry
             `(i,j)` giving the stoichiometric coefficient of species `i` as a product
             in reaction `j`.
-
+    
       + For `ComplexMatrixNetwork`
-
+        
           * `stoichmat`, the complex stoichiometry matrix [defined
             here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined

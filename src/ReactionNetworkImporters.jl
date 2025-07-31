@@ -57,7 +57,7 @@ struct ParsedReactionNetwork
     groupstosyms::Any
 end
 function ParsedReactionNetwork(rn::ReactionSystem; u0 = nothing, p = nothing,
-                               varstonames = nothing, groupstosyms = nothing)
+        varstonames = nothing, groupstosyms = nothing)
     ParsedReactionNetwork(rn, u0, p, varstonames, groupstosyms)
 end
 
@@ -68,7 +68,6 @@ include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
 export loadrxnetwork
-
 
 # Overload ensuring that u0 and u₀ can be used interchangeably.
 # (introduced when the u₀ field was changed to u0)

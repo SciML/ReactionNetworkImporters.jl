@@ -19,14 +19,14 @@ tf = 10.0
 # get the RSSA reaction network
 reset_timer!(to)
 @timeit to "netgen" prn=loadrxnetwork(RSSANetwork(), networkname, speciesf, rxsf;
-                                      printrxs = false)
+    printrxs = false)
 rn = prn.rn
 initialpop = prn.u0
 println("network parsed")
 
 # get the BioNetGen reaction network
 @timeit to "bionetgen" prnbng=loadrxnetwork(BNGNetwork(), string(networkname, "bng"),
-                                            bngfname)
+    bngfname)
 rnbng = prnbng.rn;
 u0 = prnbng.u0;
 p = prnbng.p;
