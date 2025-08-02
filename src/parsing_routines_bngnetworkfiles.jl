@@ -192,10 +192,11 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
     obseqs, namestosyms, idx
 end
 
-function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
+function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
     pmap = Dict()
+    psym_to_pvar = Dict(nameof(p) => p for p in ps)
     for (psym, pid) in ptoids
-        pvar = getproperty(opmod, psym)
+        pvar = psym_to_pvar[psym]
         parsedval = pvals[pid]
         if (parsedval isa Expr) || (parsedval isa Symbol)
             pval = Base.eval(opmod, :($parsedval))
@@ -311,7 +312,7 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     close(file)
 
     # setup default values / expressions for params and initial conditions
-    defmap, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs)
+    defmap, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
 
     # build the model
     rn = ReactionSystem(rxs, t, specs, ps; name = name, observed = obseqs,
