@@ -27,8 +27,10 @@ rn = prn.rn
 # post equilibration solve
 tf = 20000.0
 jsys = convert(JumpSystem, rn)
-u0 = convert.(Int,
-    ModelingToolkit.varmap_to_vars(ModelingToolkit.defaults(jsys), states(jsys)))
+u0 = convert.(
+    Int,
+    ModelingToolkit.varmap_to_vars(ModelingToolkit.defaults(jsys), states(jsys))
+)
 dprob = DiscreteProblem(jsys, u0, (0.0, tf), [])
 @assert eltype(dprob.u0) <: Int
 jprob = JumpProblem(jsys, dprob, RSSACR(), save_positions = (false, false))

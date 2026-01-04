@@ -26,9 +26,11 @@ struct MatrixNetwork{S, T, U, V, W, X} <: NetworkFileFormat
     """independent variable, time """
     t::X
 end
-function MatrixNetwork(rateexprs, substoich, prodstoich; species = Any[], params = Any[],
-        t = nothing)
-    MatrixNetwork(rateexprs, substoich, prodstoich, species, params, t)
+function MatrixNetwork(
+        rateexprs, substoich, prodstoich; species = Any[], params = Any[],
+        t = nothing
+    )
+    return MatrixNetwork(rateexprs, substoich, prodstoich, species, params, t)
 end
 
 # for dense matrices
@@ -73,11 +75,15 @@ mn = MatrixNetwork(rateexprs, substoich, prodstoich; species = species, params =
 parsed_network = loadrxnetwork(mn, name = :MyReactionSystem)
 ```
 """
-function loadrxnetwork(mn::MatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)) where {S <: AbstractVector,
+function loadrxnetwork(
+        mn::MatrixNetwork{S, T, U, V, W, X};
+        name = gensym(:ReactionSystem)
+    ) where {
+        S <: AbstractVector,
         T <: Matrix, U <: Matrix{Int},
         V <: AbstractVector,
-        W <: AbstractVector, X <: Any}
+        W <: AbstractVector, X <: Any,
+    }
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
     numspecs = sz[1]
@@ -114,17 +120,21 @@ function loadrxnetwork(mn::MatrixNetwork{S, T, U, V, W, X};
         rxs[j] = Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich)
     end
 
-    ParsedReactionNetwork(ReactionSystem(rxs, t, species, mn.params; name = name))
+    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, mn.params; name = name))
 end
 
 # for sparse matrices
-function loadrxnetwork(mn::MatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)) where {S <: AbstractVector,
+function loadrxnetwork(
+        mn::MatrixNetwork{S, T, U, V, W, X};
+        name = gensym(:ReactionSystem)
+    ) where {
+        S <: AbstractVector,
         T <: SparseMatrixCSC,
         U <:
         SparseMatrixCSC{Int, Int},
         V <: AbstractVector,
-        W <: AbstractVector, X <: Any}
+        W <: AbstractVector, X <: Any,
+    }
     sz = size(mn.substoich)
     @assert sz == size(mn.prodstoich)
     numspecs = sz[1]
@@ -166,7 +176,7 @@ function loadrxnetwork(mn::MatrixNetwork{S, T, U, V, W, X};
         rxs[j] = Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich)
     end
 
-    ParsedReactionNetwork(ReactionSystem(rxs, t, species, mn.params; name = name))
+    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, mn.params; name = name))
 end
 
 """
@@ -206,17 +216,23 @@ struct ComplexMatrixNetwork{S, T, U, V, W, X} <: NetworkFileFormat
     """independent variable, time """
     t::X
 end
-function ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species = Any[],
-        params = Any[], t = nothing)
-    ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat, species, params, t)
+function ComplexMatrixNetwork(
+        rateexprs, stoichmat, incidencemat; species = Any[],
+        params = Any[], t = nothing
+    )
+    return ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat, species, params, t)
 end
 
 # for Dense matrices version
-function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)) where {S <: AbstractVector,
+function loadrxnetwork(
+        cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
+        name = gensym(:ReactionSystem)
+    ) where {
+        S <: AbstractVector,
         T <: Matrix, U <: Matrix{Int},
         V <: AbstractVector,
-        W <: AbstractVector, X <: Any}
+        W <: AbstractVector, X <: Any,
+    }
     numspecs, numcomp = size(cmn.stoichmat)
     @assert all(>=(0), cmn.stoichmat)
     @assert numcomp == size(cmn.incidencemat, 1)
@@ -238,30 +254,40 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
         ps_ind = findall(!iszero, @view cmn.stoichmat[:, pc_ind[i][1]])
 
         if isempty(ss_ind) && !isempty(ps_ind)
-            rxs[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
-                nothing, cmn.stoichmat[ps_ind, pc_ind[i][1]])
+            rxs[i] = Reaction(
+                cmn.rateexprs[i], nothing, species[ps_ind],
+                nothing, cmn.stoichmat[ps_ind, pc_ind[i][1]]
+            )
 
         elseif !isempty(ss_ind) && isempty(ps_ind)
-            rxs[i] = Reaction(cmn.rateexprs[i], species[ss_ind], nothing,
-                cmn.stoichmat[ss_ind, sc_ind[i][1]], nothing)
+            rxs[i] = Reaction(
+                cmn.rateexprs[i], species[ss_ind], nothing,
+                cmn.stoichmat[ss_ind, sc_ind[i][1]], nothing
+            )
         else
-            rxs[i] = Reaction(cmn.rateexprs[i], species[ss_ind], species[ps_ind],
+            rxs[i] = Reaction(
+                cmn.rateexprs[i], species[ss_ind], species[ps_ind],
                 cmn.stoichmat[ss_ind, sc_ind[i][1]],
-                cmn.stoichmat[ps_ind, pc_ind[i][1]])
+                cmn.stoichmat[ps_ind, pc_ind[i][1]]
+            )
         end
     end
 
-    ParsedReactionNetwork(ReactionSystem(rxs, t, species, cmn.params; name = name))
+    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, cmn.params; name = name))
 end
 
 # for sparse matrices version
-function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)) where {S <: AbstractVector,
+function loadrxnetwork(
+        cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
+        name = gensym(:ReactionSystem)
+    ) where {
+        S <: AbstractVector,
         T <: SparseMatrixCSC,
         U <:
         SparseMatrixCSC{Int, Int},
         V <: AbstractVector,
-        W <: AbstractVector, X <: Any}
+        W <: AbstractVector, X <: Any,
+    }
     numspecs, numcomp = size(cmn.stoichmat)
     @assert all(>=(0), cmn.stoichmat)
     @assert numcomp == size(cmn.incidencemat, 1)
@@ -283,18 +309,24 @@ function loadrxnetwork(cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
         ps_ind = @view rows[nzrange(cmn.stoichmat, pc_ind[i][1])]
 
         if isempty(ss_ind) && !isempty(ps_ind)
-            rxs[i] = Reaction(cmn.rateexprs[i], nothing, species[ps_ind],
-                nothing, vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
+            rxs[i] = Reaction(
+                cmn.rateexprs[i], nothing, species[ps_ind],
+                nothing, vals[nzrange(cmn.stoichmat, pc_ind[i][1])]
+            )
 
         elseif !isempty(ss_ind) && isempty(ps_ind)
-            rxs[i] = Reaction(cmn.rateexprs[i], species[ss_ind], nothing,
-                vals[nzrange(cmn.stoichmat, sc_ind[i][1])], nothing)
+            rxs[i] = Reaction(
+                cmn.rateexprs[i], species[ss_ind], nothing,
+                vals[nzrange(cmn.stoichmat, sc_ind[i][1])], nothing
+            )
         else
-            rxs[i] = Reaction(cmn.rateexprs[i], species[ss_ind], species[ps_ind],
+            rxs[i] = Reaction(
+                cmn.rateexprs[i], species[ss_ind], species[ps_ind],
                 vals[nzrange(cmn.stoichmat, sc_ind[i][1])],
-                vals[nzrange(cmn.stoichmat, pc_ind[i][1])])
+                vals[nzrange(cmn.stoichmat, pc_ind[i][1])]
+            )
         end
     end
 
-    ParsedReactionNetwork(ReactionSystem(rxs, t, species, cmn.params; name = name))
+    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, cmn.params; name = name))
 end

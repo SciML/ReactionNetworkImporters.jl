@@ -10,7 +10,7 @@ using Symbolics: operation, unwrap
 # u = S₁(t)
 function funcsym(S::Symbol, t, args...)
     S = Symbol(S, args...)
-    only(@species $(S)(t))
+    return only(@species $(S)(t))
 end
 
 abstract type NetworkFileFormat end
@@ -56,9 +56,11 @@ struct ParsedReactionNetwork
     "Dict from group name (as string) to corresponding symbolic variable"
     groupstosyms::Any
 end
-function ParsedReactionNetwork(rn::ReactionSystem; u0 = nothing, p = nothing,
-        varstonames = nothing, groupstosyms = nothing)
-    ParsedReactionNetwork(rn, u0, p, varstonames, groupstosyms)
+function ParsedReactionNetwork(
+        rn::ReactionSystem; u0 = nothing, p = nothing,
+        varstonames = nothing, groupstosyms = nothing
+    )
+    return ParsedReactionNetwork(rn, u0, p, varstonames, groupstosyms)
 end
 
 export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork

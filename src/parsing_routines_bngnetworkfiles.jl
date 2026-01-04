@@ -13,13 +13,15 @@ function seek_to_block(lines, idx, start_string)
         idx += 1
         (idx > length(lines)) && error("Block: ", start_string, " was never found.")
     end
-    idx += 1
+    return idx += 1
 end
 
 # for swapping out BioNetGen symbols
 const REPLACEMENT_DICT = Dict(:ln => :log)
-function recursive_replace!(expr::Any,
-        replace_requests::Dict{Symbol, Symbol} = REPLACEMENT_DICT)
+function recursive_replace!(
+        expr::Any,
+        replace_requests::Dict{Symbol, Symbol} = REPLACEMENT_DICT
+    )
     if expr isa Symbol
         haskey(replace_requests, expr) && return replace_requests[expr]
     elseif expr isa Expr
@@ -53,7 +55,7 @@ function parse_params(ft::BNGNetwork, lines, idx)
         (idx > length(lines)) && error("Block: ", PARAM_BLOCK_END, " was never found.")
     end
 
-    ptoids, pvals, idx
+    return ptoids, pvals, idx
 end
 
 const CHARS_TO_STRIP = ",~!()."
@@ -63,7 +65,7 @@ const SPECIES_BLOCK_START = "begin species"
 const SPECIES_BLOCK_END = "end species"
 const MAX_SYM_LEN = 8
 function make_shortsym(name, sidx)
-    length(name) < MAX_SYM_LEN ? Symbol(stripchars(name)) : Symbol(string("S$sidx"))
+    return length(name) < MAX_SYM_LEN ? Symbol(stripchars(name)) : Symbol(string("S$sidx"))
 end
 function parse_species(ft::BNGNetwork, lines, idx)
     idx = seek_to_block(lines, idx, SPECIES_BLOCK_START)
@@ -84,7 +86,7 @@ function parse_species(ft::BNGNetwork, lines, idx)
         (idx > length(lines)) && error("Block: ", SPECIES_BLOCK_END, " was never found.")
     end
 
-    u0exprs, shortsymstoids, shortsymstosyms, idx
+    return u0exprs, shortsymstoids, shortsymstosyms, idx
 end
 
 const REACTIONS_BLOCK_START = "begin reactions"
@@ -110,16 +112,17 @@ function parse_reactions!(ft::BNGNetwork, specs, ps, t, lines, idx, idstosyms, o
         end
 
         any(iszero, reactantids) &&
-            (@assert length(reactantids)==1 "Found more than one reactant with id 0")
+            (@assert length(reactantids) == 1 "Found more than one reactant with id 0")
         any(iszero, productids) &&
-            (@assert length(productids)==1 "Found more than one product with id 0")
+            (@assert length(productids) == 1 "Found more than one product with id 0")
 
         # reactants and correct for higher-order rate rescalings by BioNetGen
         empty!(cntdict)
         foreach(
             rid -> (rid > 0) &&
-                   (haskey(cntdict, rid) ? (cntdict[rid] += 1) : (cntdict[rid] = 1)),
-            reactantids)
+                (haskey(cntdict, rid) ? (cntdict[rid] += 1) : (cntdict[rid] = 1)),
+            reactantids
+        )
         scalefactor = isempty(cntdict) ? 0 : prod(factorial, values(cntdict))
         (!iszero(scalefactor)) && (rate = simplify(scalefactor * rate))
         rspecs = Vector{Any}(undef, length(cntdict))
@@ -133,8 +136,9 @@ function parse_reactions!(ft::BNGNetwork, specs, ps, t, lines, idx, idstosyms, o
         empty!(cntdict)
         foreach(
             pid -> (pid > 0) &&
-                   (haskey(cntdict, pid) ? (cntdict[pid] += 1) : (cntdict[pid] = 1)),
-            productids)
+                (haskey(cntdict, pid) ? (cntdict[pid] += 1) : (cntdict[pid] = 1)),
+            productids
+        )
         pspecs = Vector{Any}(undef, length(cntdict))
         pstoich = Vector{Int}(undef, length(cntdict))
         for (i, (pid, cnt)) in enumerate(cntdict)
@@ -149,7 +153,7 @@ function parse_reactions!(ft::BNGNetwork, specs, ps, t, lines, idx, idstosyms, o
         (idx > length(lines)) && error("Block: ", REACTIONS_BLOCK_END, " was never found.")
     end
 
-    rxs, idx
+    return rxs, idx
 end
 
 const GROUPS_BLOCK_START = "begin groups"
@@ -189,7 +193,7 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
         (idx > length(lines)) && error("Block: ", GROUPS_BLOCK_END, " was never found.")
     end
 
-    obseqs, namestosyms, idx
+    return obseqs, namestosyms, idx
 end
 
 function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
@@ -219,7 +223,7 @@ function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
         push!(u0map, uvar => u0val)
     end
 
-    union(pmap, u0map), pmap, u0map
+    return union(pmap, u0map), pmap, u0map
 end
 
 # for parsing a subset of the BioNetGen .net file format
@@ -254,8 +258,10 @@ This function parses a subset of the BioNetGen `.net` file format. It assumes:
 parsed_network = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = true)
 ```
 """
-function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem),
-        verbose = true, kwargs...)
+function loadrxnetwork(
+        ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem),
+        verbose = true, kwargs...
+    )
     file = open(rxfilename, "r")
     lines = readlines(file)
     idx = 1
@@ -305,8 +311,10 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
 
     verbose && print("Parsing groups...")
     obseqs, groupstosyms,
-    idx = parse_groups(ft, lines, idx, shortsymstosyms,
-        idstoshortsyms, specs, t)
+        idx = parse_groups(
+        ft, lines, idx, shortsymstosyms,
+        idstoshortsyms, specs, t
+    )
     verbose && println("done")
 
     close(file)
@@ -315,13 +323,17 @@ function loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem
     defmap, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
 
     # build the model
-    rn = ReactionSystem(rxs, t, specs, ps; name = name, observed = obseqs,
-        defaults = defmap, kwargs...)
+    rn = ReactionSystem(
+        rxs, t, specs, ps; name = name, observed = obseqs,
+        defaults = defmap, kwargs...
+    )
 
     # get numeric values for parameters and u0
     sm = speciesmap(rn)
     @assert all(sm[funcsym(sym, t)] == i for (i, sym) in enumerate(idstoshortsyms))
 
-    ParsedReactionNetwork(rn; u0 = u0map, p = pmap, varstonames = shortsymstosyms,
-        groupstosyms = groupstosyms)
+    return ParsedReactionNetwork(
+        rn; u0 = u0map, p = pmap, varstonames = shortsymstosyms,
+        groupstosyms = groupstosyms
+    )
 end
