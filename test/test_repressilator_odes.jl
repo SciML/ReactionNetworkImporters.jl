@@ -14,8 +14,12 @@ datadir = joinpath(@__DIR__, "../data/repressilator")
 fname = joinpath(datadir, "Repressilator.net")
 gdatfile = joinpath(datadir, "Repressilator.gdat")
 print("getting gdat file...")
-gdatdf = DataFrame(load(File{format"CSV"}(gdatfile), header_exists = true,
-    spacedelim = true))
+gdatdf = DataFrame(
+    load(
+        File{format"CSV"}(gdatfile), header_exists = true,
+        spacedelim = true
+    )
+)
 println("done")
 
 # load the BNG reaction network in DiffEqBio
@@ -32,7 +36,7 @@ boprob = ODEProblem(rn, u0, (0.0, tf), p)
 bngsol = gdatdf[!, :pTetR]
 
 # note solvers run _much_ faster the second time
-bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nsteps);
+bsol = solve(boprob, Tsit5(), abstol = 1.0e-12, reltol = 1.0e-12, saveat = tf / nsteps);
 @unpack pTetR = rn
 
 # if doplot
@@ -43,4 +47,4 @@ bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nste
 # end
 
 @test all(bsol.t .== gdatdf[!, :time])
-@test all(abs.(gdatdf[!, :pTetR] - bsol[pTetR]) .< 1e-6 .* abs.(gdatdf[!, :pTetR]))
+@test all(abs.(gdatdf[!, :pTetR] - bsol[pTetR]) .< 1.0e-6 .* abs.(gdatdf[!, :pTetR]))

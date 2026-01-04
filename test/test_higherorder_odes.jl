@@ -5,7 +5,7 @@ using ReactionNetworkImporters
 # parameters
 doplot = false
 networkname = "HigherOrder"
-tf = 1e-2
+tf = 1.0e-2
 nsteps = 2000
 
 # BNG simulation data
@@ -13,8 +13,12 @@ datadir = joinpath(@__DIR__, "../data/higherorder")
 fname = joinpath(datadir, "higherorder.net")
 gdatfile = joinpath(datadir, "higherorder.gdat")
 print("getting gdat file...")
-gdatdf = DataFrame(load(File{format"CSV"}(gdatfile), header_exists = true,
-    spacedelim = true))
+gdatdf = DataFrame(
+    load(
+        File{format"CSV"}(gdatfile), header_exists = true,
+        spacedelim = true
+    )
+)
 println("done")
 
 # load the BNG reaction network in DiffEqBio
@@ -32,7 +36,7 @@ boprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
 Asol = gdatdf[!, :A]
 
 # note solvers run _much_ faster the second time
-bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nsteps);
+bsol = solve(boprob, Tsit5(), abstol = 1.0e-12, reltol = 1.0e-12, saveat = tf / nsteps);
 
 # if doplot
 #     plotlyjs()
@@ -43,4 +47,4 @@ bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nste
 # end
 
 @test all(bsol.t .== gdatdf[!, :time])
-@test all(abs.(gdatdf[!, :A] - bsol[A]) .< 1e-6 .* abs.(gdatdf[!, :A]))
+@test all(abs.(gdatdf[!, :A] - bsol[A]) .< 1.0e-6 .* abs.(gdatdf[!, :A]))

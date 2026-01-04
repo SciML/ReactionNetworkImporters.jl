@@ -9,7 +9,7 @@ using TimerOutputs
 networkname = "tester"
 tf = 10.0
 
-# input files, specify path 
+# input files, specify path
 datadir = joinpath(@__DIR__, "../data/repressilator")
 fname = joinpath(datadir, "Repressilator.net")
 
@@ -17,17 +17,21 @@ const to = TimerOutput()
 reset_timer!(to)
 
 # get the reaction network
-@timeit to "netgen" prn=loadrxnetwork(RSSAFile(), networkname, speciesf, rxsf;
-    printrxs = false)
+@timeit to "netgen" prn = loadrxnetwork(
+    RSSAFile(), networkname, speciesf, rxsf;
+    printrxs = false
+)
 rn = prn.rn;
 initialpop = prn.u0;
-@timeit to "addodes" addodes!(rn; build_jac = false, build_symfuncs = false,
-    build_paramjac = false)
-@timeit to "ODEProb" oprob=ODEProblem(rn, convert.(Float64, initialpop), (0.0, tf))
+@timeit to "addodes" addodes!(
+    rn; build_jac = false, build_symfuncs = false,
+    build_paramjac = false
+)
+@timeit to "ODEProb" oprob = ODEProblem(rn, convert.(Float64, initialpop), (0.0, tf))
 show(to)
 println()
 
-# note solvers run faster the second time 
+# note solvers run faster the second time
 
 # I haven't been able to successfully solve the system with Rodas4/Rodas5
 #reset_timer!(to); @timeit to "Rodas4" begin sol = solve(oprob,Rodas4(autodiff=false),dense=false,calck=false); end; show(to)

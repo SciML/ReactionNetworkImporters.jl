@@ -13,8 +13,12 @@ datadir = joinpath(@__DIR__, "../data/nullrxs")
 fname = joinpath(datadir, "birth-death.net")
 gdatfile = joinpath(datadir, "birth-death.gdat")
 print("getting gdat file...")
-gdatdf = DataFrame(load(File{format"CSV"}(gdatfile), header_exists = true,
-    spacedelim = true))
+gdatdf = DataFrame(
+    load(
+        File{format"CSV"}(gdatfile), header_exists = true,
+        spacedelim = true
+    )
+)
 println("done")
 
 # load the BNG reaction network in DiffEqBio
@@ -28,7 +32,7 @@ boprob = ODEProblem(rn, u0, (0.0, tf), p)
 @test isequal(prnbng.u0, prnbng.u₀)
 
 # note solvers run _much_ faster the second time
-bsol = solve(boprob, Tsit5(), abstol = 1e-12, reltol = 1e-12, saveat = tf / nsteps)
+bsol = solve(boprob, Tsit5(), abstol = 1.0e-12, reltol = 1.0e-12, saveat = tf / nsteps)
 
 if doplot
     plotlyjs()
@@ -39,5 +43,7 @@ if doplot
 end
 
 @test all(bsol.t .== gdatdf[!, :time])
-@test all(abs.(gdatdf[!, :Atot] - bsol[1, :]) .<
-          max.(1e-8 .* abs.(gdatdf[!, :Atot]), 1e-12))
+@test all(
+    abs.(gdatdf[!, :Atot] - bsol[1, :]) .<
+        max.(1.0e-8 .* abs.(gdatdf[!, :Atot]), 1.0e-12)
+)

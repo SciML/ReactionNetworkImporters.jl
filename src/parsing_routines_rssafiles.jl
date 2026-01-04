@@ -8,7 +8,7 @@ function parse_species(ft::RSSANetwork, fname)
         end
     end
 
-    specs_ic
+    return specs_ic
 end
 
 function parse_reactions(ft::RSSANetwork, fname)
@@ -25,11 +25,13 @@ function parse_reactions(ft::RSSANetwork, fname)
         end
     end
 
-    rxstrs, rxrates
+    return rxstrs, rxrates
 end
 
-function build_rxnetwork(ft::RSSANetwork, networkname, rxstrs, rxrates; printrxs = false,
-        kwargs...)
+function build_rxnetwork(
+        ft::RSSANetwork, networkname, rxstrs, rxrates; printrxs = false,
+        kwargs...
+    )
 
     # string representing the network
     rxiobuf = IOBuffer()
@@ -48,7 +50,7 @@ function build_rxnetwork(ft::RSSANetwork, networkname, rxstrs, rxrates; printrxs
     # build the network using Catalyst
     rn = eval(Meta.parse(rnstr))
 
-    rn, rnstr
+    return rn, rnstr
 end
 
 function get_init_condit(ft::RSSANetwork, rn, specs_ic)
@@ -57,7 +59,7 @@ function get_init_condit(ft::RSSANetwork, rn, specs_ic)
         icvec[i] = specs_ic[sym]
     end
 
-    icvec
+    return icvec
 end
 
 # for parsing the simple format from the book by Thanh et al.
@@ -73,5 +75,5 @@ function loadrxnetwork(ft::RSSANetwork, specs_ic_file, rxs_file; kwargs...)
     rn, rnstr = build_rxnetwork(ft, networkname, rxstrs, rxrates; kwargs...)
     initialpop = get_init_condit(ft, rn, specs_ic)
 
-    ParsedReactionNetwork(rn, initialpop)
+    return ParsedReactionNetwork(rn, initialpop)
 end
