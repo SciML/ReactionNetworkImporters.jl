@@ -77,8 +77,8 @@ parsed_network = loadrxnetwork(mn, name = :MyReactionSystem)
 """
 function loadrxnetwork(
         mn::MatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)
-    ) where {
+        name::Symbol = gensym(:ReactionSystem)
+    )::ParsedReactionNetwork where {
         S <: AbstractVector,
         T <: Matrix, U <: Matrix{Int},
         V <: AbstractVector,
@@ -126,8 +126,8 @@ end
 # for sparse matrices
 function loadrxnetwork(
         mn::MatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)
-    ) where {
+        name::Symbol = gensym(:ReactionSystem)
+    )::ParsedReactionNetwork where {
         S <: AbstractVector,
         T <: SparseMatrixCSC,
         U <:
@@ -226,8 +226,8 @@ end
 # for Dense matrices version
 function loadrxnetwork(
         cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)
-    ) where {
+        name::Symbol = gensym(:ReactionSystem)
+    )::ParsedReactionNetwork where {
         S <: AbstractVector,
         T <: Matrix, U <: Matrix{Int},
         V <: AbstractVector,
@@ -279,8 +279,8 @@ end
 # for sparse matrices version
 function loadrxnetwork(
         cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
-        name = gensym(:ReactionSystem)
-    ) where {
+        name::Symbol = gensym(:ReactionSystem)
+    )::ParsedReactionNetwork where {
         S <: AbstractVector,
         T <: SparseMatrixCSC,
         U <:
