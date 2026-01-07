@@ -8,7 +8,7 @@ features, will definitely not work.
 """
 Seek to a line matching `start_string`.
 """
-function seek_to_block(lines, idx, start_string)
+function seek_to_block(lines::AbstractVector{<:AbstractString}, idx::Integer, start_string::AbstractString)::Int
     while lines[idx] != start_string
         idx += 1
         (idx > length(lines)) && error("Block: ", start_string, " was never found.")
@@ -34,7 +34,7 @@ end
 
 const PARAM_BLOCK_START = "begin parameters"
 const PARAM_BLOCK_END = "end parameters"
-function parse_params(ft::BNGNetwork, lines, idx)
+function parse_params(ft::BNGNetwork, lines::AbstractVector{<:AbstractString}, idx::Integer)
     idx = seek_to_block(lines, idx, PARAM_BLOCK_START)
 
     # parse params
@@ -59,15 +59,16 @@ function parse_params(ft::BNGNetwork, lines, idx)
 end
 
 const CHARS_TO_STRIP = ",~!()."
-stripchars = (s) -> replace(s, Regex("[$CHARS_TO_STRIP]") => "")
-hasstripchars = (s) -> occursin(Regex("[$CHARS_TO_STRIP]"), s)
+const CHARS_TO_STRIP_REGEX = Regex("[$CHARS_TO_STRIP]")
+stripchars(s::AbstractString)::String = replace(s, CHARS_TO_STRIP_REGEX => "")
+hasstripchars(s::AbstractString)::Bool = occursin(CHARS_TO_STRIP_REGEX, s)
 const SPECIES_BLOCK_START = "begin species"
 const SPECIES_BLOCK_END = "end species"
 const MAX_SYM_LEN = 8
-function make_shortsym(name, sidx)
+function make_shortsym(name::AbstractString, sidx::Integer)::Symbol
     return length(name) < MAX_SYM_LEN ? Symbol(stripchars(name)) : Symbol(string("S$sidx"))
 end
-function parse_species(ft::BNGNetwork, lines, idx)
+function parse_species(ft::BNGNetwork, lines::AbstractVector{<:AbstractString}, idx::Integer)
     idx = seek_to_block(lines, idx, SPECIES_BLOCK_START)
 
     # parse species
@@ -91,7 +92,11 @@ end
 
 const REACTIONS_BLOCK_START = "begin reactions"
 const REACTIONS_BLOCK_END = "end reactions"
-function parse_reactions!(ft::BNGNetwork, specs, ps, t, lines, idx, idstosyms, opmod)
+function parse_reactions!(
+        ft::BNGNetwork, specs::AbstractVector, ps::AbstractVector, t,
+        lines::AbstractVector{<:AbstractString}, idx::Integer,
+        idstosyms::AbstractVector{Symbol}, opmod::Module
+    )
     idx = seek_to_block(lines, idx, REACTIONS_BLOCK_START)
     cntdict = Dict{Int, Int}()
     rxs = Reaction[]
@@ -158,7 +163,11 @@ end
 
 const GROUPS_BLOCK_START = "begin groups"
 const GROUPS_BLOCK_END = "end groups"
-function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsyms, specs, t)
+function parse_groups(
+        ft::BNGNetwork, lines::AbstractVector{<:AbstractString}, idx::Integer,
+        shortsymstosyms::AbstractDict{Symbol, Symbol}, idstoshortsyms::AbstractVector{Symbol},
+        specs::AbstractVector, t
+    )
     idx = seek_to_block(lines, idx, GROUPS_BLOCK_START)
     namestosyms = Dict{String, Any}()
     obseqs = Equation[]
@@ -196,7 +205,10 @@ function parse_groups(ft::BNGNetwork, lines, idx, shortsymstosyms, idstoshortsym
     return obseqs, namestosyms, idx
 end
 
-function exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
+function exprs_to_defs(
+        opmod::Module, ptoids::AbstractDict{Symbol, Int}, pvals::AbstractVector,
+        specs::AbstractVector, u0exprs::AbstractVector, ps::AbstractVector
+    )
     pmap = Dict()
     psym_to_pvar = Dict(nameof(p) => p for p in ps)
     for (psym, pid) in ptoids
@@ -259,9 +271,9 @@ parsed_network = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = tr
 ```
 """
 function loadrxnetwork(
-        ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem),
-        verbose = true, kwargs...
-    )
+        ft::BNGNetwork, rxfilename::AbstractString; name::Symbol = gensym(:ReactionSystem),
+        verbose::Bool = true, kwargs...
+    )::ParsedReactionNetwork
     file = open(rxfilename, "r")
     lines = readlines(file)
     idx = 1

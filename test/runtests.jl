@@ -4,6 +4,9 @@ using SafeTestsets, Test
     @time @safetestset "Quality Assurance" begin
         include("qa.jl")
     end
+    @time @safetestset "JET Static Analysis" begin
+        include("test_jet.jl")
+    end
     @time @safetestset "BNG Birth-Death Test" begin
         include("test_nullrxs_odes.jl")
     end
