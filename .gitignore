@@ -8,4 +8,6 @@
 Manifest.toml
 .vscode
 .vscode/*
+.claude
+.claude/*
 

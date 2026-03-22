@@ -228,9 +228,9 @@ end
 
 # for parsing a subset of the BioNetGen .net file format
 """
-    loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem), verbose = false, kwargs...)
+    loadrxnetwork(ft::BNGNetwork, rxfilename; name = gensym(:ReactionSystem), verbose = true, kwargs...)
 
-Parses a BioNetGen `.net` file and constructs a `ParsedReactionNetwork` object.
+Parses a BioNetGen `.net` file and constructs a Catalyst `ReactionSystem`.
 
 # Arguments
 - `ft::BNGNetwork`: Indicates the file to be parsed is a BioNetGen ".net" file.
@@ -242,10 +242,12 @@ Parses a BioNetGen `.net` file and constructs a `ParsedReactionNetwork` object.
 - `kwargs...`: Additional keyword arguments passed to the `ReactionSystem` constructor.
 
 # Returns
-A `ParsedReactionNetwork` object containing:
-- The `ReactionSystem` with reactions, species, and parameters.
-- Initial conditions (`u0`) and parameter values (`p`).
-- Mappings between variable names and symbols.
+A Catalyst `ReactionSystem` (not marked as complete). Initial conditions, parameter
+values, and BNG-specific mappings are stored as system metadata:
+- `Catalyst.get_u0_map(rn)`: `Dict` mapping species to initial condition values.
+- `Catalyst.get_parameter_map(rn)`: `Dict` mapping parameters to their values.
+- `get_varstonames(rn)`: `Dict` mapping internal species symbols to full BNG name strings.
+- `get_groupstosyms(rn)`: `Dict` mapping BNG group name strings to observable symbols.
 
 # Notes
 This function parses a subset of the BioNetGen `.net` file format. It assumes:
@@ -255,7 +257,8 @@ This function parses a subset of the BioNetGen `.net` file format. It assumes:
 
 # Example
 ```julia
-parsed_network = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = true)
+rn = loadrxnetwork(BNGNetwork(), "path/to/network.net", verbose = true)
+rn = complete(rn)
 ```
 """
 function loadrxnetwork(
@@ -322,18 +325,18 @@ function loadrxnetwork(
     # setup default values / expressions for params and initial conditions
     defmap, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
 
-    # build the model
+    # build the model with metadata
+    metadata = [Catalyst.U0Map => u0map, Catalyst.ParameterMap => pmap,
+        VarsToNames => shortsymstosyms, GroupsToSyms => groupstosyms]
     rn = ReactionSystem(
-        rxs, t, specs, ps; name = name, observed = obseqs,
-        defaults = defmap, kwargs...
+        rxs, t, specs, ps; name, observed = obseqs,
+        initial_conditions = defmap,
+        metadata, kwargs...
     )
 
-    # get numeric values for parameters and u0
+    # verify species ordering
     sm = speciesmap(rn)
     @assert all(sm[funcsym(sym, t)] == i for (i, sym) in enumerate(idstoshortsyms))
 
-    return ParsedReactionNetwork(
-        rn; u0 = u0map, p = pmap, varstonames = shortsymstosyms,
-        groupstosyms = groupstosyms
-    )
+    return rn
 end

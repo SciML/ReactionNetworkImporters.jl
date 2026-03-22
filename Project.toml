@@ -1,33 +1,35 @@
 name = "ReactionNetworkImporters"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 authors = ["Samuel Isaacson <isaacsas@users.noreply.github.com>"]
-version = "0.16.1"
+version = "1.0.0"
 
 [deps]
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+ModelingToolkitBase = "7771a370-6774-4173-bd38-47e70ca0b839"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 Aqua = "0.8"
-CSVFiles = "1"
-Catalyst = "15.0"
+CSV = "0.10"
+Catalyst = "16"
 DataFrames = "1.7"
 DataStructures = "0.18.13, 0.19"
 LinearAlgebra = "1.10"
-ModelingToolkit = "9.72"
+ModelingToolkitBase = "1.17"
 OrdinaryDiffEqTsit5 = "1.1"
 SafeTestsets = "0.1"
 SparseArrays = "1.10"
-Symbolics = "6.31.1"
+SymbolicUtils = "4.9.1"
+Symbolics = "7.13.0"
 Test = "1"
 julia = "1.10"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
-CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OrdinaryDiffEqTsit5 = "b1df2697-797e-41e3-8120-5422d3b24e4a"
@@ -35,4 +37,4 @@ SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "CSVFiles", "DataFrames", "LinearAlgebra", "OrdinaryDiffEqTsit5", "SafeTestsets", "Test"]
+test = ["Aqua", "CSV", "DataFrames", "LinearAlgebra", "OrdinaryDiffEqTsit5", "SafeTestsets", "Test"]

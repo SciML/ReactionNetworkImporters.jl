@@ -31,10 +31,10 @@ const to = TimerOutput()
 reset_timer!(to)
 
 # BioNetGen network
-@timeit to "bionetgen" prnbng = loadrxnetwork(BNGNetwork(), fname);
+@timeit to "bionetgen" rnbng = loadrxnetwork(BNGNetwork(), fname);
 show(to)
-rnbng = prnbng.rn
-@timeit to "bODESystem" bosys = convert(ODESystem, rnbng)
+rnbng = complete(rnbng)
+@timeit to "bODESystem" bosys = ode_model(rnbng)
 show(to)
 @timeit to "bODEProb" boprob = ODEProblem(bosys, Float64[], (0.0, tf), Float64[])
 show(to)

@@ -1,7 +1,5 @@
-using Catalyst, OrdinaryDiffEqTsit5, DataFrames, CSVFiles, LinearAlgebra
+using Catalyst, OrdinaryDiffEqTsit5, DataFrames, CSV, LinearAlgebra
 using ReactionNetworkImporters
-
-# using Plots
 
 # parameters
 doplot = false
@@ -14,23 +12,22 @@ datadir = joinpath(@__DIR__, "../data/repressilator")
 fname = joinpath(datadir, "Repressilator.net")
 gdatfile = joinpath(datadir, "Repressilator.gdat")
 print("getting gdat file...")
-gdatdf = DataFrame(
-    load(
-        File{format"CSV"}(gdatfile), header_exists = true,
-        spacedelim = true
-    )
-)
+gdatdf = CSV.read(gdatfile, DataFrame; delim = ' ', ignorerepeated = true)
 println("done")
 
-# load the BNG reaction network in DiffEqBio
-prnbng = loadrxnetwork(BNGNetwork(), fname)
-rn = complete(prnbng.rn)
+# load the BNG reaction network
+rnbng = loadrxnetwork(BNGNetwork(), fname)
+
+# test metadata is set
+@test Catalyst.has_u0_map(rnbng)
+@test Catalyst.has_parameter_map(rnbng)
+@test has_varstonames(rnbng)
+@test has_groupstosyms(rnbng)
+
+rn = complete(rnbng)
 u0 = Float64[]
 p = Float64[]
 boprob = ODEProblem(rn, u0, (0.0, tf), p)
-
-# Test that u0 == u₀ (used when the u0 indexing was introduced).
-@test isequal(prnbng.u0, prnbng.u₀)
 
 # BNG simulation data testing
 bngsol = gdatdf[!, :pTetR]
