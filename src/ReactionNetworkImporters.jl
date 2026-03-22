@@ -2,6 +2,7 @@ module ReactionNetworkImporters
 
 using DataStructures, Catalyst, SparseArrays
 using Symbolics: operation, unwrap
+using SymbolicUtils: hasmetadata, getmetadata, setmetadata
 
 # creates a ModelingToolkit function-like Symbol
 # can then do stuff like
@@ -19,78 +20,85 @@ abstract type NetworkFileFormat end
 #struct RSSANetwork <: NetworkFileFormat end
 struct BNGNetwork <: NetworkFileFormat end
 
+### System-Level Metadata Key Types and Accessors ###
+
 """
-    ParsedReactionNetwork(rn::ReactionSystem; u0 = nothing, p = nothing, varstonames = nothing, groupstosyms = nothing)
+    VarsToNames
 
-A container for storing a parsed reaction network along with its associated metadata.
+Metadata key for storing BNG species variable-to-full-name mappings on a
+`ReactionSystem`. Stores a `Dict` mapping the internal symbolic variable of a
+species to a `String` with its full name from the .net file.
 
-# Fields
-- `rn`, a Catalyst `ReactionSystem`. **Note** this system is *not* marked complete by
-  default (see the [Catalyst docs](https://catalyst.sciml.ai/) for a discussion of
-  completeness of systems).
-- `u0`, a `Dict` mapping initial condition symbolic variables to numeric values and/or
-  symbolic expressions.
-- `p`, a `Dict` mapping parameter symbolic variables to numeric values and/or symbolic
-  expressions.
-- `varstonames`, a `Dict` mapping the internal symbolic variable of a species used in the
-  generated `ReactionSystem` to a `String` generated from the name in the .net file. This is
-  necessary as BioNetGen can generate exceptionally long species names, involving characters
-  that lead to malformed species names when used with `Catalyst`.
-- `groupstosyms`, a `Dict` mapping the `String`s representing names for any groups defined
-  in the BioNetGen file to the corresponding symbolic variable representing the
-  `ModelingToolkit` symbolic observable associated with the group.
+See also: [`has_varstonames`](@ref), [`get_varstonames`](@ref), [`set_varstonames`](@ref)
 """
-struct ParsedReactionNetwork
-    "Catalyst Network"
-    rn::ReactionSystem
+struct VarsToNames end
 
-    "Dict mapping initial condition symbolic variables to values."
-    u0::Any
+"""
+    has_varstonames(rs::ReactionSystem)
 
-    "Dict mapping parameter symbolic variables to values."
-    p::Any
+Returns `true` if the `ReactionSystem` has a `VarsToNames` metadata entry.
+"""
+has_varstonames(rs::ReactionSystem) = hasmetadata(rs, VarsToNames)
 
-    "Dict mapping symbolic variable for species names to full string for species name"
-    varstonames::Any
+"""
+    get_varstonames(rs::ReactionSystem)
 
-    "Dict from group name (as string) to corresponding symbolic variable"
-    groupstosyms::Any
-end
-function ParsedReactionNetwork(
-        rn::ReactionSystem; u0 = nothing, p = nothing,
-        varstonames = nothing, groupstosyms = nothing
-    )
-    return ParsedReactionNetwork(rn, u0, p, varstonames, groupstosyms)
-end
+Returns the `VarsToNames` metadata from the `ReactionSystem`, or `nothing` if
+not set.
+"""
+get_varstonames(rs::ReactionSystem) = getmetadata(rs, VarsToNames, nothing)
 
-export BNGNetwork, MatrixNetwork, ParsedReactionNetwork, ComplexMatrixNetwork
+"""
+    set_varstonames(rs::ReactionSystem, m)
+
+Returns a **new** `ReactionSystem` with the `VarsToNames` metadata set to `m`.
+The original system is not modified.
+"""
+set_varstonames(rs::ReactionSystem, m) = setmetadata(rs, VarsToNames, m)
+
+"""
+    GroupsToSyms
+
+Metadata key for storing BNG group-name-to-symbol mappings on a
+`ReactionSystem`. Stores a `Dict` mapping `String` group names to
+corresponding symbolic observable variables.
+
+See also: [`has_groupstosyms`](@ref), [`get_groupstosyms`](@ref), [`set_groupstosyms`](@ref)
+"""
+struct GroupsToSyms end
+
+"""
+    has_groupstosyms(rs::ReactionSystem)
+
+Returns `true` if the `ReactionSystem` has a `GroupsToSyms` metadata entry.
+"""
+has_groupstosyms(rs::ReactionSystem) = hasmetadata(rs, GroupsToSyms)
+
+"""
+    get_groupstosyms(rs::ReactionSystem)
+
+Returns the `GroupsToSyms` metadata from the `ReactionSystem`, or `nothing` if
+not set.
+"""
+get_groupstosyms(rs::ReactionSystem) = getmetadata(rs, GroupsToSyms, nothing)
+
+"""
+    set_groupstosyms(rs::ReactionSystem, m)
+
+Returns a **new** `ReactionSystem` with the `GroupsToSyms` metadata set to `m`.
+The original system is not modified.
+"""
+set_groupstosyms(rs::ReactionSystem, m) = setmetadata(rs, GroupsToSyms, m)
+
+export BNGNetwork, MatrixNetwork, ComplexMatrixNetwork
+export VarsToNames, GroupsToSyms
+export has_varstonames, get_varstonames, set_varstonames
+export has_groupstosyms, get_groupstosyms, set_groupstosyms
 
 # parsers
 include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
 
 export loadrxnetwork
-
-# Overload ensuring that u0 and u₀ can be used interchangeably.
-# (introduced when the u₀ field was changed to u0)
-# Should be deleted whenever u₀ is fully deprecated.
-
-# Ensures that `prnbng.u₀` works.
-function Base.getproperty(prnbng::ParsedReactionNetwork, name::Symbol)
-    if name === :u₀
-        return getfield(prnbng, :u0)
-    else
-        return getfield(prnbng, name)
-    end
-end
-
-# Ensures that `prnbng.u₀ = ...` works.
-function Base.setproperty!(prnbng::ParsedReactionNetwork, name::Symbol, x)
-    if name === :u₀
-        return setfield!(prnbng, :u0, x)
-    else
-        return setfield!(prnbng, name, x)
-    end
-end
 
 end # module

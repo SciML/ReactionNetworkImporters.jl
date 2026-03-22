@@ -37,8 +37,7 @@ end
 """
     loadrxnetwork(mn::MatrixNetwork; name = gensym(:ReactionSystem))
 
-Converts a `MatrixNetwork` into a `ParsedReactionNetwork` by constructing a
-`ReactionSystem`.
+Converts a `MatrixNetwork` into a Catalyst `ReactionSystem`.
 
 # Arguments
 - `mn::MatrixNetwork`: A `MatrixNetwork` object containing the stoichiometric matrices, rate
@@ -47,7 +46,7 @@ Converts a `MatrixNetwork` into a `ParsedReactionNetwork` by constructing a
   generated symbol.
 
 # Returns
-A `ParsedReactionNetwork` 
+A Catalyst `ReactionSystem` (not marked as complete).
 
 # Notes
 - The `MatrixNetwork` must have substrate (`substoich`) and product (`prodstoich`)
@@ -71,8 +70,8 @@ species = [@species A(t), B(t)]
 params = [@parameters k1, k2]
 mn = MatrixNetwork(rateexprs, substoich, prodstoich; species = species, params = params)
 
-# Convert to a ParsedReactionNetwork
-parsed_network = loadrxnetwork(mn, name = :MyReactionSystem)
+# Convert to a ReactionSystem
+rn = loadrxnetwork(mn, name = :MyReactionSystem)
 ```
 """
 function loadrxnetwork(
@@ -120,7 +119,7 @@ function loadrxnetwork(
         rxs[j] = Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich)
     end
 
-    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, mn.params; name = name))
+    return ReactionSystem(rxs, t, species, mn.params; name)
 end
 
 # for sparse matrices
@@ -176,7 +175,7 @@ function loadrxnetwork(
         rxs[j] = Reaction(mn.rateexprs[j], subs, prods, sstoich, pstoich)
     end
 
-    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, mn.params; name = name))
+    return ReactionSystem(rxs, t, species, mn.params; name)
 end
 
 """
@@ -273,7 +272,7 @@ function loadrxnetwork(
         end
     end
 
-    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, cmn.params; name = name))
+    return ReactionSystem(rxs, t, species, cmn.params; name)
 end
 
 # for sparse matrices version
@@ -328,5 +327,5 @@ function loadrxnetwork(
         end
     end
 
-    return ParsedReactionNetwork(ReactionSystem(rxs, t, species, cmn.params; name = name))
+    return ReactionSystem(rxs, t, species, cmn.params; name)
 end

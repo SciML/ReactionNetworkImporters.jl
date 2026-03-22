@@ -31,10 +31,10 @@ const to = TimerOutput()
 reset_timer!(to)
 
 # BioNetGen network
-@timeit to "bionetgen" prnbng = loadrxnetwork(BNGNetwork(), fname);
+@timeit to "bionetgen" rnbng = loadrxnetwork(BNGNetwork(), fname);
 show(to)
-rnbng = prnbng.rn
-@timeit to "bODESystem" bosys = convert(ODESystem, rnbng)
+rnbng = complete(rnbng)
+@timeit to "bODESystem" bosys = ode_model(rnbng)
 show(to)
 @timeit to "bODEProb" boprob = ODEProblem(bosys, Float64[], (0.0, tf), Float64[])
 show(to)
@@ -43,24 +43,10 @@ p = zeros(length(parameters(rnbng)))
 du = similar(u);
 @timeit to "f1" boprob.f(du, u, p, 0.0)
 @timeit to "f2" boprob.f(du, u, p, 0.0)
-if build_jac
-    J = zeros(length(u), length(u))
-    #J = similar(rnbng.odefun.jac_prototype)
-    @timeit to "J1" rnbng.jac(J, u, p, 0.0)
-    @timeit to "J2" rnbng.jac(J, u, p, 0.0)
-end
 show(to)
 println()
 
 # DiffEq solver
-#reset_timer!(to);
-#@timeit to "BNG_CVODE_BDF-LU-1" begin bsol = solve(boprob, CVODE_BDF(), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-#@timeit to "BNG_CVODE_BDF-LU-2" begin bsol = solve(boprob, CVODE_BDF(), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-#@timeit to "BNG_CVODE_BDF-GMRES-1" begin bsol = solve(boprob, CVODE_BDF(linear_solver=:GMRES), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-#@timeit to "BNG_CVODE_BDF-GMRES-2" begin bsol = solve(boprob, CVODE_BDF(linear_solver=:GMRES), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-# #reset_timer!(to); @timeit to "BNG_RODAS5_BDF" begin bsol2 = solve(boprob, rodas5(autodiff=false), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-#@timeit to "KenCarp4-1" begin sol = solve(boprob,KenCarp4(autodiff=false,linsolve=LinSolveFactorize(lu)), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
-#@timeit to "KenCarp4-2" begin bsol = solve(boprob,KenCarp4(autodiff=false,linsolve=LinSolveFactorize(lu)), saveat=1., abstol=1e-8, reltol=1e-8); end; show(to)
 @timeit to "KenCarp4-1" begin
     sol = solve(
         boprob, KenCarp4(autodiff = false), abstol = 1.0e-8,
@@ -92,8 +78,4 @@ if doplot
 end
 
 # test the error, note may be large in abs value though small relatively
-# #norm(gdatdf[:Activated_Syk] - asynbng, Inf)
-# #norm(asynbng - basyk', Inf)
 norm(gdatdf[!, :Activated_Syk] - sol[Activated_Syk], Inf)
-
-#@assert all(abs.(gdatdf[!,:Activated_Syk] - basyk') .< 1e-6 * abs.(gdatdf[:Activated_Syk]))

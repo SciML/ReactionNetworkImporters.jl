@@ -1,5 +1,5 @@
 using Catalyst, ReactionNetworkImporters, SparseArrays
-using ModelingToolkit: nameof
+using ModelingToolkitBase: nameof
 
 # version giving parameters and rates
 rs = @reaction_network rs1 begin
@@ -36,21 +36,21 @@ incidencemat = [
     0 0 0 0 1
 ]
 mn1 = MatrixNetwork(pars, substoich, prodstoich; params = pars)
-prn = loadrxnetwork(mn1; name = nameof(rs)) # dense version
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(mn1; name = nameof(rs)) # dense version
+@test Catalyst.isequivalent(rs, complete(rn))
 mn2 = MatrixNetwork(pars, sparse(substoich), sparse(prodstoich); params = pars)
-prn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
+@test Catalyst.isequivalent(rs, complete(rn))
 
 cmn1 = ComplexMatrixNetwork(pars, compstoichmat, incidencemat; params = pars)
-prn = loadrxnetwork(cmn1; name = nameof(rs))
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(cmn1; name = nameof(rs))
+@test Catalyst.isequivalent(rs, complete(rn))
 cmn2 = ComplexMatrixNetwork(
     pars, sparse(compstoichmat), sparse(incidencemat);
     params = pars
 )
-prn = loadrxnetwork(cmn2; name = nameof(rs))
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(cmn2; name = nameof(rs))
+@test Catalyst.isequivalent(rs, complete(rn))
 
 # version with hard coded rates (no parameter symbols)
 rs = @reaction_network rs2 begin
@@ -61,21 +61,21 @@ rs = @reaction_network rs2 begin
     5.0, 3S3 --> 3S1
 end
 mn1 = MatrixNetwork(convert.(Float64, 1:5), substoich, prodstoich)
-prn = loadrxnetwork(mn1; name = nameof(rs))   # dense version
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(mn1; name = nameof(rs))   # dense version
+@test Catalyst.isequivalent(rs, complete(rn))
 mn2 = MatrixNetwork(convert.(Float64, 1:5), sparse(substoich), sparse(prodstoich))
-prn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
+@test Catalyst.isequivalent(rs, complete(rn))
 
 cmn1 = ComplexMatrixNetwork(convert.(Float64, 1:5), compstoichmat, incidencemat)
-prn = loadrxnetwork(cmn1; name = nameof(rs))
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(cmn1; name = nameof(rs))
+@test Catalyst.isequivalent(rs, complete(rn))
 cmn2 = ComplexMatrixNetwork(
     convert.(Float64, 1:5), sparse(compstoichmat),
     sparse(incidencemat)
 )
-prn = loadrxnetwork(cmn2; name = nameof(rs))
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(cmn2; name = nameof(rs))
+@test Catalyst.isequivalent(rs, complete(rn))
 
 # version with species names, rate functions and symbolic parameters
 rs = @reaction_network rs3 begin
@@ -89,25 +89,25 @@ end
 @species A(t) B(t) C(t)
 species = [A, B, C]
 rates = [k1 * A, k2, k3, k4, k5]
-mn1 = MatrixNetwork(rates, substoich, prodstoich; species = species, params = pars)
-prn = loadrxnetwork(mn1; name = nameof(rs)) # dense version
-@test rs == complete(prn.rn)
+mn1 = MatrixNetwork(rates, substoich, prodstoich; species, params = pars)
+rn = loadrxnetwork(mn1; name = nameof(rs)) # dense version
+@test Catalyst.isequivalent(rs, complete(rn))
 mn2 = MatrixNetwork(
-    rates, sparse(substoich), sparse(prodstoich); species = species,
+    rates, sparse(substoich), sparse(prodstoich); species,
     params = pars
 )
-prn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(mn2; name = nameof(rs)) # sparse version
+@test Catalyst.isequivalent(rs, complete(rn))
 
 cmn1 = ComplexMatrixNetwork(
-    rates, compstoichmat, incidencemat; species = species,
+    rates, compstoichmat, incidencemat; species,
     params = pars
 )
-prn = loadrxnetwork(cmn1; name = nameof(rs))
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(cmn1; name = nameof(rs))
+@test Catalyst.isequivalent(rs, complete(rn))
 cmn2 = ComplexMatrixNetwork(
     rates, sparse(compstoichmat), sparse(incidencemat);
-    species = species, params = pars
+    species, params = pars
 )
-prn = loadrxnetwork(cmn2; name = nameof(rs))
-@test rs == complete(prn.rn)
+rn = loadrxnetwork(cmn2; name = nameof(rs))
+@test Catalyst.isequivalent(rs, complete(rn))
