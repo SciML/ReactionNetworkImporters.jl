@@ -55,7 +55,7 @@ description, i.e. a
 file, which can be loaded into a Catalyst `ReactionSystem` as:
 
 ```julia
-using ReactionNetworkImporters
+using ReactionNetworkImporters, Catalyst
 fname = "PATH/TO/Repressilator.net"
 rn = loadrxnetwork(BNGNetwork(), fname)
 ```
@@ -82,7 +82,7 @@ Given the loaded `ReactionSystem`, we can construct and solve the corresponding
 ODE model by
 
 ```julia
-using OrdinaryDiffEq, Catalyst
+using OrdinaryDiffEqTsit5
 rn = complete(rn)   # mark the reaction network as complete
 tf = 100000.0
 oprob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
@@ -107,6 +107,8 @@ network using the `@reaction_network` macro, and then show how to build the same
 network from these matrices using `ReactionNetworkImporters`:
 
 ```julia
+using ReactionNetworkImporters, Catalyst
+
 # Catalyst network from the macro:
 rs = @reaction_network testnetwork begin
     k1, 2A --> B
@@ -133,8 +135,7 @@ mn = MatrixNetwork(pars, substoich, prodstoich; species = species,
 rn = loadrxnetwork(mn; name = :testnetwork) # dense version
 
 # test the two networks are the same
-using Catalyst: isequivalent
-@assert isequivalent(rs, complete(rn))
+@assert Catalyst.isequivalent(rs, complete(rn))
 
 # network from reaction complex stoichiometry
 stoichmat = [2 0 1 0 0 3;
@@ -151,7 +152,7 @@ cmn = ComplexMatrixNetwork(pars, stoichmat, incidencemat; species = species,
 rn = loadrxnetwork(cmn; name = :testnetwork)
 
 # test the two networks are the same
-@assert isequivalent(rs, complete(rn))
+@assert Catalyst.isequivalent(rs, complete(rn))
 ```
 
 The basic usages are
