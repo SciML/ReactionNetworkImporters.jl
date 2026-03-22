@@ -2,7 +2,7 @@
 
 This package provides importers to load reaction networks into
 [Catalyst.jl](https://docs.sciml.ai/Catalyst/stable/)
-[`ReactionSystem`s](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.ReactionSystem)
+[`ReactionSystem`s](https://docs.sciml.ai/Catalyst/stable/api/core_api/#Catalyst.ReactionSystem)
 from several file formats. Currently, it supports loading networks in the
 following formats:
 
@@ -169,7 +169,7 @@ rn = loadrxnetwork(cmn::ComplexMatrixNetwork)
 Here `MatrixNetwork` and `ComplexMatrixNetwork` are the types, which select that
 we are constructing a substrate/product stoichiometric matrix-based or a
 reaction complex matrix-based stoichiometric representation as input. See the
-[Catalyst.jl API](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/) for more
+[Catalyst.jl API](https://docs.sciml.ai/Catalyst/stable/api/core_api/) for more
 discussion on these matrix representations, and how Catalyst handles symbolic
 reaction rate expressions. These two types have the following fields:
 
@@ -193,9 +193,9 @@ reaction rate expressions. These two types have the following fields:
       + For `ComplexMatrixNetwork`
 
           * `stoichmat`, the complex stoichiometry matrix [defined
-            here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.complexstoichmat).
+            here](https://docs.sciml.ai/Catalyst/stable/api/core_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined
-            here](https://docs.sciml.ai/Catalyst/stable/api/catalyst_api/#Catalyst.reactioncomplexes).
+            here](https://docs.sciml.ai/Catalyst/stable/api/core_api/#Catalyst.reactioncomplexes).
   - `species`, an optional vector of symbolic variables representing each species
     in the network. Can be constructed using the Catalyst.jl `@species` macro.
     Each species should be dependent on the same time variable (`t` in the example
