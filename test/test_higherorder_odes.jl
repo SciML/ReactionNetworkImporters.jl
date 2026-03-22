@@ -36,5 +36,13 @@ Asol = gdatdf[!, :A]
 # note solvers run _much_ faster the second time
 bsol = solve(boprob, Tsit5(), abstol = 1.0e-12, reltol = 1.0e-12, saveat = tf / nsteps);
 
+# if doplot
+#     plotlyjs()
+#     p1 = plot(gdatdf[!, :time], gdatdf[!, :A], label = :A_BNG)
+#     plot!(p1, bsol.t, bsol[A], label = :A_DE)
+#     display(p1)
+#     println("Err = ", norm(gdatdf[!, :A] - bsol[Aid, :], Inf))
+# end
+
 @test all(bsol.t .== gdatdf[!, :time])
 @test all(abs.(gdatdf[!, :A] - bsol[A]) .< 1.0e-6 .* abs.(gdatdf[!, :A]))

@@ -36,5 +36,12 @@ bngsol = gdatdf[!, :pTetR]
 bsol = solve(boprob, Tsit5(), abstol = 1.0e-12, reltol = 1.0e-12, saveat = tf / nsteps);
 @unpack pTetR = rn
 
+# if doplot
+#     plotlyjs()
+#     p1 = plot(gdatdf[!, :time], gdatdf[!, :pTetR], label = :BNGPTetR)
+#     plot!(p1, bsol.t, bsol[pTetR], label = :DEBPTetR)
+#     display(p1)
+# end
+
 @test all(bsol.t .== gdatdf[!, :time])
 @test all(abs.(gdatdf[!, :pTetR] - bsol[pTetR]) .< 1.0e-6 .* abs.(gdatdf[!, :pTetR]))

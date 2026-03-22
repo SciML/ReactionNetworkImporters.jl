@@ -323,14 +323,14 @@ function loadrxnetwork(
     close(file)
 
     # setup default values / expressions for params and initial conditions
-    _, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
+    defmap, pmap, u0map = exprs_to_defs(opmod, ptoids, pvals, specs, u0exprs, ps)
 
     # build the model with metadata
     metadata = [Catalyst.U0Map => u0map, Catalyst.ParameterMap => pmap,
         VarsToNames => shortsymstosyms, GroupsToSyms => groupstosyms]
     rn = ReactionSystem(
         rxs, t, specs, ps; name, observed = obseqs,
-        initial_conditions = merge(u0map, pmap),
+        initial_conditions = defmap,
         metadata, kwargs...
     )
 
