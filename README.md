@@ -181,9 +181,9 @@ reaction rate expressions. These two types have the following fields:
       + For `ComplexMatrixNetwork`
 
           * `stoichmat`, the complex stoichiometry matrix [defined
-            here](https://docs.sciml.ai/Catalyst/stable/api/core_api/#Catalyst.complexstoichmat).
+            here](https://docs.sciml.ai/Catalyst/stable/api/network_analysis_api/#Catalyst.complexstoichmat).
           * `incidencemat`, the complex incidence matrix [defined
-            here](https://docs.sciml.ai/Catalyst/stable/api/core_api/#Catalyst.reactioncomplexes).
+            here](https://docs.sciml.ai/Catalyst/stable/api/network_analysis_api/#Catalyst.reactioncomplexes).
   - `species`, an optional vector of symbolic variables representing each species
     in the network. Can be constructed using the Catalyst.jl `@species` macro.
     Each species should be dependent on the same time variable (`t` in the example
