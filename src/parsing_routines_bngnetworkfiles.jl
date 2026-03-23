@@ -634,11 +634,8 @@ function loadrxnetwork(
     Base.eval(opmod, :(t = Catalyst.default_t()))
     Base.eval(opmod, :(time() = Catalyst.default_t()))
 
-    # register mratio using HypergeometricFunctions
-    Base.eval(opmod, quote
-        using HypergeometricFunctions: _₁F₁
-        mratio(a, b, z) = _₁F₁(a + 1, b + 1, z) / _₁F₁(a, b, z)
-    end)
+    # register mratio using the module-level _₁F₁ import
+    Base.eval(opmod, :(mratio(a, b, z) = $_₁F₁(a + 1, b + 1, z) / $_₁F₁(a, b, z)))
 
     for p in ps
         psym = nameof(p)

@@ -1,6 +1,7 @@
 module ReactionNetworkImporters
 
 using DataStructures, Catalyst, SparseArrays
+using HypergeometricFunctions: _₁F₁
 using Symbolics: operation, unwrap
 using SymbolicUtils: hasmetadata, getmetadata, setmetadata
 
