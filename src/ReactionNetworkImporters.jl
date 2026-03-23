@@ -25,9 +25,10 @@ struct BNGNetwork <: NetworkFileFormat end
 """
     VarsToNames
 
-Metadata key for storing BNG species variable-to-full-name mappings on a
-`ReactionSystem`. Stores a `Dict` mapping the internal symbolic variable of a
-species to a `String` with its full name from the .net file.
+Metadata key for storing BNG variable-to-full-name mappings on a
+`ReactionSystem`. Stores a `Dict` mapping internal symbolic variables (both
+dynamic species and constant-species parameters) to their full BNG name
+strings from the .net file.
 
 See also: [`has_varstonames`](@ref), [`get_varstonames`](@ref), [`set_varstonames`](@ref)
 """
