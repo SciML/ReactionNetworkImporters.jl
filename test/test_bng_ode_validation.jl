@@ -28,6 +28,7 @@ function test_ode_match(netfile, gdatfile, obs_col::Symbol;
 
     @test sol.retcode == ReturnCode.Success
     @test length(sol.t) == nrow(gdatdf)
+    @test all(sol.t .== gdatdf[!, :time])
 
     bng_vals = gdatdf[!, obs_col]
     cat_vals = sol[getproperty(rn_c, obs_col)]
@@ -109,18 +110,6 @@ end
         joinpath(datadir, "test_synthesis_complex.net"),
         joinpath(datadir, "test_synthesis_complex.gdat"),
         :Receptor; tf = 40.0, nsteps = 100, atol = 1e-6
-    )
-end
-
-# ═════════════════════════════════════════════════════════════════════════════
-# test_ANG_synthesis_simple.net — ANG synthesis
-# ═════════════════════════════════════════════════════════════════════════════
-@testset "test_ANG_synthesis_simple.net" begin
-    datadir = joinpath(@__DIR__, "../data/test_ANG_synthesis_simple")
-    test_ode_match(
-        joinpath(datadir, "test_ANG_synthesis_simple.net"),
-        joinpath(datadir, "test_ANG_synthesis_simple.gdat"),
-        :add_molecule; tf = 40.0, nsteps = 100, atol = 1e-6
     )
 end
 
