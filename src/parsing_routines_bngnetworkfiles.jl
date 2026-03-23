@@ -254,13 +254,12 @@ end
 const GROUPS_BLOCK_START = "begin groups"
 
 function parse_groups(ft::BNGNetwork, lines, boundaries, shortsymstosyms,
-                      idstovars, t)
-    haskey(boundaries, GROUPS_BLOCK_START) ||
-        error("Required block '$GROUPS_BLOCK_START' not found.")
-    (start_idx, end_idx) = boundaries[GROUPS_BLOCK_START]
-
+                      idstovars, t, param_names)
     namestosyms = Dict{String, Any}()
     obseqs = Equation[]
+    haskey(boundaries, GROUPS_BLOCK_START) || return obseqs, namestosyms
+    (start_idx, end_idx) = boundaries[GROUPS_BLOCK_START]
+
     syms_set = Set(keys(shortsymstosyms))
 
     for idx in start_idx:(end_idx - 1)
@@ -269,8 +268,8 @@ function parse_groups(ft::BNGNetwork, lines, boundaries, shortsymstosyms,
         vals = split(stripped)
         name = Symbol(vals[2])
 
-        # skip groups whose name matches an existing species symbol or the time variable
-        (name in syms_set || name == :t) && continue
+        # skip groups whose name collides with species, parameters, or the time variable
+        (name in syms_set || name in param_names || name == :t) && continue
         obs = (@variables $name($t))[1]
         namestosyms[vals[2]] = obs
 
@@ -653,8 +652,9 @@ function loadrxnetwork(
 
     # ── Step 6: parse groups (before functions — functions reference groups) ──
     verbose && print("Parsing groups...")
+    param_names = Set(keys(ptoids))
     obseqs, groupstosyms = parse_groups(
-        ft, lines, boundaries, shortsymstosyms, idstovars, t)
+        ft, lines, boundaries, shortsymstosyms, idstovars, t, param_names)
     verbose && println("done")
 
     # Build extra_bindings for group RHS expressions and function values.

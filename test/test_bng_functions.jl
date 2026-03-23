@@ -359,3 +359,41 @@ end
     @test rx_rate_name == :k1
     rm(tmpfile)
 end
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Test: .net files without groups block
+# ═════════════════════════════════════════════════════════════════════════════
+@testset "No groups block (blbr.net)" begin
+    datadir = joinpath(@__DIR__, "../data/blbr")
+    fname = joinpath(datadir, "blbr.net")
+
+    rn = loadrxnetwork(BNGNetwork(), fname; verbose = false)
+    @test length(species(rn)) > 0
+    @test length(reactions(rn)) > 0
+    # no groups → no observables, but should still load
+    @test isempty(observed(rn))
+
+    # verify ODE can be built
+    rn_c = complete(rn)
+    prob = ODEProblem(rn_c, Float64[], (0.0, 1.0), Float64[])
+    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    @test sol.retcode == ReturnCode.Success
+end
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Test: group name colliding with parameter name (toy-jim.net)
+# ═════════════════════════════════════════════════════════════════════════════
+@testset "Group-parameter name collision (toy-jim.net)" begin
+    datadir = joinpath(@__DIR__, "../data/toy-jim")
+    fname = joinpath(datadir, "toy-jim.net")
+
+    rn = loadrxnetwork(BNGNetwork(), fname; verbose = false)
+    @test length(species(rn)) > 0
+    @test length(reactions(rn)) > 0
+
+    # verify the model constructs without "duplicate names" error
+    rn_c = complete(rn)
+    prob = ODEProblem(rn_c, Float64[], (0.0, 1.0), Float64[])
+    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    @test sol.retcode == ReturnCode.Success
+end
