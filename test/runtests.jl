@@ -13,6 +13,12 @@ using SafeTestsets, Test
     @time @safetestset "BNG Higher Order Test" begin
         include("test_higherorder_odes.jl")
     end
+    @time @safetestset "BNG Functions/Sat/Fixed/Builtins Test" begin
+        include("test_bng_functions.jl")
+    end
+    @time @safetestset "BNG ODE Validation Test" begin
+        include("test_bng_ode_validation.jl")
+    end
     @time @safetestset "Matrix Input Test" begin
         include("test_mats.jl")
     end

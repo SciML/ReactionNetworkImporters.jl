@@ -1,3 +1,6 @@
+[files]
+extend-exclude = ["data/", "*.net", "*.gdat", "*.cdat"]
+
 [default.extend-words]
 # Julia-specific functions
 indexin = "indexin"
