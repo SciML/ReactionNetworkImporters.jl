@@ -1,5 +1,11 @@
 # History
 
+## v1.2.0
+
+- Compat bump for `OrdinaryDiffEqTsit5` to include v2 (the OrdinaryDiffEq v7
+  release line, which brings in SciMLBase v3, DiffEqBase v7, and
+  RecursiveArrayTools v4). No source changes were required.
+
 ## v1.0.0
 
 Breaking release for compatibility with Catalyst.jl v16.
