@@ -11,27 +11,32 @@ function load_gdat(path)
     if startswith(lines[1], "#")
         lines[1] = lstrip(lines[1], ['#', ' '])
     end
-    CSV.read(IOBuffer(join(lines, '\n')), DataFrame; delim = ' ', ignorerepeated = true)
+    return CSV.read(IOBuffer(join(lines, '\n')), DataFrame; delim = ' ', ignorerepeated = true)
 end
 
-function test_ode_vs_gdat(rn_incomplete, gdatfile, obs_col::Symbol;
-                          tf, nsteps, atol = 1e-6, rtol = 1e-12)
+function test_ode_vs_gdat(
+        rn_incomplete, gdatfile, obs_col::Symbol;
+        tf, nsteps, atol = 1.0e-6, rtol = 1.0e-12
+    )
     gdatdf = load_gdat(gdatfile)
     rn = complete(rn_incomplete)
     prob = ODEProblem(rn, Float64[], (0.0, tf), Float64[])
-    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = rtol,
-                saveat = tf / nsteps)
+    sol = solve(
+        prob, Tsit5(); abstol = 1.0e-12, reltol = rtol,
+        saveat = tf / nsteps
+    )
     @test all(sol.t .== gdatdf[!, :time])
     bng_vals = gdatdf[!, obs_col]
     # use relative tolerance where values are non-tiny, absolute otherwise
     cat_vals = sol[getproperty(rn, obs_col)]
     for (i, (bng, cat)) in enumerate(zip(bng_vals, cat_vals))
-        if abs(bng) > 1e-10
+        if abs(bng) > 1.0e-10
             @test abs(bng - cat) < atol * abs(bng)
         else
-            @test abs(bng - cat) < 1e-10
+            @test abs(bng - cat) < 1.0e-10
         end
     end
+    return
 end
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -82,7 +87,7 @@ end
     # verify ODE can be built and solved (gdat ICs don't match .net ICs so no comparison)
     rn_c = complete(rn)
     prob = ODEProblem(rn_c, Float64[], (0.0, 1.0), Float64[])
-    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    sol = solve(prob, Tsit5(); abstol = 1.0e-12, reltol = 1.0e-12)
     @test sol.retcode == ReturnCode.Success
 end
 
@@ -98,7 +103,7 @@ end
     @test length(species(rn)) == 4
     @test length(reactions(rn)) == 8
 
-    test_ode_vs_gdat(rn, gdatfile, :Ga; tf = 50.0, nsteps = 500, atol = 1e-4)
+    test_ode_vs_gdat(rn, gdatfile, :Ga; tf = 50.0, nsteps = 500, atol = 1.0e-4)
 end
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -114,7 +119,7 @@ end
     @test length(reactions(rn)) == 8
 
     # Sat and Func versions of CaOscillate should produce identical results
-    test_ode_vs_gdat(rn, gdatfile, :Ga; tf = 50.0, nsteps = 500, atol = 1e-4)
+    test_ode_vs_gdat(rn, gdatfile, :Ga; tf = 50.0, nsteps = 500, atol = 1.0e-4)
 end
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -129,7 +134,7 @@ end
     @test length(species(rn)) == 4
     @test length(reactions(rn)) == 4
 
-    test_ode_vs_gdat(rn, gdatfile, :CheYp; tf = 0.2, nsteps = 20, atol = 1e-6)
+    test_ode_vs_gdat(rn, gdatfile, :CheYp; tf = 0.2, nsteps = 20, atol = 1.0e-6)
 end
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -144,7 +149,7 @@ end
     @test length(species(rn)) == 3
     @test length(reactions(rn)) == 3
 
-    test_ode_vs_gdat(rn, gdatfile, :x_exact; tf = 10.0, nsteps = 100, atol = 1e-4)
+    test_ode_vs_gdat(rn, gdatfile, :x_exact; tf = 10.0, nsteps = 100, atol = 1.0e-4)
 end
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -176,7 +181,7 @@ end
     # verify we can build and solve an ODE
     rn_c = complete(rn)
     prob = ODEProblem(rn_c, Float64[], (0.0, 60.0), Float64[])
-    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    sol = solve(prob, Tsit5(); abstol = 1.0e-12, reltol = 1.0e-12)
     @test sol.retcode == ReturnCode.Success
 end
 
@@ -204,7 +209,7 @@ end
     @test length(species(rn)) == 3
     @test length(reactions(rn)) == 2
 
-    test_ode_vs_gdat(rn, gdatfile, :C_obs; tf = 10.0, nsteps = 1000, atol = 1e-4)
+    test_ode_vs_gdat(rn, gdatfile, :C_obs; tf = 10.0, nsteps = 1000, atol = 1.0e-4)
 end
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -252,14 +257,16 @@ end
     rn = loadrxnetwork(BNGNetwork(), tmpfile; verbose = false)
     u0map = Catalyst.get_u0_map(rn)
     # if((1==1), N0, 0) evaluates to the symbolic parameter N0 (which has value 50)
-    u0_vals = Dict(nameof(Symbolics.operation(Symbolics.unwrap(k))) => v
-                   for (k, v) in u0map)
+    u0_vals = Dict(
+        nameof(Symbolics.operation(Symbolics.unwrap(k))) => v
+            for (k, v) in u0map
+    )
     @test isequal(u0_vals[:A], u0_vals[:B])  # both should be N0
 
     # verify the ODE builds and solves correctly (parameter substitution works)
     rn_c = complete(rn)
     prob = ODEProblem(rn_c, Float64[], (0.0, 1.0), Float64[])
-    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    sol = solve(prob, Tsit5(); abstol = 1.0e-12, reltol = 1.0e-12)
     @test sol.retcode == ReturnCode.Success
     # A(0) should be 50 (= N0)
     @test sol[species(rn_c)[1]][1] ≈ 50.0
@@ -376,7 +383,7 @@ end
     # verify ODE can be built
     rn_c = complete(rn)
     prob = ODEProblem(rn_c, Float64[], (0.0, 1.0), Float64[])
-    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    sol = solve(prob, Tsit5(); abstol = 1.0e-12, reltol = 1.0e-12)
     @test sol.retcode == ReturnCode.Success
 end
 
@@ -394,6 +401,6 @@ end
     # verify the model constructs without "duplicate names" error
     rn_c = complete(rn)
     prob = ODEProblem(rn_c, Float64[], (0.0, 1.0), Float64[])
-    sol = solve(prob, Tsit5(); abstol = 1e-12, reltol = 1e-12)
+    sol = solve(prob, Tsit5(); abstol = 1.0e-12, reltol = 1.0e-12)
     @test sol.retcode == ReturnCode.Success
 end

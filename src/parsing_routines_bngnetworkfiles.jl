@@ -253,8 +253,10 @@ end
 
 const GROUPS_BLOCK_START = "begin groups"
 
-function parse_groups(ft::BNGNetwork, lines, boundaries, shortsymstosyms,
-                      idstovars, t, param_names)
+function parse_groups(
+        ft::BNGNetwork, lines, boundaries, shortsymstosyms,
+        idstovars, t, param_names
+    )
     namestosyms = Dict{String, Any}()
     obseqs = Equation[]
     haskey(boundaries, GROUPS_BLOCK_START) || return obseqs, namestosyms
@@ -312,8 +314,10 @@ to `isdefined` until the next world age, we track function bindings in
 `extra_bindings` (a `Dict{Symbol, Any}`) and pass them through to
 `eval_bng_expr` for resolution.
 """
-function parse_functions!(ft::BNGNetwork, lines, boundaries, opmod,
-                          extra_bindings::Dict{Symbol, Any})
+function parse_functions!(
+        ft::BNGNetwork, lines, boundaries, opmod,
+        extra_bindings::Dict{Symbol, Any}
+    )
     haskey(boundaries, FUNCTIONS_BLOCK_START) || return extra_bindings
     (start_idx, end_idx) = boundaries[FUNCTIONS_BLOCK_START]
 
@@ -364,8 +368,10 @@ end
 const REACTIONS_BLOCK_START = "begin reactions"
 const TYPED_RATE_KEYWORDS = Set(["Ele", "Sat", "MM", "Hill"])
 
-function parse_reactions!(ft::BNGNetwork, t, lines, boundaries, idstovars, opmod;
-                         extra_bindings = nothing)
+function parse_reactions!(
+        ft::BNGNetwork, t, lines, boundaries, idstovars, opmod;
+        extra_bindings = nothing
+    )
     haskey(boundaries, REACTIONS_BLOCK_START) ||
         error("Required block '$REACTIONS_BLOCK_START' not found.")
     (start_idx, end_idx) = boundaries[REACTIONS_BLOCK_START]
@@ -383,9 +389,11 @@ function parse_reactions!(ft::BNGNetwork, t, lines, boundaries, idstovars, opmod
         # ── determine rate expression ──
         rate_token = vals[4]
         if rate_token in TYPED_RATE_KEYWORDS
-            rate = _parse_typed_rate(rate_token, vals, reactantids,
-                                     idstovars, cntdict, opmod;
-                                     extra_bindings)
+            rate = _parse_typed_rate(
+                rate_token, vals, reactantids,
+                idstovars, cntdict, opmod;
+                extra_bindings
+            )
         else
             # ordinary elementary rate expression
             rateexpr = parse_bng_expr(rate_token)
@@ -440,8 +448,10 @@ Handle typed rate keywords (`Ele`, `Sat`, `MM`, `Hill`) in reaction lines.
 Returns the rate expression to use (mass-action multiplication is still
 applied by the caller for `Sat` and `Ele`).
 """
-function _parse_typed_rate(rate_type, vals, reactantids, idstovars, cntdict, opmod;
-                          extra_bindings = nothing)
+function _parse_typed_rate(
+        rate_type, vals, reactantids, idstovars, cntdict, opmod;
+        extra_bindings = nothing
+    )
     if rate_type == "Ele"
         # explicit elementary: use next token as rate expression
         rateexpr = parse_bng_expr(vals[5])
@@ -463,10 +473,10 @@ function _parse_typed_rate(rate_type, vals, reactantids, idstovars, cntdict, opm
         for (rid, cnt) in cntdict
             cnt > 1 && error(
                 "Sat rate law with reactant stoichiometry > 1 is not supported. " *
-                "BNG's stochastic Sat uses binomial coefficients in the saturation " *
-                "term, which cannot be represented as a single symbolic expression " *
-                "valid for both ODE and stochastic simulation. Consider reformulating " *
-                "as a function block in the .bngl source."
+                    "BNG's stochastic Sat uses binomial coefficients in the saturation " *
+                    "term, which cannot be represented as a single symbolic expression " *
+                    "valid for both ODE and stochastic simulation. Consider reformulating " *
+                    "as a function block in the .bngl source."
             )
         end
 
@@ -493,10 +503,10 @@ function _parse_typed_rate(rate_type, vals, reactantids, idstovars, cntdict, opm
     elseif rate_type in ("MM", "Hill")
         error(
             "Typed rate law '$rate_type' is not currently supported for .net import. " *
-            "MM uses a tQSSA formula that cannot be decomposed into rate constant + " *
-            "mass action, and Hill has binomial coefficient issues for stoichiometry " *
-            "> 1. If you need support for this rate type, please open an issue at " *
-            "the ReactionNetworkImporters.jl repository."
+                "MM uses a tQSSA formula that cannot be decomposed into rate constant + " *
+                "mass action, and Hill has binomial coefficient issues for stoichiometry " *
+                "> 1. If you need support for this rate type, please open an issue at " *
+                "the ReactionNetworkImporters.jl repository."
         )
     else
         error("Unknown typed rate keyword: '$rate_type'")
@@ -507,8 +517,10 @@ end
 # Parameter / initial condition evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 
-function exprs_to_defs(opmod, ptoids, pvals, idstovars, u0exprs, ps, isfixed;
-                       extra_bindings = nothing)
+function exprs_to_defs(
+        opmod, ptoids, pvals, idstovars, u0exprs, ps, isfixed;
+        extra_bindings = nothing
+    )
     pmap = Dict()
     psym_to_pvar = Dict(nameof(p) => p for p in ps)
     for (psym, pid) in ptoids
@@ -601,7 +613,8 @@ function loadrxnetwork(
     # ── Step 3: parse species (with fixed-species + compartment detection) ──
     verbose && print("Parsing species...")
     u0exprs, shortsymstoids, shortsymstosyms, isfixed = parse_species(
-        ft, lines, boundaries)
+        ft, lines, boundaries
+    )
     verbose && println("done")
 
     # ── Step 4: build unified id-to-variable map ──
@@ -654,7 +667,8 @@ function loadrxnetwork(
     verbose && print("Parsing groups...")
     param_names = Set(keys(ptoids))
     obseqs, groupstosyms = parse_groups(
-        ft, lines, boundaries, shortsymstosyms, idstovars, t, param_names)
+        ft, lines, boundaries, shortsymstosyms, idstovars, t, param_names
+    )
     verbose && println("done")
 
     # Build extra_bindings for group RHS expressions and function values.
@@ -673,8 +687,10 @@ function loadrxnetwork(
 
     # ── Step 8: parse reactions ──
     verbose && print("Parsing and adding reactions...")
-    rxs = parse_reactions!(ft, t, lines, boundaries, idstovars, opmod;
-                           extra_bindings)
+    rxs = parse_reactions!(
+        ft, t, lines, boundaries, idstovars, opmod;
+        extra_bindings
+    )
     verbose && println("done")
 
     # ── Step 9: build ReactionSystem ──
@@ -682,11 +698,14 @@ function loadrxnetwork(
     all_ps = vcat(ps, constant_specs)
     defmap, pmap, u0map = exprs_to_defs(
         opmod, ptoids, pvals, idstovars, u0exprs, all_ps, isfixed;
-        extra_bindings)
+        extra_bindings
+    )
 
     # build metadata
-    metadata = [Catalyst.U0Map => u0map, Catalyst.ParameterMap => pmap,
-        VarsToNames => shortsymstosyms, GroupsToSyms => groupstosyms]
+    metadata = [
+        Catalyst.U0Map => u0map, Catalyst.ParameterMap => pmap,
+        VarsToNames => shortsymstosyms, GroupsToSyms => groupstosyms,
+    ]
     rn = ReactionSystem(
         rxs, t, dynamic_specs, all_ps; name, observed = obseqs,
         initial_conditions = defmap,
