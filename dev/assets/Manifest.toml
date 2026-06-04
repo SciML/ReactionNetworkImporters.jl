@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "bd6d2a10c6f8fff66c96ee7601867c942fedc17f"
+project_hash = "f33ecddfc8c97567d44eb21fdeaa6b578243c6c6"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "bbc22a9a08a0ef6460041086d8a7b27940ed4ffd"
@@ -1342,7 +1342,7 @@ version = "1.11.0"
 
 [[deps.ReactionNetworkImporters]]
 deps = ["Catalyst", "DataStructures", "HypergeometricFunctions", "ModelingToolkitBase", "SparseArrays", "SymbolicUtils", "Symbolics"]
-path = "/home/chrisrackauckas/github-runners/demeter4-5/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
+path = "/home/runner/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 version = "1.3.0"
 
@@ -1689,9 +1689,9 @@ version = "1.1.0"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "ArrayInterface", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "EnumX", "ExproniconLite", "Graphs", "LinearAlgebra", "MacroTools", "Moshi", "MultivariatePolynomials", "MutableArithmetics", "NaNMath", "PrecompileTools", "ReadOnlyArrays", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArraysCore", "SymbolicIndexingInterface", "TaskLocalValues", "TermInterface", "WeakCacheSets"]
-git-tree-sha1 = "4d684e04d1b535aff0bb0e955b2d6279fcb01b59"
+git-tree-sha1 = "9ea31de3982ad73cbfe2409d8df0a2b2b12b5cba"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "4.34.0"
+version = "4.34.1"
 
     [deps.SymbolicUtils.extensions]
     SymbolicUtilsChainRulesCoreExt = "ChainRulesCore"
