@@ -1,5 +1,7 @@
 using Pkg
 
+using SafeTestsets, Test
+
 const GROUP = get(ENV, "GROUP", "All")
 
 if GROUP == "QA"
@@ -8,8 +10,6 @@ if GROUP == "QA"
     Pkg.instantiate()
     include("qa.jl")
 else
-    using SafeTestsets, Test
-
     @time begin
         @time @safetestset "BNG Birth-Death Test" begin
             include("test_nullrxs_odes.jl")
