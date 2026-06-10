@@ -35,8 +35,9 @@ CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OrdinaryDiffEqTsit5 = "b1df2697-797e-41e3-8120-5422d3b24e4a"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "CSV", "DataFrames", "LinearAlgebra", "OrdinaryDiffEqTsit5", "SafeTestsets", "Test"]
+test = ["Aqua", "CSV", "DataFrames", "LinearAlgebra", "OrdinaryDiffEqTsit5", "Pkg", "SafeTestsets", "Test"]
