@@ -1311,7 +1311,7 @@ version = "1.11.0"
 
 [[deps.ReactionNetworkImporters]]
 deps = ["Catalyst", "DataStructures", "HypergeometricFunctions", "ModelingToolkitBase", "SparseArrays", "SymbolicUtils", "Symbolics"]
-path = "/home/chrisrackauckas/github-runners/demeter3-20/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
+path = "/home/runner/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 version = "1.3.0"
 
