@@ -14,6 +14,7 @@ run_qa(
                 :U0Map,        # public in Catalyst (declared `public`; only invisible to EI on Julia 1.10)
                 :ParameterMap, # public in Catalyst (declared `public`; only invisible to EI on Julia 1.10)
                 :parse,        # Base.Meta.parse, non-public stdlib name
+                :eval,         # Base.eval, non-public Base name; required to eval BNG exprs in a target module
             ),
         ),
     ),
