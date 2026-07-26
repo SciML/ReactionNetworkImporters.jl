@@ -1,29 +1,46 @@
 """
-Given substrate and product stoichiometric matrices, rate-expressions and lists
-of species and parameters, return a ReactionSystem that describes the chemical
-reaction network.
+    MatrixNetwork(rateexprs, substoich, prodstoich; species = Any[], params = Any[], t = nothing)
 
-Assumed that the substrate and product stoichiometry matrices are stored as
-numspecies by numrxs matrices, with entry (i,j) giving the stoichiometric
-coefficient of species i within rx j.
+Input representation for constructing a Catalyst reaction network from
+substrate and product stoichiometry matrices.
+
+# Arguments
+- `rateexprs::AbstractVector`: One symbolic or numeric rate expression per reaction.
+- `substoich::AbstractMatrix`: Species-by-reaction substrate coefficients.
+- `prodstoich::AbstractMatrix{Int}`: Species-by-reaction product coefficients;
+  it must have the same size as `substoich`.
+
+# Keywords
+- `species::AbstractVector = Any[]`: Symbolic species in row order. Empty uses
+  generated species with the chosen independent variable.
+- `params::AbstractVector = Any[]`: Symbolic parameters referenced by `rateexprs`.
+- `t = nothing`: Independent variable. `nothing` uses `Catalyst.default_t()`.
+
+# Fields
+- `rateexprs`: Rate expressions, one for each reaction column.
+- `substoich`: Substrate stoichiometry matrix.
+- `prodstoich`: Product stoichiometry matrix.
+- `species`: Symbolic species in matrix-row order.
+- `params`: Symbolic parameters available to rate expressions.
+- `t`: Independent variable or `nothing`.
+
+# Examples
+```jldoctest
+using ReactionNetworkImporters
+
+network = MatrixNetwork([1.0], reshape([1], 1, 1), reshape([0], 1, 1))
+network isa MatrixNetwork
+
+# output
+true
+```
 """
 struct MatrixNetwork{S, T, U, V, W, X} <: NetworkFileFormat
-    """The symbolic expressions for each reaction rate."""
     rateexprs::S
-
-    """substoich[i,j] = is the substrate stoichiometric coefficient matrix"""
     substoich::T
-
-    """prodstoich[i,j] is the product stoichiometric coefficient matrix"""
     prodstoich::U
-
-    """species in the network """
     species::V
-
-    """ Parameters """
     params::W
-
-    """independent variable, time """
     t::X
 end
 function MatrixNetwork(
@@ -33,45 +50,37 @@ function MatrixNetwork(
     return MatrixNetwork(rateexprs, substoich, prodstoich, species, params, t)
 end
 
-# for dense matrices
 """
     loadrxnetwork(mn::MatrixNetwork; name = gensym(:ReactionSystem))
 
-Converts a `MatrixNetwork` into a Catalyst `ReactionSystem`.
+Convert a `MatrixNetwork` into a Catalyst `ReactionSystem`.
 
 # Arguments
-- `mn::MatrixNetwork`: A `MatrixNetwork` object containing the stoichiometric matrices, rate
-  expressions, species, and parameters.
-- `name::Symbol`: (Optional) Name for the resulting `ReactionSystem`. Defaults to a
-  generated symbol.
+- `mn::MatrixNetwork`: Input matrix representation satisfying `MatrixNetwork`'s
+  dimensionality rules.
+
+# Keywords
+- `name::Symbol = gensym(:ReactionSystem)`: Name assigned to the resulting system.
 
 # Returns
-A Catalyst `ReactionSystem` (not marked as complete).
+- `ReactionSystem`: An incomplete Catalyst system. Call `complete` before using
+  it to construct a SciML problem.
 
-# Notes
-- The `MatrixNetwork` must have substrate (`substoich`) and product (`prodstoich`)
-  stoichiometric matrices of the same size.
-- The stoichiometric matrices are assumed to be `numspecies x numrxs`, where each entry `(i,
-  j)` represents the stoichiometric coefficient of species `i` in reaction `j`.
-- If the `species` field in `MatrixNetwork` is empty, species symbols are automatically
-  generated.
-- The `t` field specifies the independent variable (e.g., time). If not provided, a default
-  time variable is used.
+# Rules
+- `substoich` and `prodstoich` must be species-by-reaction matrices of equal size.
+- Each rate expression corresponds to one reaction column.
+- An empty `species` vector requests generated species symbols.
 
-# Example
-```julia
-using Catalyst
+# Examples
+```jldoctest
+using ReactionNetworkImporters
 
-# Define a MatrixNetwork
-rateexprs = [1.0, 2.0]
-substoich = [1 0; 0 1]
-prodstoich = [0 1; 1 0]
-species = [@species A(t), B(t)]
-params = [@parameters k1, k2]
-mn = MatrixNetwork(rateexprs, substoich, prodstoich; species = species, params = params)
+network = MatrixNetwork([1.0], reshape([1], 1, 1), reshape([0], 1, 1))
+system = loadrxnetwork(network; name = :decay)
+nameof(system)
 
-# Convert to a ReactionSystem
-rn = loadrxnetwork(mn, name = :MyReactionSystem)
+# output
+:decay
 ```
 """
 function loadrxnetwork(
@@ -179,40 +188,48 @@ function loadrxnetwork(
 end
 
 """
-Given complex stoichiometric matrix ,incidence matrix ,rate-expressions and list of species,parameters
-, return a ReactionSystem that describes the chemical reaction network
+    ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species = Any[], params = Any[], t = nothing)
 
-Notes:
+Input representation for constructing a Catalyst reaction network from complex
+stoichiometry and complex-incidence matrices.
 
-  - The column of complex stoichiometric represents composition of reaction complexes,
-    with positive entries of size num_of_species by num_of_complexes, where
-    the non-zero positive entries in the k'th column denote stoichiometric
-    coefficients of the species participating in the k'th reaction complex.
+# Arguments
+- `rateexprs::AbstractVector`: One symbolic or numeric rate expression per reaction.
+- `stoichmat::AbstractMatrix`: Species-by-complex nonnegative stoichiometric coefficients.
+- `incidencemat::AbstractMatrix{Int}`: Complex-by-reaction matrix whose entries
+  are `-1`, `0`, or `1`.
 
-  - The complex incidence matrix, is number of complexes by number of reactions with
-    Bᵢⱼ = -1, if the i'th complex is the substrate of the j'th reaction,
-    1, if the i'th complex is the product of the j'th reaction,
-    0, otherwise
+# Keywords
+- `species::AbstractVector = Any[]`: Symbolic species in row order. Empty uses
+  generated species with the chosen independent variable.
+- `params::AbstractVector = Any[]`: Symbolic parameters referenced by `rateexprs`.
+- `t = nothing`: Independent variable. `nothing` uses `Catalyst.default_t()`.
+
+# Fields
+- `rateexprs`: Rate expressions, one for each reaction column.
+- `stoichmat`: Species-by-complex stoichiometry matrix.
+- `incidencemat`: Complex-by-reaction incidence matrix.
+- `species`: Symbolic species in matrix-row order.
+- `params`: Symbolic parameters available to rate expressions.
+- `t`: Independent variable or `nothing`.
+
+# Examples
+```jldoctest
+using ReactionNetworkImporters
+
+network = ComplexMatrixNetwork([1.0], [1 0], reshape([-1, 1], 2, 1))
+network isa ComplexMatrixNetwork
+
+# output
+true
+```
 """
 struct ComplexMatrixNetwork{S, T, U, V, W, X} <: NetworkFileFormat
-    """The symbolic expressions for each reaction rate."""
     rateexprs::S
-
-    """stoichmat[i,j] = is the stoichiometric coefficient in the j'th reaction for the i'th species"""
     stoichmat::T
-
-    """incidencemat[i,j] is the incidence matrix with incidencemat[i,j] = -1, if the i'th complex
-    is the substrate of the j'th reaction, 1, if the i'th complex is the product
-    of the j'th reaction, 0, otherwise"""
-    incidencemat::U  # all elements are integer always in incidence matrix
-
-    """species in the network """
+    incidencemat::U
     species::V
-
-    """ Parameters """
     params::W
-
-    """independent variable, time """
     t::X
 end
 function ComplexMatrixNetwork(
@@ -222,7 +239,40 @@ function ComplexMatrixNetwork(
     return ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat, species, params, t)
 end
 
-# for Dense matrices version
+"""
+    loadrxnetwork(cmn::ComplexMatrixNetwork; name = gensym(:ReactionSystem))
+
+Convert a `ComplexMatrixNetwork` into a Catalyst `ReactionSystem`.
+
+# Arguments
+- `cmn::ComplexMatrixNetwork`: Complex-matrix representation satisfying the
+  documented stoichiometry and incidence rules.
+
+# Keywords
+- `name::Symbol = gensym(:ReactionSystem)`: Name assigned to the resulting system.
+
+# Returns
+- `ReactionSystem`: An incomplete Catalyst system. Call `complete` before using
+  it to construct a SciML problem.
+
+# Rules
+- `stoichmat` is species-by-complex and has nonnegative entries.
+- `incidencemat` is complex-by-reaction with entries in `(-1, 0, 1)`.
+- Every reaction column needs one substrate complex (`-1`) and one product
+  complex (`1`).
+
+# Examples
+```jldoctest
+using ReactionNetworkImporters
+
+network = ComplexMatrixNetwork([1.0], [1 0], reshape([-1, 1], 2, 1))
+system = loadrxnetwork(network; name = :conversion)
+nameof(system)
+
+# output
+:conversion
+```
+"""
 function loadrxnetwork(
         cmn::ComplexMatrixNetwork{S, T, U, V, W, X};
         name = gensym(:ReactionSystem)
