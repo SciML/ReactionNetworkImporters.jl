@@ -52,8 +52,8 @@ end
 
 const REPLACEMENT_DICT = Dict{Symbol, Any}(
     :ln => :log,
-    :_pi => :pi,
-    :_e => :(MathConstants.e)
+    :_pi => pi,
+    :_e => exp(1)
 )
 
 function recursive_replace!(
@@ -93,50 +93,66 @@ function parse_bng_expr(s::AbstractString)
     return expr
 end
 
-"""
-    eval_bng_expr(opmod::Module, expr; extra_bindings=nothing)
+bng_power(base::Integer, exponent::Integer) =
+    exponent < 0 ? float(base)^exponent : base^exponent
+bng_power(base, exponent) = base^exponent
 
-Evaluate a parsed BNG expression in the given module context. Handles raw
-`Expr`, `Symbol` (looked up in `extra_bindings` then `opmod` first, otherwise
-created as a new parameter), and numeric literals.
+const BNG_FUNCTIONS = Dict{Symbol, Function}(
+    :+ => +,
+    :- => -,
+    :* => *,
+    :/ => /,
+    :^ => bng_power,
+    Symbol("==") => ==,
+    Symbol("!=") => !=,
+    Symbol("<") => <,
+    Symbol("<=") => <=,
+    Symbol(">") => >,
+    Symbol(">=") => >=,
+    :ifelse => ifelse,
+    :min => min,
+    :max => max,
+    :log => log,
+    :sqrt => sqrt,
+    :exp => exp,
+)
 
-`extra_bindings` is an optional `Dict{Symbol, Any}` of additional name→value
-mappings that take precedence over `opmod`. This is needed because `Base.eval`
-bindings created inside compiled functions are not visible to `isdefined` until
-the next world age.
+bng_mratio(a, b, z) = _₁F₁(a + 1, b + 1, z) / _₁F₁(a, b, z)
+
 """
-function eval_bng_expr(opmod::Module, expr; extra_bindings = nothing)
-    if expr isa Expr
-        # substitute any extra_bindings into the expression before eval
-        if extra_bindings !== nothing
-            expr = _substitute_bindings(expr, extra_bindings)
-        end
-        return Base.eval(opmod, expr)
-    elseif expr isa Symbol
+    eval_bng_expr(bindings, expr; extra_bindings = nothing)
+
+Evaluate a parsed BioNetGen expression using the supported BioNetGen grammar.
+Variable bindings in `extra_bindings` take precedence over `bindings`; unknown
+symbols become Catalyst parameters. This explicit interpreter avoids evaluating
+file contents as Julia code.
+"""
+function eval_bng_expr(bindings::Dict{Symbol, Any}, expr; extra_bindings = nothing)
+    if expr isa Symbol
         if extra_bindings !== nothing && haskey(extra_bindings, expr)
             return extra_bindings[expr]
-        elseif isdefined(opmod, expr)
-            return Base.eval(opmod, expr)
-        else
-            return (@parameters $expr)[1]
+        elseif haskey(bindings, expr)
+            return bindings[expr]
         end
-    else
+        return (@parameters $expr)[1]
+    elseif !(expr isa Expr)
         return expr
+    elseif expr.head != :call
+        error("Unsupported BioNetGen expression form: $(expr.head)")
     end
-end
 
-"""
-Recursively substitute symbols in an expression using the given bindings dict.
-"""
-function _substitute_bindings(expr, bindings::Dict{Symbol, Any})
-    if expr isa Symbol
-        return get(bindings, expr, expr)
-    elseif expr isa Expr
-        new_args = map(a -> _substitute_bindings(a, bindings), expr.args)
-        return Expr(expr.head, new_args...)
-    else
-        return expr
+    operator = expr.args[1]
+    if operator == :time
+        length(expr.args) == 1 || error("time() does not accept arguments.")
+        return bindings[:t]
+    elseif operator == :mratio
+        args = [eval_bng_expr(bindings, arg; extra_bindings) for arg in expr.args[2:end]]
+        return bng_mratio(args...)
+    elseif operator isa Symbol && haskey(BNG_FUNCTIONS, operator)
+        args = [eval_bng_expr(bindings, arg; extra_bindings) for arg in expr.args[2:end]]
+        return BNG_FUNCTIONS[operator](args...)
     end
+    error("Unsupported BioNetGen function: $operator")
 end
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -304,18 +320,16 @@ end
 const FUNCTIONS_BLOCK_START = "begin functions"
 
 """
-    parse_functions!(ft, lines, boundaries, opmod, extra_bindings)
+    parse_functions!(ft, lines, boundaries, bindings, extra_bindings)
 
 Parse the optional `begin functions` block. Returns `extra_bindings` (mutated)
 with function name symbols mapped to their symbolic values.
 
-Because `Base.eval` bindings created inside compiled functions are not visible
-to `isdefined` until the next world age, we track function bindings in
-`extra_bindings` (a `Dict{Symbol, Any}`) and pass them through to
-`eval_bng_expr` for resolution.
+Function values are stored in `extra_bindings` and passed to `eval_bng_expr`
+for explicit name resolution.
 """
 function parse_functions!(
-        ft::BNGNetwork, lines, boundaries, opmod,
+        ft::BNGNetwork, lines, boundaries, bindings,
         extra_bindings::Dict{Symbol, Any}
     )
     haskey(boundaries, FUNCTIONS_BLOCK_START) || return extra_bindings
@@ -352,7 +366,7 @@ function parse_functions!(
         end
 
         fexpr = parse_bng_expr(fexpr_str)
-        fval = eval_bng_expr(opmod, fexpr; extra_bindings)
+        fval = eval_bng_expr(bindings, fexpr; extra_bindings)
 
         fsym = Symbol(fname)
         extra_bindings[fsym] = fval
@@ -369,7 +383,7 @@ const REACTIONS_BLOCK_START = "begin reactions"
 const TYPED_RATE_KEYWORDS = Set(["Ele", "Sat", "MM", "Hill"])
 
 function parse_reactions!(
-        ft::BNGNetwork, t, lines, boundaries, idstovars, opmod;
+        ft::BNGNetwork, t, lines, boundaries, idstovars, bindings;
         extra_bindings = nothing
     )
     haskey(boundaries, REACTIONS_BLOCK_START) ||
@@ -391,13 +405,13 @@ function parse_reactions!(
         if rate_token in TYPED_RATE_KEYWORDS
             rate = _parse_typed_rate(
                 rate_token, vals, reactantids,
-                idstovars, cntdict, opmod;
+                idstovars, cntdict, bindings;
                 extra_bindings
             )
         else
             # ordinary elementary rate expression
             rateexpr = parse_bng_expr(rate_token)
-            rate = eval_bng_expr(opmod, rateexpr; extra_bindings)
+            rate = eval_bng_expr(bindings, rateexpr; extra_bindings)
         end
 
         # ── validate null species (id 0 must be the sole entry if present) ──
@@ -442,20 +456,20 @@ function parse_reactions!(
 end
 
 """
-    _parse_typed_rate(rate_type, vals, reactantids, idstovars, cntdict, opmod)
+    _parse_typed_rate(rate_type, vals, reactantids, idstovars, cntdict, bindings)
 
 Handle typed rate keywords (`Ele`, `Sat`, `MM`, `Hill`) in reaction lines.
 Returns the rate expression to use (mass-action multiplication is still
 applied by the caller for `Sat` and `Ele`).
 """
 function _parse_typed_rate(
-        rate_type, vals, reactantids, idstovars, cntdict, opmod;
+        rate_type, vals, reactantids, idstovars, cntdict, bindings;
         extra_bindings = nothing
     )
     if rate_type == "Ele"
         # explicit elementary: use next token as rate expression
         rateexpr = parse_bng_expr(vals[5])
-        return eval_bng_expr(opmod, rateexpr; extra_bindings)
+        return eval_bng_expr(bindings, rateexpr; extra_bindings)
 
     elseif rate_type == "Sat"
         # extract parameter tokens (everything between "Sat" and #comment)
@@ -481,7 +495,9 @@ function _parse_typed_rate(
         end
 
         # resolve parameters
-        params = [eval_bng_expr(opmod, parse_bng_expr(tok); extra_bindings) for tok in param_tokens]
+        params = [
+            eval_bng_expr(bindings, parse_bng_expr(tok); extra_bindings) for tok in param_tokens
+        ]
         kcat = params[1]
         Km_vals = params[2:end]
 
@@ -518,7 +534,7 @@ end
 # ─────────────────────────────────────────────────────────────────────────────
 
 function exprs_to_defs(
-        opmod, ptoids, pvals, idstovars, u0exprs, ps, isfixed;
+        bindings, ptoids, pvals, idstovars, u0exprs, ps, isfixed;
         extra_bindings = nothing
     )
     pmap = Dict()
@@ -526,14 +542,14 @@ function exprs_to_defs(
     for (psym, pid) in ptoids
         pvar = psym_to_pvar[psym]
         parsedval = pvals[pid]
-        pval = eval_bng_expr(opmod, parsedval; extra_bindings)
+        pval = eval_bng_expr(bindings, parsedval; extra_bindings)
         push!(pmap, pvar => pval)
     end
 
     u0map = Dict()
     for (i, u0expr) in enumerate(u0exprs)
         uvar = idstovars[i]
-        u0val = eval_bng_expr(opmod, u0expr; extra_bindings)
+        u0val = eval_bng_expr(bindings, u0expr; extra_bindings)
         if isfixed[i]
             push!(pmap, uvar => u0val)
         else
@@ -554,39 +570,33 @@ end
 Parse a BioNetGen `.net` file and construct a Catalyst `ReactionSystem`.
 
 # Arguments
-- `ft::BNGNetwork`: Indicates the file to be parsed is a BioNetGen ".net" file.
-- `rxfilename::String`: Path to the `.net` file to be parsed.
-- `name::Symbol`: (Optional) Name for the resulting `ReactionSystem`. Defaults to a
-  generated symbol.
-- `verbose::Bool`: (Optional) If `true`, prints detailed progress information during
-  parsing. Defaults to `true`.
-- `kwargs...`: Additional keyword arguments passed to the `ReactionSystem` constructor.
+- `ft::BNGNetwork`: Selector for the BioNetGen `.net` format.
+- `rxfilename::AbstractString`: Path to the network file.
+
+# Keywords
+- `name::Symbol = gensym(:ReactionSystem)`: Name assigned to the returned system.
+- `verbose::Bool = true`: Print parser progress when `true`.
+- `kwargs...`: Additional keywords forwarded to `ReactionSystem`.
 
 # Returns
-A Catalyst `ReactionSystem` (not marked as complete). Initial conditions, parameter
-values, and BNG-specific mappings are stored as system metadata:
-- `Catalyst.get_u0_map(rn)`: `Dict` mapping species to initial condition values.
-- `Catalyst.get_parameter_map(rn)`: `Dict` mapping parameters to their values.
-- `get_varstonames(rn)`: `Dict` mapping internal symbolic variables (both dynamic
-  species and constant-species parameters) to full BNG name strings.
-- `get_groupstosyms(rn)`: `Dict` mapping BNG group name strings to observable symbols.
+- `ReactionSystem`: Incomplete Catalyst system. Its metadata contains initial
+  conditions, parameter values, BNG variable names, and BNG group observables.
 
-# Supported features
-- Parameter expressions (including `min`, `max`, `if`/`ifelse`, `mratio`)
-- Species with initial conditions (including `\$`-prefixed constant species)
-- Compartment-prefixed species (`@Comp::Name` → `Comp_Name` symbol)
-- Reactions with elementary and `Sat` typed rate laws
-- Function blocks (concentration-dependent and time-dependent rate expressions)
-- Groups (observables as weighted sums of species)
+# Rules
+- Supports parameter expressions, fixed species, compartment-prefixed species,
+  elementary and `Sat` rate laws, function blocks, and groups.
+- `MM`, `Hill`, and `tfun()` constructs are unsupported and throw an error.
+- Call `complete` on the returned system before constructing a SciML problem.
 
-# Unsupported features (will error)
-- `MM` and `Hill` typed rate laws
-- `tfun()` tabular interpolation functions
+# Examples
+```jldoctest
+using ReactionNetworkImporters
 
-# Example
-```julia
-rn = loadrxnetwork(BNGNetwork(), "path/to/network.net"; verbose = true)
-rn = complete(rn)
+format = BNGNetwork()
+format isa ReactionNetworkImporters.NetworkFileFormat
+
+# output
+true
 ```
 """
 function loadrxnetwork(
@@ -639,19 +649,13 @@ function loadrxnetwork(
     end
     verbose && println("done")
 
-    # ── Step 5: set up opmod with parameters, variables, time, and built-ins ──
-    verbose && print("Setting up expression evaluation module...")
-    opmod = Module()
-    Base.eval(opmod, :(using Catalyst))
-    Base.eval(opmod, :(t = Catalyst.default_t()))
-    Base.eval(opmod, :(time() = Catalyst.default_t()))
-
-    # register mratio using the module-level _₁F₁ import
-    Base.eval(opmod, :(mratio(a, b, z) = $_₁F₁(a + 1, b + 1, z) / $_₁F₁(a, b, z)))
+    # ── Step 5: bind parameters, variables, and built-ins for expression evaluation ──
+    verbose && print("Setting up expression bindings...")
+    bindings = Dict{Symbol, Any}(:t => t, :pi => pi, :e => exp(1))
 
     for p in ps
         psym = nameof(p)
-        Base.eval(opmod, :($psym = $p))
+        bindings[psym] = p
     end
     for (sid, var) in enumerate(idstovars)
         if isfixed[sid]
@@ -659,7 +663,7 @@ function loadrxnetwork(
         else
             ssym = nameof(operation(unwrap(var)))
         end
-        Base.eval(opmod, :($ssym = $var))
+        bindings[ssym] = var
     end
     verbose && println("done")
 
@@ -671,9 +675,7 @@ function loadrxnetwork(
     )
     verbose && println("done")
 
-    # Build extra_bindings for group RHS expressions and function values.
-    # We use a Dict rather than Base.eval because bindings created via Base.eval
-    # inside compiled functions are not visible to isdefined until the next world age.
+    # Build extra bindings for group RHS expressions and function values.
     extra_bindings = Dict{Symbol, Any}()
     for obseq in obseqs
         gsym = nameof(operation(unwrap(obseq.lhs)))
@@ -682,13 +684,13 @@ function loadrxnetwork(
 
     # ── Step 7: parse functions (optional block) ──
     verbose && print("Parsing functions...")
-    parse_functions!(ft, lines, boundaries, opmod, extra_bindings)
+    parse_functions!(ft, lines, boundaries, bindings, extra_bindings)
     verbose && println("done")
 
     # ── Step 8: parse reactions ──
     verbose && print("Parsing and adding reactions...")
     rxs = parse_reactions!(
-        ft, t, lines, boundaries, idstovars, opmod;
+        ft, t, lines, boundaries, idstovars, bindings;
         extra_bindings
     )
     verbose && println("done")
@@ -697,7 +699,7 @@ function loadrxnetwork(
     # evaluate parameter values and initial conditions
     all_ps = vcat(ps, constant_specs)
     defmap, pmap, u0map = exprs_to_defs(
-        opmod, ptoids, pvals, idstovars, u0exprs, all_ps, isfixed;
+        bindings, ptoids, pvals, idstovars, u0exprs, all_ps, isfixed;
         extra_bindings
     )
 

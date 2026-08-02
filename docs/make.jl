@@ -35,8 +35,8 @@ makedocs(
         canonical = "https://docs.sciml.ai/ReactionNetworkImporters/stable/"
     ),
     modules = [ReactionNetworkImporters],
-    checkdocs = :exports, warnonly = [:missing_docs],
-    clean = true, doctest = false, pages = pages
+    checkdocs = :exports,
+    clean = true, doctest = true, pages = pages
 )
 
 deploydocs(

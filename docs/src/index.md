@@ -224,12 +224,6 @@ will simply name the species `S1`, `S2`,..., `SN` for a system with `N` total
 species. `params` defaults to an empty vector, so that it does not need to be
 set for systems with no parameters.
 
-## API Reference
-
-```@autodocs
-Modules = [ReactionNetworkImporters]
-```
-
 ## Reproducibility
 
 ```@raw html
