@@ -4,6 +4,7 @@ import Catalyst
 using Catalyst: Reaction, ReactionSystem, @parameters, @species, @variables
 using HypergeometricFunctions: _₁F₁
 using OrderedCollections: OrderedDict
+using SciMLPublic: @public
 using SparseArrays: SparseMatrixCSC, nonzeros, nzrange, rowvals
 using SymbolicUtils: getmetadata, hasmetadata, setmetadata, simplify
 using Symbolics: Equation, Num, unwrap
@@ -42,7 +43,7 @@ true
 ```
 """
 abstract type NetworkFileFormat end
-public NetworkFileFormat
+@public NetworkFileFormat
 
 # exported data types
 #struct RSSANetwork <: NetworkFileFormat end

@@ -12,5 +12,5 @@ end
     @test format isa NetworkFileFormat
     @test loadrxnetwork(format, :network) == (name = :generic_only, payload = :network)
     @test loadrxnetwork(format, :network; name = :custom) ==
-          (name = :custom, payload = :network)
+        (name = :custom, payload = :network)
 end
