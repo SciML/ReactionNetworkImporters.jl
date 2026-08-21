@@ -4,6 +4,7 @@ import Catalyst
 using Catalyst: Reaction, ReactionSystem, @parameters, @species, @variables
 using HypergeometricFunctions: _₁F₁
 using OrderedCollections: OrderedDict
+using PrecompileTools: @compile_workload, @setup_workload
 using SciMLPublic: @public
 using SparseArrays: SparseMatrixCSC, nonzeros, nzrange, rowvals
 using SymbolicUtils: getmetadata, hasmetadata, setmetadata, simplify
@@ -195,6 +196,7 @@ export has_groupstosyms, get_groupstosyms, set_groupstosyms
 # parsers
 include("parsing_routines_bngnetworkfiles.jl")
 include("parsing_routines_matrixnetworks.jl")
+include("precompilation.jl")
 
 export loadrxnetwork
 
