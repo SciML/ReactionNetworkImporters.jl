@@ -61,23 +61,20 @@ rn = loadrxnetwork(mn::MatrixNetwork)
 
 cmn = ComplexMatrixNetwork(rateexprs, stoichmat, incidencemat; species = Any[],
     params = Any[], t = nothing)
-rn = loadrxnetwork(cmn::ComplexMatrixNetwork)</code></pre><p>Here <code>MatrixNetwork</code> and <code>ComplexMatrixNetwork</code> are the types, which select that we are constructing a substrate/product stoichiometric matrix-based or a reaction complex matrix-based stoichiometric representation as input. See the <a href="https://docs.sciml.ai/Catalyst/stable/api/core_api/">Catalyst.jl API</a> for more discussion on these matrix representations, and how Catalyst handles symbolic reaction rate expressions. These two types have the following fields:</p><ul><li><p><code>rateexprs</code>, any valid <a href="https://docs.sciml.ai/Symbolics/stable/">Symbolics.jl</a> expression for the rates, or any basic number type. This can be a hard-coded rate constant like <code>1.0</code>, a parameter like <code>k1</code> above, or a general Symbolics expression involving parameters and species like <code>k*A</code>.</p></li><li><p>matrix inputs</p><ul><li><p>For <code>MatrixNetwork</code></p><ul><li><code>substoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a substrate in reaction <code>j</code>.</li><li><code>prodstoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a product in reaction <code>j</code>.</li></ul></li><li><p>For <code>ComplexMatrixNetwork</code></p><ul><li><code>stoichmat</code>, the complex stoichiometry matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/network_analysis_api/#Catalyst.complexstoichmat">defined here</a>.</li><li><code>incidencemat</code>, the complex incidence matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/network_analysis_api/#Catalyst.reactioncomplexes">defined here</a>.</li></ul></li></ul></li><li><p><code>species</code>, an optional vector of symbolic variables representing each species in the network. Can be constructed using the Catalyst.jl <code>@species</code> macro. Each species should be dependent on the same time variable (<code>t</code> in the example above).</p></li><li><p><code>parameters</code>, a vector of symbolic variables representing each parameter in the network. Can be constructed with the Catalyst.jl <code>@parameters</code> macro. If no parameters are used, it is an optional keyword.</p></li><li><p><code>t</code>, an optional Symbolics.jl variable representing time as the independent variable of the reaction network. If not provided, <code>Catalyst.default_t()</code> is used to determine the default time variable.</p></li></ul><p>For both input types, <code>loadrxnetwork</code> returns a Catalyst <code>ReactionSystem</code>. The system is <strong>not</strong> marked as complete by default and must be manually completed by calling <code>rn = complete(rn)</code> before creating an <code>ODEProblem</code> or such; see the Catalyst docs for details.</p><p>Dispatches are added if <code>substoich</code> and <code>prodstoich</code> both have the type <code>SparseMatrixCSC</code>in case of <code>MatrixNetwork</code> (or <code>stoichmat</code> and <code>incidencemat</code> both have the type <code>SparseMatrixCSC</code> in case of <code>ComplexMatrixNetwork</code>), in which case they are efficiently iterated through using the <code>SparseArrays</code> interface.</p><p>If the keyword argument <code>species</code> is not set, the resulting reaction network will simply name the species <code>S1</code>, <code>S2</code>,..., <code>SN</code> for a system with <code>N</code> total species. <code>params</code> defaults to an empty vector, so that it does not need to be set for systems with no parameters.</p><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl/docs/Project.toml`
-  <span class="sgr90">[479239e8] </span>Catalyst v16.2.3
+rn = loadrxnetwork(cmn::ComplexMatrixNetwork)</code></pre><p>Here <code>MatrixNetwork</code> and <code>ComplexMatrixNetwork</code> are the types, which select that we are constructing a substrate/product stoichiometric matrix-based or a reaction complex matrix-based stoichiometric representation as input. See the <a href="https://docs.sciml.ai/Catalyst/stable/api/core_api/">Catalyst.jl API</a> for more discussion on these matrix representations, and how Catalyst handles symbolic reaction rate expressions. These two types have the following fields:</p><ul><li><p><code>rateexprs</code>, any valid <a href="https://docs.sciml.ai/Symbolics/stable/">Symbolics.jl</a> expression for the rates, or any basic number type. This can be a hard-coded rate constant like <code>1.0</code>, a parameter like <code>k1</code> above, or a general Symbolics expression involving parameters and species like <code>k*A</code>.</p></li><li><p>matrix inputs</p><ul><li><p>For <code>MatrixNetwork</code></p><ul><li><code>substoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a substrate in reaction <code>j</code>.</li><li><code>prodstoich</code>, a number of species by number of reactions matrix, with entry <code>(i,j)</code> giving the stoichiometric coefficient of species <code>i</code> as a product in reaction <code>j</code>.</li></ul></li><li><p>For <code>ComplexMatrixNetwork</code></p><ul><li><code>stoichmat</code>, the complex stoichiometry matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/network_analysis_api/#Catalyst.complexstoichmat">defined here</a>.</li><li><code>incidencemat</code>, the complex incidence matrix <a href="https://docs.sciml.ai/Catalyst/stable/api/network_analysis_api/#Catalyst.reactioncomplexes">defined here</a>.</li></ul></li></ul></li><li><p><code>species</code>, an optional vector of symbolic variables representing each species in the network. Can be constructed using the Catalyst.jl <code>@species</code> macro. Each species should be dependent on the same time variable (<code>t</code> in the example above).</p></li><li><p><code>parameters</code>, a vector of symbolic variables representing each parameter in the network. Can be constructed with the Catalyst.jl <code>@parameters</code> macro. If no parameters are used, it is an optional keyword.</p></li><li><p><code>t</code>, an optional Symbolics.jl variable representing time as the independent variable of the reaction network. If not provided, <code>Catalyst.default_t()</code> is used to determine the default time variable.</p></li></ul><p>For both input types, <code>loadrxnetwork</code> returns a Catalyst <code>ReactionSystem</code>. The system is <strong>not</strong> marked as complete by default and must be manually completed by calling <code>rn = complete(rn)</code> before creating an <code>ODEProblem</code> or such; see the Catalyst docs for details.</p><p>Dispatches are added if <code>substoich</code> and <code>prodstoich</code> both have the type <code>SparseMatrixCSC</code>in case of <code>MatrixNetwork</code> (or <code>stoichmat</code> and <code>incidencemat</code> both have the type <code>SparseMatrixCSC</code> in case of <code>ComplexMatrixNetwork</code>), in which case they are efficiently iterated through using the <code>SparseArrays</code> interface.</p><p>If the keyword argument <code>species</code> is not set, the resulting reaction network will simply name the species <code>S1</code>, <code>S2</code>,..., <code>SN</code> for a system with <code>N</code> total species. <code>params</code> defaults to an empty vector, so that it does not need to be set for systems with no parameters.</p><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl/docs/Project.toml`
+  <span class="sgr90">[479239e8] </span>Catalyst v16.3.0
   <span class="sgr90">[e30172f5] </span>Documenter v1.17.0
-  <span class="sgr90">[b4db0fb7] </span>ReactionNetworkImporters v1.4.0 `~/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.12.6
-Commit 15346901f00 (2026-04-09 19:20 UTC)
+  <span class="sgr90">[b4db0fb7] </span>ReactionNetworkImporters v1.4.0 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.12.7
+Commit 6d172b025e4 (2026-08-15 08:05 UTC)
 Build Info:
   Official https://julialang.org release
 Platform Info:
   OS: Linux (x86_64-linux-gnu)
-  CPU: 112 × AMD EPYC 7663 56-Core Processor
+  CPU: 4 × INTEL(R) XEON(R) PLATINUM 8573C
   WORD_SIZE: 64
-  LLVM: libLLVM-18.1.7 (ORCJIT, znver3)
+  LLVM: libLLVM-18.1.7 (ORCJIT, sapphirerapids)
   GC: Built with stock GC
-Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)
-Environment:
-  JULIA_CPU_THREADS = 4
-  JULIA_NUM_PRECOMPILE_TASKS = 4</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl/docs/Manifest.toml`
+Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl/docs/Manifest.toml`
   <span class="sgr90">[47edcb42] </span>ADTypes v1.23.0
   <span class="sgr90">[14f7f29c] </span>AMD v0.5.3
   <span class="sgr90">[a4c015fc] </span>ANSIColoredPrinters v0.0.1
@@ -86,7 +83,7 @@ Environment:
   <span class="sgr90">[7d9f7c33] </span>Accessors v0.1.45
   <span class="sgr90">[79e6a3ab] </span>Adapt v4.7.0
   <span class="sgr90">[ec485272] </span>ArnoldiMethod v0.4.0
-  <span class="sgr90">[4fba245c] </span>ArrayInterface v7.29.0
+  <span class="sgr90">[4fba245c] </span>ArrayInterface v7.30.0
   <span class="sgr90">[4c555306] </span>ArrayLayouts v1.12.2
   <span class="sgr90">[aae01518] </span>BandedMatrices v1.11.0
   <span class="sgr90">[e2ed5e7c] </span>Bijections v0.2.2
@@ -94,8 +91,8 @@ Environment:
   <span class="sgr90">[caf10ac8] </span>BipartiteGraphs v0.1.11
   <span class="sgr90">[8e7c35d0] </span>BlockArrays v1.10.0
   <span class="sgr90">[70df07ce] </span>BracketingNonlinearSolve v1.12.5
-  <span class="sgr90">[479239e8] </span>Catalyst v16.2.3
-  <span class="sgr90">[944b1d66] </span>CodecZlib v0.7.8
+  <span class="sgr90">[479239e8] </span>Catalyst v16.3.0
+  <span class="sgr90">[944b1d66] </span>CodecZlib v0.7.9
 <span class="sgr33">⌅</span> <span class="sgr90">[861a8166] </span>Combinatorics v1.0.2
   <span class="sgr90">[38540f10] </span>CommonSolve v0.2.13
   <span class="sgr90">[bbf7d656] </span>CommonSubexpressions v0.3.1
@@ -109,11 +106,11 @@ Environment:
   <span class="sgr90">[9a962f9c] </span>DataAPI v1.16.0
   <span class="sgr90">[864edb3b] </span>DataStructures v0.19.6
   <span class="sgr90">[e2d170a0] </span>DataValueInterfaces v1.0.0
-  <span class="sgr90">[2b5f629d] </span>DiffEqBase v7.15.0
+  <span class="sgr90">[2b5f629d] </span>DiffEqBase v7.18.1
   <span class="sgr90">[459566f4] </span>DiffEqCallbacks v4.19.2
   <span class="sgr90">[163ba53b] </span>DiffResults v1.1.0
   <span class="sgr90">[b552c78f] </span>DiffRules v1.16.0
-  <span class="sgr90">[a0c0ee7d] </span>DifferentiationInterface v0.7.20
+  <span class="sgr90">[a0c0ee7d] </span>DifferentiationInterface v0.7.21
   <span class="sgr90">[8d63f2c5] </span>DispatchDoctor v0.4.28
   <span class="sgr90">[ffbed154] </span>DocStringExtensions v0.9.5
   <span class="sgr90">[e30172f5] </span>Documenter v1.17.0
@@ -134,7 +131,7 @@ Environment:
   <span class="sgr90">[f6369f11] </span>ForwardDiff v1.4.5
   <span class="sgr90">[a85aefff] </span>FunctionMaps v0.1.2
   <span class="sgr90">[069b7b12] </span>FunctionWrappers v1.1.3
-  <span class="sgr90">[77dc65aa] </span>FunctionWrappersWrappers v1.12.1
+  <span class="sgr90">[77dc65aa] </span>FunctionWrappersWrappers v1.13.0
   <span class="sgr90">[46192b85] </span>GPUArraysCore v0.2.0
   <span class="sgr90">[a0844989] </span>Gamma v1.2.0
   <span class="sgr90">[d7ba0133] </span>Git v1.5.0
@@ -151,28 +148,29 @@ Environment:
   <span class="sgr90">[692b3bcd] </span>JLLWrappers v1.8.0
   <span class="sgr90">[682c06a0] </span>JSON v1.7.1
   <span class="sgr90">[ae98c720] </span>Jieko v0.2.1
-  <span class="sgr90">[ccbc3e58] </span>JumpProcesses v9.29.2
+  <span class="sgr90">[ccbc3e58] </span>JumpProcesses v9.29.3
   <span class="sgr90">[ba0b0d4f] </span>Krylov v0.10.9
-  <span class="sgr90">[b964fa9f] </span>LaTeXStrings v1.4.0
-  <span class="sgr90">[23fbe1c1] </span>Latexify v0.16.11
+  <span class="sgr90">[2faa5264] </span>LHLFactorization v2.0.0
+  <span class="sgr90">[b964fa9f] </span>LaTeXStrings v1.4.1
+  <span class="sgr90">[23fbe1c1] </span>Latexify v0.16.12
   <span class="sgr90">[0e77f7df] </span>LazilyInitializedFields v1.3.0
-  <span class="sgr90">[87fe0de2] </span>LineSearch v0.1.14
-  <span class="sgr90">[7ed4a6bd] </span>LinearSolve v5.10.0
+  <span class="sgr90">[87fe0de2] </span>LineSearch v0.1.15
+  <span class="sgr90">[7ed4a6bd] </span>LinearSolve v5.12.0
   <span class="sgr90">[2ab3a3ac] </span>LogExpFunctions v1.0.1
   <span class="sgr90">[e6f89c97] </span>LoggingExtras v1.2.0
   <span class="sgr90">[1914dd2f] </span>MacroTools v0.5.16
   <span class="sgr90">[d0879d2d] </span>MarkdownAST v0.1.3
   <span class="sgr90">[bb5d69b7] </span>MaybeInplace v0.1.7
-  <span class="sgr90">[7771a370] </span>ModelingToolkitBase v1.65.0
+  <span class="sgr90">[7771a370] </span>ModelingToolkitBase v1.67.0
   <span class="sgr90">[2e0e35c7] </span>Moshi v0.3.12
   <span class="sgr90">[46d2c3a1] </span>MuladdMacro v0.2.7
   <span class="sgr90">[102ac46a] </span>MultivariatePolynomials v0.5.19
   <span class="sgr90">[d8a4904e] </span>MutableArithmetics v1.8.0
   <span class="sgr90">[77ba4419] </span>NaNMath v1.1.4
-  <span class="sgr90">[be0214bd] </span>NonlinearSolveBase v2.44.0
-  <span class="sgr90">[5959db7a] </span>NonlinearSolveFirstOrder v2.3.2
+  <span class="sgr90">[be0214bd] </span>NonlinearSolveBase v2.46.0
+  <span class="sgr90">[5959db7a] </span>NonlinearSolveFirstOrder v2.4.0
   <span class="sgr90">[6fe1bfb0] </span>OffsetArrays v1.17.0
-<span class="sgr33">⌅</span> <span class="sgr90">[bac558e1] </span>OrderedCollections v1.8.2
+  <span class="sgr90">[bac558e1] </span>OrderedCollections v2.0.1
   <span class="sgr90">[bbf590c4] </span>OrdinaryDiffEqCore v4.14.3
   <span class="sgr90">[d96e819e] </span>Parameters v0.13.1
   <span class="sgr90">[69de0a69] </span>Parsers v2.8.7
@@ -180,36 +178,36 @@ Environment:
   <span class="sgr90">[d236fae5] </span>PreallocationTools v1.5.0
   <span class="sgr90">[aea7be01] </span>PrecompileTools v1.3.4
   <span class="sgr90">[21216c6a] </span>Preferences v1.5.2
-  <span class="sgr90">[08abe8d2] </span>PrettyTables v3.4.6
+  <span class="sgr90">[08abe8d2] </span>PrettyTables v3.4.8
   <span class="sgr90">[27ebfcd6] </span>Primes v0.5.7
   <span class="sgr90">[0c0d3e7f] </span>PureKLU v1.4.1
-  <span class="sgr90">[b4db0fb7] </span>ReactionNetworkImporters v1.4.0 `~/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`
+  <span class="sgr90">[b4db0fb7] </span>ReactionNetworkImporters v1.4.0 `~/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl`
   <span class="sgr90">[988b38a3] </span>ReadOnlyArrays v0.2.0
   <span class="sgr90">[795d4caa] </span>ReadOnlyDicts v1.0.1
   <span class="sgr90">[3cdcf5f2] </span>RecipesBase v1.3.4
-  <span class="sgr90">[731186ca] </span>RecursiveArrayTools v4.4.0
+  <span class="sgr90">[731186ca] </span>RecursiveArrayTools v4.5.0
   <span class="sgr90">[189a3867] </span>Reexport v1.2.2
   <span class="sgr90">[2792f1a3] </span>RegistryInstances v0.1.0
   <span class="sgr90">[ae029012] </span>Requires v1.3.1
   <span class="sgr90">[9fe22ead] </span>RespecializeParams v1.2.0
   <span class="sgr90">[7e49a35a] </span>RuntimeGeneratedFunctions v0.5.24
   <span class="sgr90">[9dfe8606] </span>SCCNonlinearSolve v1.15.0
-  <span class="sgr90">[0bca4576] </span>SciMLBase v3.47.0
+  <span class="sgr90">[0bca4576] </span>SciMLBase v3.49.1
   <span class="sgr90">[19f34311] </span>SciMLJacobianOperators v0.1.17
   <span class="sgr90">[a6db7da4] </span>SciMLLogging v2.0.4
-  <span class="sgr90">[c0aeaf25] </span>SciMLOperators v1.26.1
+  <span class="sgr90">[c0aeaf25] </span>SciMLOperators v1.28.0
   <span class="sgr90">[431bcebd] </span>SciMLPublic v1.2.4
   <span class="sgr90">[53ae85a6] </span>SciMLStructures v1.10.4
   <span class="sgr90">[efcf1570] </span>Setfield v1.1.2
   <span class="sgr90">[727e6d20] </span>SimpleNonlinearSolve v2.14.0
   <span class="sgr90">[699a6c99] </span>SimpleTraits v0.9.6
   <span class="sgr90">[a57abbd0] </span>SparseColumnPivotedQR v2.1.6
-  <span class="sgr90">[276daf66] </span>SpecialFunctions v2.8.3
+  <span class="sgr90">[276daf66] </span>SpecialFunctions v2.9.0
   <span class="sgr90">[0c0c59c1] </span>StarAlgebras v0.3.0
   <span class="sgr90">[90137ffa] </span>StaticArrays v1.9.19
   <span class="sgr90">[1e83bf80] </span>StaticArraysCore v1.4.4
   <span class="sgr90">[10745b16] </span>Statistics v1.11.1
-  <span class="sgr90">[892a3eda] </span>StringManipulation v0.4.7
+  <span class="sgr90">[892a3eda] </span>StringManipulation v0.5.0
   <span class="sgr90">[ec057cc2] </span>StructUtils v2.8.5
   <span class="sgr90">[2efcf032] </span>SymbolicIndexingInterface v0.3.54
   <span class="sgr90">[19f23fe9] </span>SymbolicLimits v1.1.5
@@ -226,7 +224,7 @@ Environment:
   <span class="sgr90">[781d530d] </span>TruncatedStacktraces v1.4.0
   <span class="sgr90">[3a884ed6] </span>UnPack v1.0.2
   <span class="sgr90">[d30d5f5c] </span>WeakCacheSets v0.1.0
-  <span class="sgr90">[2e619515] </span>Expat_jll v2.8.2+0
+  <span class="sgr90">[2e619515] </span>Expat_jll v2.8.3+0
   <span class="sgr90">[61579ee1] </span>Ghostscript_jll v9.55.1+0
   <span class="sgr90">[020c3dae] </span>Git_LFS_jll v3.7.1+0
   <span class="sgr90">[f8c6e375] </span>Git_jll v2.55.0+0
@@ -269,18 +267,18 @@ Environment:
   <span class="sgr90">[8dfed614] </span>Test v1.11.0
   <span class="sgr90">[cf7118a7] </span>UUIDs v1.11.0
   <span class="sgr90">[4ec0a83e] </span>Unicode v1.11.0
-  <span class="sgr90">[e66e0078] </span>CompilerSupportLibraries_jll v1.3.0+1
+  <span class="sgr90">[e66e0078] </span>CompilerSupportLibraries_jll v1.3.1+2
   <span class="sgr90">[deac9b47] </span>LibCURL_jll v8.15.0+0
   <span class="sgr90">[e37daf67] </span>LibGit2_jll v1.9.0+0
   <span class="sgr90">[29816b5a] </span>LibSSH2_jll v1.11.3+1
   <span class="sgr90">[14a3606d] </span>MozillaCACerts_jll v2025.11.4
   <span class="sgr90">[4536629a] </span>OpenBLAS_jll v0.3.29+0
   <span class="sgr90">[05823500] </span>OpenLibm_jll v0.8.7+0
-  <span class="sgr90">[458c3c95] </span>OpenSSL_jll v3.5.4+0
+  <span class="sgr90">[458c3c95] </span>OpenSSL_jll v3.5.6+0
   <span class="sgr90">[efcefdf7] </span>PCRE2_jll v10.44.0+1
   <span class="sgr90">[bea87d4a] </span>SuiteSparse_jll v7.8.3+2
   <span class="sgr90">[83775a58] </span>Zlib_jll v1.3.1+2
   <span class="sgr90">[8e850b90] </span>libblastrampoline_jll v5.15.0+0
   <span class="sgr90">[8e850ede] </span>nghttp2_jll v1.64.0+1
   <span class="sgr90">[3f19e933] </span>p7zip_jll v17.7.0+0
-<span class="sgr36"><span class="sgr1">Info</span></span> Packages marked with <span class="sgr33">⌅</span> have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v1.4.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v1.4.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Saturday 15 August 2026 04:25">Saturday 15 August 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<span class="sgr36"><span class="sgr1">Info</span></span> Packages marked with <span class="sgr33">⌅</span> have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v1.4.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/ReactionNetworkImporters.jl/tree/gh-pages/v1.4.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 21 August 2026 19:24">Friday 21 August 2026</span>. Using Julia version 1.12.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
