@@ -1388,9 +1388,9 @@ version = "1.11.0"
 
 [[deps.ReactionNetworkImporters]]
 deps = ["Catalyst", "HypergeometricFunctions", "ModelingToolkitBase", "OrderedCollections", "PrecompileTools", "SciMLPublic", "SparseArrays", "SymbolicUtils", "Symbolics", "TermInterface"]
-path = "/home/runner/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
+path = "/home/runner/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"
 uuid = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
-version = "1.4.0"
+version = "1.5.0"
 
 [[deps.ReadOnlyArrays]]
 git-tree-sha1 = "e6f7ddf48cf141cb312b078ca21cb2d29d0dc11d"
