@@ -4,7 +4,7 @@ Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 ReactionNetworkImporters = "b4db0fb7-de2a-5028-82bf-5021f5cfa881"
 
 [sources]
-ReactionNetworkImporters = {path = "/home/runner/work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"}
+ReactionNetworkImporters = {path = "/home/runner/_work/ReactionNetworkImporters.jl/ReactionNetworkImporters.jl"}
 
 [compat]
 Catalyst = "16"
